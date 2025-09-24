@@ -1,0 +1,77 @@
+{
+  "name": "ipinayo - Catholic Mass Selections",
+  "short_name": "ipinayo",
+  "description": "Create and manage Catholic Mass selections with ease. Sharing joy through music.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#030f2b",
+  "theme_color": "#175bea",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/icons/icon-192x192.jpg",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-512x512.jpg",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/images/logo.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["productivity", "music", "lifestyle", "utilities"],
+  "lang": "en",
+  "dir": "ltr",
+  "prefer_related_applications": false,
+  "shortcuts": [
+    {
+      "name": "Create Mass Selection",
+      "short_name": "Create",
+      "description": "Create a new Mass selection",
+      "url": "/create",
+      "icons": [
+        {
+          "src": "/icons/icon-192x192.jpg",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Dashboard",
+      "short_name": "Dashboard",
+      "description": "View your Mass selections",
+      "url": "/dashboard",
+      "icons": [
+        {
+          "src": "/icons/icon-192x192.jpg",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/images/screenshot-wide.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "ipinayo Dashboard"
+    },
+    {
+      "src": "/images/screenshot-narrow.png",
+      "sizes": "640x1136",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "ipinayo Mobile View"
+    }
+  ]
+}
