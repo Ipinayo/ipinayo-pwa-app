@@ -81,7 +81,7 @@ export class OfflineStorage {
       const transaction = this.db!.transaction(["mass-selections"], "readonly")
       const store = transaction.objectStore("mass-selections")
       const index = store.index("synced")
-      const request = index.getAll(false)
+      const request = index.getAll(IDBKeyRange.only(false))
 
       request.onerror = () => reject(request.error)
       request.onsuccess = () => resolve(request.result)
