@@ -1,30 +1,8 @@
-import { PDFDocument, rgb, StandardFonts } from "pdf-lib"
+import { PDFDocument, StandardFonts, rgb } from "pdf-lib"
 
-interface MassPart {
-  id: string
-  partName: string
-  keySignature?: string
-  notes?: string
-}
+import { GenerateMassSelection } from "@/types/models"
 
-interface MassSelection {
-  id: string
-  title: string
-  date: string
-  templateType: string
-  liturgicalYear?: string
-  season?: string
-  themes?: string
-  pastoralFocus?: string
-  isPublic: boolean
-  createdBy: {
-    name?: string
-    email: string
-  }
-  parts: MassPart[]
-}
-
-export async function generateMassSelectionPDF(selection: MassSelection): Promise<Uint8Array> {
+export async function generateMassSelectionPDF(selection: GenerateMassSelection): Promise<Uint8Array> {
   const pdfDoc = await PDFDocument.create()
   const page = pdfDoc.addPage([612, 792]) // Letter size
   const { width, height } = page.getSize()
@@ -91,7 +69,7 @@ export async function generateMassSelectionPDF(selection: MassSelection): Promis
   }
 
   const details = [
-    `Date: ${formatDate(selection.date)}`,
+    `Date: ${formatDate(selection.date.toISOString())}`,
     `Template: ${selection.templateType}`,
     selection.liturgicalYear ? `Liturgical Year: Year ${selection.liturgicalYear}` : null,
     selection.season ? `Season: ${selection.season}` : null,
