@@ -2,17 +2,18 @@ const CACHE_NAME = "ipinayo-v1"
 const STATIC_CACHE_NAME = "ipinayo-static-v1"
 const DYNAMIC_CACHE_NAME = "ipinayo-dynamic-v1"
 
-// Assets to cache on install
+// Assets to cache on install (only public assets)
 const STATIC_ASSETS = [
   "/",
-  "/dashboard",
-  "/create",
   "/auth/signin",
   "/manifest.json",
   "/images/logo.png",
   "/offline",
-  // Add other critical assets
+  // Add other critical public assets
 ]
+
+// Define auth-protected routes
+const PROTECTED_ROUTES = ['/dashboard', '/create', '/edit', '/view']
 
 // Install event - cache static assets
 self.addEventListener("install", (event) => {
@@ -57,7 +58,7 @@ self.addEventListener("activate", (event) => {
   )
 })
 
-// Fetch event - serve from cache, fallback to network
+// Fetch event - handle caching strategies
 self.addEventListener("fetch", (event) => {
   const { request } = event
   const url = new URL(request.url)
@@ -71,6 +72,9 @@ self.addEventListener("fetch", (event) => {
   if (url.origin !== location.origin) {
     return
   }
+
+  // Check if route is protected (for offline fallback logic)
+  const isProtectedRoute = PROTECTED_ROUTES.some(route => url.pathname.startsWith(route))
 
   // Handle API requests
   if (url.pathname.startsWith("/api/")) {
@@ -104,50 +108,40 @@ self.addEventListener("fetch", (event) => {
     return
   }
 
-  // Handle page requests with cache-first strategy
+  // Network-first strategy for all page requests
   event.respondWith(
-    caches.match(request).then((cachedResponse) => {
-      if (cachedResponse) {
-        // Serve from cache and update in background
-        fetch(request)
-          .then((response) => {
-            if (response.ok) {
-              caches.open(DYNAMIC_CACHE_NAME).then((cache) => {
-                cache.put(request, response.clone())
-              })
-            }
+    fetch(request)
+      .then((response) => {
+        // Cache all successful responses (not redirects)
+        if (response.ok && response.status === 200 && !response.redirected) {
+          console.log("[SW] Caching page:", url.pathname)
+          const responseClone = response.clone()
+          caches.open(DYNAMIC_CACHE_NAME).then((cache) => {
+            cache.put(request, responseClone)
           })
-          .catch(() => {
-            // Network failed, but we have cache
-          })
-        return cachedResponse
-      }
-
-      // Not in cache, fetch from network
-      return fetch(request)
-        .then((response) => {
-          if (response.ok) {
-            // Cache successful responses
-            const responseClone = response.clone()
-            caches.open(DYNAMIC_CACHE_NAME).then((cache) => {
-              cache.put(request, responseClone)
-            })
-          }
-          return response
+        } else {
+          console.log("[SW] Not caching response:", response.status, response.redirected)
+        }
+        return response
+      })
+      .catch(async (error) => {
+        console.log("[SW] Network failed, checking cache:", url.pathname)
+        // Fallback to cache when network fails
+        const cachedResponse = await caches.match(request)
+        if (cachedResponse) {
+          console.log("[SW] Serving cached page:", url.pathname)
+          return cachedResponse
+        }
+        // For protected routes or navigation requests that aren't cached, show offline page
+        if (isProtectedRoute || request.mode === "navigate") {
+          console.log("[SW] Showing offline page for:", url.pathname)
+          return caches.match("/offline")
+        }
+        return new Response("Offline", {
+          status: 503,
+          statusText: "Service Unavailable",
         })
-        .catch(() => {
-          // Network failed and not in cache
-          // Return offline page for navigation requests
-          if (request.mode === "navigate") {
-            return caches.match("/offline")
-          }
-          // Return a generic offline response
-          return new Response("Offline", {
-            status: 503,
-            statusText: "Service Unavailable",
-          })
-        })
-    }),
+      })
   )
 })
 
@@ -176,6 +170,7 @@ async function syncMassSelections() {
           })
           // Remove from offline storage after successful sync
           await removeOfflineData(data.id)
+          console.log("[SW] Synced mass selection:", data.id)
         } catch (error) {
           console.error("[SW] Error syncing mass selection:", error)
         }
