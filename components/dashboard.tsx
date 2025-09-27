@@ -1,96 +1,117 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useSession, signOut } from "next-auth/react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { SampleDataBanner } from "@/components/sample-data-banner"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
-  Plus,
   Calendar,
-  Music,
-  Download,
   Copy,
+  Download,
   Edit,
-  Trash2,
   Eye,
+  Filter,
   Globe,
   Lock,
-  MoreVertical,
   LogOut,
-  User,
+  MoreVertical,
+  Music,
+  Plus,
   Search,
-  Filter,
   SortAsc,
   SortDesc,
-} from "lucide-react"
-import Image from "next/image"
-import Link from "next/link"
+  Trash2,
+  User,
+} from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useActionState, useEffect, useState } from "react";
+
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import Image from "next/image";
+import { Input } from "@/components/ui/input";
+import Link from "next/link";
+import { SampleDataBanner } from "@/components/sample-data-banner";
+import { Separator } from "@/components/ui/separator";
+import { logout } from "@/lib/actions/auth";
+import { useSession } from "next-auth/react";
 
 interface MassPart {
-  id: string
-  partName: string
-  keySignature?: string
-  notes?: string
+  id: string;
+  partName: string;
+  keySignature?: string;
+  notes?: string;
 }
 
 interface MassSelection {
-  id: string
-  title: string
-  date: string
-  templateType: string
-  liturgicalYear?: string
-  season?: string
-  themes?: string
-  pastoralFocus?: string
-  isPublic: boolean
-  createdAt: string
-  updatedAt: string
+  id: string;
+  title: string;
+  date: string;
+  templateType: string;
+  liturgicalYear?: string;
+  season?: string;
+  themes?: string;
+  pastoralFocus?: string;
+  isPublic: boolean;
+  createdAt: string;
+  updatedAt: string;
   createdBy: {
-    name?: string
-    email: string
-  }
-  parts: MassPart[]
+    name?: string;
+    email: string;
+  };
+  parts: MassPart[];
   _count: {
-    parts: number
-  }
+    parts: number;
+  };
 }
 
 interface PaginationInfo {
-  page: number
-  limit: number
-  total: number
-  pages: number
+  page: number;
+  limit: number;
+  total: number;
+  pages: number;
 }
 
 export function Dashboard() {
-  const { data: session } = useSession()
-  const [selections, setSelections] = useState<MassSelection[]>([])
+  const { data: session } = useSession();
+  const [selections, setSelections] = useState<MassSelection[]>([]);
   const [pagination, setPagination] = useState<PaginationInfo>({
     page: 1,
     limit: 10,
     total: 0,
     pages: 0,
-  })
-  const [loading, setLoading] = useState(true)
-  const [searchQuery, setSearchQuery] = useState("")
-  const [seasonFilter, setSeasonFilter] = useState("all")
-  const [sortBy, setSortBy] = useState("updatedAt")
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc")
+  });
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [seasonFilter, setSeasonFilter] = useState("all");
+  const [sortBy, setSortBy] = useState("updatedAt");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+
+  const [_, logoutAction, logoutIsPending] = useActionState(logout, undefined);
 
   useEffect(() => {
-    fetchSelections()
-  }, [pagination.page, searchQuery, seasonFilter, sortBy, sortOrder])
+    fetchSelections();
+  }, [pagination.page, searchQuery, seasonFilter, sortBy, sortOrder]);
 
   const fetchSelections = async () => {
     try {
-      setLoading(true)
+      setLoading(true);
       const params = new URLSearchParams({
         page: pagination.page.toString(),
         limit: pagination.limit.toString(),
@@ -98,60 +119,61 @@ export function Dashboard() {
         season: seasonFilter,
         sortBy,
         sortOrder,
-      })
+      });
 
-      const response = await fetch(`/api/mass-selections?${params}`)
+      const response = await fetch(`/api/mass-selections?${params}`);
       if (response.ok) {
-        const data = await response.json()
-        setSelections(data.selections)
-        setPagination(data.pagination)
+        const data = await response.json();
+        setSelections(data.selections);
+        setPagination(data.pagination);
       }
     } catch (error) {
-      console.error("Error fetching selections:", error)
+      console.error("Error fetching selections:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleClone = async (id: string) => {
     try {
       const response = await fetch(`/api/mass-selections/${id}/clone`, {
         method: "POST",
-      })
+      });
       if (response.ok) {
-        fetchSelections() // Refresh the list
+        fetchSelections(); // Refresh the list
       }
     } catch (error) {
-      console.error("Error cloning selection:", error)
+      console.error("Error cloning selection:", error);
     }
-  }
+  };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this mass selection?")) return
+    if (!confirm("Are you sure you want to delete this mass selection?"))
+      return;
 
     try {
       const response = await fetch(`/api/mass-selections/${id}`, {
         method: "DELETE",
-      })
+      });
       if (response.ok) {
-        fetchSelections() // Refresh the list
+        fetchSelections(); // Refresh the list
       }
     } catch (error) {
-      console.error("Error deleting selection:", error)
+      console.error("Error deleting selection:", error);
     }
-  }
+  };
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
       month: "long",
       day: "numeric",
-    })
-  }
+    });
+  };
 
   const isOwner = (selection: MassSelection) => {
-    return session?.user?.email === selection.createdBy.email
-  }
+    return session?.user?.email === selection.createdBy.email;
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -160,7 +182,13 @@ export function Dashboard() {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <Image src="/images/logo.png" alt="ipinayo" width={120} height={40} className="h-10 w-auto" />
+              <Image
+                src="/images/logo.png"
+                alt="ipinayo"
+                width={120}
+                height={40}
+                className="h-10 w-auto"
+              />
               <Separator orientation="vertical" className="h-8" />
               <h1 className="text-2xl font-display text-primary">Dashboard</h1>
             </div>
@@ -168,9 +196,15 @@ export function Dashboard() {
             <div className="flex items-center gap-4">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+                  <Button
+                    variant="ghost"
+                    className="relative h-10 w-10 rounded-full"
+                  >
                     <Avatar className="h-10 w-10">
-                      <AvatarImage src={session?.user?.image || ""} alt={session?.user?.name || ""} />
+                      <AvatarImage
+                        src={session?.user?.image || ""}
+                        alt={session?.user?.name || ""}
+                      />
                       <AvatarFallback>
                         <User className="h-4 w-4" />
                       </AvatarFallback>
@@ -180,16 +214,32 @@ export function Dashboard() {
                 <DropdownMenuContent className="w-56" align="end">
                   <div className="flex items-center justify-start gap-2 p-2">
                     <div className="flex flex-col space-y-1 leading-none">
-                      {session?.user?.name && <p className="font-medium">{session.user.name}</p>}
+                      {session?.user?.name && (
+                        <p className="font-medium">{session.user.name}</p>
+                      )}
                       {session?.user?.email && (
-                        <p className="w-[200px] truncate text-sm text-muted-foreground">{session.user.email}</p>
+                        <p className="w-[200px] truncate text-sm text-muted-foreground">
+                          {session.user.email}
+                        </p>
                       )}
                     </div>
                   </div>
                   <Separator />
-                  <DropdownMenuItem onClick={() => signOut()}>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Sign out
+                  <DropdownMenuItem asChild>
+                    <form
+                      action={logoutAction}
+                      className="flex w-full justify-start"
+                    >
+                      <Button
+                        variant="outline"
+                        className="flex w-full justify-start"
+                        size="sm"
+                        disabled={logoutIsPending}
+                      >
+                        <LogOut className="mr-2 h-4 w-4" />
+                        <span>Sign Out</span>
+                      </Button>
+                    </form>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -202,8 +252,12 @@ export function Dashboard() {
       <main className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h2 className="text-3xl font-display text-foreground mb-2">Mass Selections</h2>
-            <p className="text-muted-foreground">Create, manage, and share your Catholic Mass selections</p>
+            <h2 className="text-3xl font-display text-foreground mb-2">
+              Mass Selections
+            </h2>
+            <p className="text-muted-foreground">
+              Create, manage, and share your Catholic Mass selections
+            </p>
           </div>
           <Button asChild className="bg-primary hover:bg-primary/90">
             <Link href="/create">
@@ -246,13 +300,17 @@ export function Dashboard() {
             <Select
               value={`${sortBy}-${sortOrder}`}
               onValueChange={(value) => {
-                const [field, order] = value.split("-")
-                setSortBy(field)
-                setSortOrder(order as "asc" | "desc")
+                const [field, order] = value.split("-");
+                setSortBy(field);
+                setSortOrder(order as "asc" | "desc");
               }}
             >
               <SelectTrigger className="w-[140px]">
-                {sortOrder === "asc" ? <SortAsc className="mr-2 h-4 w-4" /> : <SortDesc className="mr-2 h-4 w-4" />}
+                {sortOrder === "asc" ? (
+                  <SortAsc className="mr-2 h-4 w-4" />
+                ) : (
+                  <SortDesc className="mr-2 h-4 w-4" />
+                )}
                 <SelectValue placeholder="Sort" />
               </SelectTrigger>
               <SelectContent>
@@ -290,7 +348,9 @@ export function Dashboard() {
             <CardContent>
               <Music className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
               <h3 className="text-lg font-semibold mb-2">
-                {searchQuery || seasonFilter !== "all" ? "No Matching Selections" : "No Mass Selections Yet"}
+                {searchQuery || seasonFilter !== "all"
+                  ? "No Matching Selections"
+                  : "No Mass Selections Yet"}
               </h3>
               <p className="text-muted-foreground mb-4">
                 {searchQuery || seasonFilter !== "all"
@@ -310,11 +370,16 @@ export function Dashboard() {
         ) : (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {selections.map((selection) => (
-              <Card key={selection.id} className="hover:shadow-lg transition-shadow">
+              <Card
+                key={selection.id}
+                className="hover:shadow-lg transition-shadow"
+              >
                 <CardHeader className="pb-3">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
-                      <CardTitle className="text-lg line-clamp-2 mb-1">{selection.title}</CardTitle>
+                      <CardTitle className="text-lg line-clamp-2 mb-1">
+                        {selection.title}
+                      </CardTitle>
                       <CardDescription className="flex items-center gap-2">
                         <Calendar className="h-3 w-3" />
                         {formatDate(selection.date)}
@@ -334,7 +399,11 @@ export function Dashboard() {
                       )}
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 w-8 p-0"
+                          >
                             <MoreVertical className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
@@ -353,18 +422,28 @@ export function Dashboard() {
                               </Link>
                             </DropdownMenuItem>
                           )}
-                          <DropdownMenuItem onClick={() => handleClone(selection.id)}>
+                          <DropdownMenuItem
+                            onClick={() => handleClone(selection.id)}
+                          >
                             <Copy className="mr-2 h-4 w-4" />
                             Clone
                           </DropdownMenuItem>
                           <DropdownMenuItem
-                            onClick={() => window.open(`/api/mass-selections/${selection.id}/pdf`, "_blank")}
+                            onClick={() =>
+                              window.open(
+                                `/api/mass-selections/${selection.id}/pdf`,
+                                "_blank"
+                              )
+                            }
                           >
                             <Download className="mr-2 h-4 w-4" />
                             Download PDF
                           </DropdownMenuItem>
                           {isOwner(selection) && (
-                            <DropdownMenuItem onClick={() => handleDelete(selection.id)} className="text-destructive">
+                            <DropdownMenuItem
+                              onClick={() => handleDelete(selection.id)}
+                              className="text-destructive"
+                            >
                               <Trash2 className="mr-2 h-4 w-4" />
                               Delete
                             </DropdownMenuItem>
@@ -388,12 +467,20 @@ export function Dashboard() {
                     )}
 
                     {selection.themes && (
-                      <p className="text-sm text-muted-foreground line-clamp-2">{selection.themes}</p>
+                      <p className="text-sm text-muted-foreground line-clamp-2">
+                        {selection.themes}
+                      </p>
                     )}
 
                     <div className="flex items-center justify-between text-xs text-muted-foreground">
-                      <span>by {selection.createdBy.name || selection.createdBy.email}</span>
-                      <span>Updated {new Date(selection.updatedAt).toLocaleDateString()}</span>
+                      <span>
+                        by{" "}
+                        {selection.createdBy.name || selection.createdBy.email}
+                      </span>
+                      <span>
+                        Updated{" "}
+                        {new Date(selection.updatedAt).toLocaleDateString()}
+                      </span>
                     </div>
                   </div>
                 </CardContent>
@@ -407,7 +494,9 @@ export function Dashboard() {
           <div className="flex items-center justify-center gap-2 mt-8">
             <Button
               variant="outline"
-              onClick={() => setPagination((prev) => ({ ...prev, page: prev.page - 1 }))}
+              onClick={() =>
+                setPagination((prev) => ({ ...prev, page: prev.page - 1 }))
+              }
               disabled={pagination.page === 1}
             >
               Previous
@@ -417,7 +506,9 @@ export function Dashboard() {
             </span>
             <Button
               variant="outline"
-              onClick={() => setPagination((prev) => ({ ...prev, page: prev.page + 1 }))}
+              onClick={() =>
+                setPagination((prev) => ({ ...prev, page: prev.page + 1 }))
+              }
               disabled={pagination.page === pagination.pages}
             >
               Next
@@ -426,5 +517,5 @@ export function Dashboard() {
         )}
       </main>
     </div>
-  )
+  );
 }
