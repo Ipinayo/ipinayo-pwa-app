@@ -1,10 +1,11 @@
-"use client"
+"use client";
 
-import { signIn } from "next-auth/react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Music, Users, FileText, Download } from "lucide-react"
-import Image from "next/image"
+import { Card, CardContent } from "@/components/ui/card";
+import { Download, FileText, Music, Users } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import Image from "next/image";
+import { signIn } from "next-auth/react";
 
 export function LandingPage() {
   return (
@@ -14,22 +15,32 @@ export function LandingPage() {
         <div className="text-center space-y-8">
           {/* Logo */}
           <div className="flex justify-center">
-            <Image src="/images/logo.png" alt="ipinayo" width={300} height={120} className="h-20 w-auto" priority />
+            <Image
+              src="/images/logo.png"
+              alt="ipinayo"
+              width={300}
+              height={120}
+              className="h-20 w-auto"
+              priority
+            />
           </div>
 
           {/* Hero Content */}
           <div className="max-w-3xl mx-auto space-y-6">
-            <h1 className="text-4xl md:text-6xl font-display text-balance leading-tight">Catholic Mass Selections</h1>
+            <h1 className="text-4xl md:text-6xl font-display text-balance leading-tight">
+              Catholic Mass Selections
+            </h1>
             <p className="text-xl md:text-2xl text-muted-foreground text-pretty leading-relaxed">
-              Create, manage, and share liturgical plans with ease. From Sunday Mass to special celebrations, organize
-              your musical selections beautifully.
+              Create, manage, and share liturgical plans with ease. From Sunday
+              Mass to special celebrations, organize your musical selections
+              beautifully.
             </p>
 
             <div className="pt-4">
               <Button
                 size="lg"
                 className="text-lg px-8 py-6 rounded-xl"
-                onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
+                onClick={() => signIn()}
               >
                 <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24">
                   <path
@@ -64,7 +75,8 @@ export function LandingPage() {
               </div>
               <h3 className="font-display text-lg">Mass Templates</h3>
               <p className="text-sm text-muted-foreground">
-                Choose from Sunday Mass, Wedding, Funeral, and more pre-configured templates.
+                Choose from Sunday Mass, Wedding, Funeral, and more
+                pre-configured templates.
               </p>
             </CardContent>
           </Card>
@@ -76,7 +88,8 @@ export function LandingPage() {
               </div>
               <h3 className="font-display text-lg">Share & Collaborate</h3>
               <p className="text-sm text-muted-foreground">
-                Make selections public for others to view and clone for their own use.
+                Make selections public for others to view and clone for their
+                own use.
               </p>
             </CardContent>
           </Card>
@@ -88,7 +101,8 @@ export function LandingPage() {
               </div>
               <h3 className="font-display text-lg">Organized Planning</h3>
               <p className="text-sm text-muted-foreground">
-                Track liturgical year, seasons, themes, and pastoral focus for each Mass.
+                Track liturgical year, seasons, themes, and pastoral focus for
+                each Mass.
               </p>
             </CardContent>
           </Card>
@@ -100,12 +114,13 @@ export function LandingPage() {
               </div>
               <h3 className="font-display text-lg">PDF Export</h3>
               <p className="text-sm text-muted-foreground">
-                Generate professional PDFs of your Mass selections for printing and sharing.
+                Generate professional PDFs of your Mass selections for printing
+                and sharing.
               </p>
             </CardContent>
           </Card>
         </div>
       </div>
     </div>
-  )
+  );
 }
