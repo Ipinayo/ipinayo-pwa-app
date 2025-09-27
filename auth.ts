@@ -1,32 +1,25 @@
-import Credentials from 'next-auth/providers/credentials';
 import NextAuth from 'next-auth';
-import bcrypt from 'bcrypt';
-import { getUser } from './lib/data';
-import { z } from 'zod';
+import Nodemailer from "next-auth/providers/nodemailer"
+import { PrismaAdapter } from "@auth/prisma-adapter"
+import authConfig from "./auth.config";
+import prisma from './lib/prisma';
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+    ...authConfig,
+    adapter: PrismaAdapter(prisma),
     providers: [
-        Credentials({
-            async authorize(credentials) {
-                const parsedCredentials = z
-                    .object({ email: z.string().email(), password: z.string().min(6) })
-                    .safeParse(credentials);
-
-                if (parsedCredentials.success) {
-                    const { email, password } = parsedCredentials.data;
-                    const user = await getUser(email);
-                    if (!user) return null;
-                    const passwordsMatch = await bcrypt.compare(password, user.password);
-
-                    if (passwordsMatch) return user;
-                }
-
-                console.log('Invalid credentials');
-                return null;
+        ...authConfig.providers,
+        Nodemailer({
+            id: 'email',
+            name: 'email',
+            server: {
+                host: process.env.EMAIL_SERVER_HOST,
+                port: Number(process.env.EMAIL_SERVER_PORT),
+                auth: {
+                    user: process.env.EMAIL_SERVER_USER,
+                    pass: process.env.EMAIL_SERVER_PASSWORD,
+                },
             },
-        }),
-    ],
-    session: {
-        strategy: "jwt",
-    },
+            from: process.env.EMAIL_FROM,
+        })],
 });
