@@ -12,39 +12,33 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
-  title: "ipinayo - Catholic Mass Selections",
+  title: "Ìpínayò - Sharing joy through music",
   description:
     "Create and manage Catholic Mass selections with ease. Sharing joy through music.",
-  generator: "ipinayo",
+  generator: "Ìpínayò",
   manifest: "/manifest.json",
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#175bea" },
-    { media: "(prefers-color-scheme: dark)", color: "#030f2b" },
-  ],
-  viewport:
-    "minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no, viewport-fit=cover",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "ipinayo",
+    title: "Ìpínayò",
   },
   keywords: ["Catholic", "Mass", "Music", "Liturgy", "PWA", "Offline"],
-  authors: [{ name: "ipinayo" }],
-  creator: "ipinayo",
-  publisher: "ipinayo",
+  authors: [{ name: "Ìpínayò" }],
+  creator: "Ìpínayò",
+  publisher: "Ìpínayò",
   formatDetection: {
     telephone: false,
   },
   openGraph: {
     type: "website",
-    siteName: "ipinayo",
-    title: "ipinayo - Catholic Mass Selections",
+    siteName: "Ìpínayò",
+    title: "Ìpínayò - Sharing joy through music",
     description:
       "Create and manage Catholic Mass selections with ease. Sharing joy through music.",
   },
   twitter: {
     card: "summary",
-    title: "ipinayo - Catholic Mass Selections",
+    title: "Ìpínayò - Sharing joy through music",
     description:
       "Create and manage Catholic Mass selections with ease. Sharing joy through music.",
   },
@@ -56,10 +50,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${sourceSans.variable} ${pattaya.variable} ${geistMono.variable} ${playfairDisplay.variable} antialiased`}
-      >
+    <html
+      lang="en"
+      className={`${sourceSans.variable} ${pattaya.variable} ${geistMono.variable} ${playfairDisplay.variable} antialiased`}
+      suppressHydrationWarning
+    >
+      <body className={`antialiased`}>
         <Suspense fallback={<div>Loading...</div>}>
           <ThemeProvider
             attribute="class"

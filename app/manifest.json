@@ -1,6 +1,6 @@
 {
-  "name": "ipinayo - Catholic Mass Selections",
-  "short_name": "ipinayo",
+  "name": "Ìpínayò - Sharing joy through music",
+  "short_name": "Ìpínayò",
   "description": "Create and manage Catholic Mass selections with ease. Sharing joy through music.",
   "start_url": "/",
   "display": "standalone",
@@ -28,7 +28,12 @@
       "purpose": "any"
     }
   ],
-  "categories": ["productivity", "music", "lifestyle", "utilities"],
+  "categories": [
+    "productivity",
+    "music",
+    "lifestyle",
+    "utilities"
+  ],
   "lang": "en",
   "dir": "ltr",
   "prefer_related_applications": false,
@@ -64,14 +69,14 @@
       "sizes": "1280x720",
       "type": "image/png",
       "form_factor": "wide",
-      "label": "ipinayo Dashboard"
+      "label": "Ìpínayò Dashboard"
     },
     {
       "src": "/images/screenshot-narrow.png",
       "sizes": "640x1136",
       "type": "image/png",
       "form_factor": "narrow",
-      "label": "ipinayo Mobile View"
+      "label": "Ìpínayò Mobile View"
     }
   ]
 }

@@ -184,7 +184,7 @@ export function Dashboard() {
             <div className="flex items-center gap-4">
               <Image
                 src="/images/logo.png"
-                alt="ipinayo"
+                alt="logo"
                 width={120}
                 height={40}
                 className="h-10 w-auto"
@@ -256,7 +256,7 @@ export function Dashboard() {
               Mass Selections
             </h2>
             <p className="text-muted-foreground">
-              Create, manage, and share your Catholic Mass selections
+              Create, manage, and share Catholic Mass selections
             </p>
           </div>
           <Button asChild className="bg-primary hover:bg-primary/90">

@@ -17,7 +17,7 @@ export function LandingPage() {
           <div className="flex justify-center">
             <Image
               src="/images/logo.png"
-              alt="ipinayo"
+              alt="logo"
               width={300}
               height={120}
               className="h-20 w-auto"

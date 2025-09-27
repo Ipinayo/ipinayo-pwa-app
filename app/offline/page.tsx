@@ -1,10 +1,16 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { WifiOff, RefreshCw, Home } from "lucide-react"
-import Image from "next/image"
-import Link from "next/link"
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { WifiOff, RefreshCw, Home } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
 
 export default function OfflinePage() {
   return (
@@ -12,15 +18,21 @@ export default function OfflinePage() {
       <Card className="w-full max-w-md text-center">
         <CardHeader className="pb-4">
           <div className="flex justify-center mb-4">
-            <Image src="/images/logo.png" alt="ipinayo" width={120} height={40} className="h-10 w-auto" />
+            <Image
+              src="/images/logo.png"
+              alt="logo"
+              width={120}
+              height={40}
+              className="h-10 w-auto"
+            />
           </div>
           <div className="flex justify-center mb-4">
             <WifiOff className="h-16 w-16 text-muted-foreground" />
           </div>
           <CardTitle className="text-2xl">You're Offline</CardTitle>
           <CardDescription>
-            It looks like you've lost your internet connection. Don't worry, you can still view your cached Mass
-            selections.
+            It looks like you've lost your internet connection. Don't worry, you
+            can still view your cached Mass selections.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -51,5 +63,5 @@ export default function OfflinePage() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

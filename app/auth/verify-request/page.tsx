@@ -19,7 +19,7 @@ export default function VerifyRequestPage() {
           <div className="flex justify-center">
             <Image
               src="/images/logo.png"
-              alt="ipinayo"
+              alt="logo"
               width={200}
               height={80}
               className="h-12 w-auto"

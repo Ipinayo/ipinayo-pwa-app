@@ -220,7 +220,7 @@ self.addEventListener("push", (event) => {
     ],
   }
 
-  event.waitUntil(self.registration.showNotification("ipinayo", options))
+  event.waitUntil(self.registration.showNotification("Ìpínayò", options))
 })
 
 // Notification click handling
