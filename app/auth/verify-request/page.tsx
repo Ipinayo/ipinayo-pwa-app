@@ -34,14 +34,14 @@ export default function VerifyRequestPage() {
             Check your email
           </CardTitle>
           <CardDescription className="text-center">
-            We've sent you a magic link to sign in to your account. Click the
-            link in the email to continue.
+            We've sent a link to your email. Click the link in the email to
+            continue.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="text-sm text-muted-foreground text-center space-y-2">
-            <p>The link will expire in 24 hours for security.</p>
-            <p>If you don't see the email, check your spam folder.</p>
+            <p>The link will expire in 24 hours.</p>
+            <p>If you don't see the email, please check your spam folder.</p>
           </div>
 
           <div className="pt-4">

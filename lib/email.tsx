@@ -1,3 +1,4 @@
+import type { NodemailerConfig } from "next-auth/providers/nodemailer";
 import { createTransport } from "nodemailer";
 
 export async function sendVerificationRequest({
@@ -7,8 +8,13 @@ export async function sendVerificationRequest({
 }: {
   identifier: string;
   url: string;
-  provider: { server: any; from: string };
+  expires: Date;
+  provider: NodemailerConfig;
+  token: string;
+  theme: any;
+  request: Request;
 }) {
+  // your email sending logic, update to use new params if needed
   const { server, from } = provider;
 
   // Create transporter
@@ -19,7 +25,7 @@ export async function sendVerificationRequest({
     from,
     subject: "Sign in to Ìpínayò",
     text: text({ url, email }),
-    html: html({ url, email }),
+    html: html({ url, email, from }),
   });
 
   const failed = result.rejected;
@@ -28,7 +34,15 @@ export async function sendVerificationRequest({
   }
 }
 
-function html({ url, email }: { url: string; email: string }) {
+function html({
+  url,
+  email,
+  from,
+}: {
+  url: string;
+  email: string;
+  from?: string;
+}) {
   const escapedEmail = `${email.replace(/\./g, "&#8203;.")}`;
   const escapedHost = `${new URL(url).host.replace(/\./g, "&#8203;.")}`;
 
@@ -43,17 +57,17 @@ function html({ url, email }: { url: string; email: string }) {
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
       line-height: 1.6;
-      color: #333;
+      color: #030f2b;
       max-width: 600px;
       margin: 0 auto;
       padding: 20px;
-      background-color: #f8f9fa;
+      background-color: #fff;
     }
     .container {
       background: white;
       border-radius: 12px;
       padding: 40px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 4px 6px #030f2b;
     }
     .logo {
       text-align: center;
@@ -68,26 +82,37 @@ function html({ url, email }: { url: string; email: string }) {
       margin-bottom: 30px;
     }
     .header h1 {
-      color: #8B5A3C;
-      font-size: 28px;
-      margin: 0 0 10px 0;
+      color: #175bea;
+      font-size: 32px;
+      margin: 0 0 1px 0;
       font-weight: 600;
+      background: linear-gradient(to bottom, #175bea , #00c5fb); 
+      -webkit-background-clip: text; 
+      background-clip: text;
+      color: transparent; 
     }
     .header p {
-      color: #666;
-      font-size: 16px;
+      background: linear-gradient(to bottom, #175bea , #00c5fb); 
+      -webkit-background-clip: text; 
+      background-clip: text;
+      color: transparent;
+      font-size: 12px;
+      text-transform: uppercase;
+      font-style: italic;
+      letter-spacing: -0.5px;
+      word-spacing: -1px;
       margin: 0;
     }
     .content {
       margin-bottom: 30px;
     }
     .content p {
-      margin-bottom: 20px;
-      font-size: 16px;
+      margin: 1px;
+      font-size: 14px;
     }
     .button {
       display: inline-block;
-      background: linear-gradient(135deg, #8B5A3C 0%, #A0522D 100%);
+      background: linear-gradient(135deg, #00c5fb 0%, #175bea 100%);
       color: white;
       text-decoration: none;
       padding: 16px 32px;
@@ -104,46 +129,45 @@ function html({ url, email }: { url: string; email: string }) {
     .fallback {
       margin-top: 30px;
       padding-top: 20px;
-      border-top: 1px solid #eee;
+      border-top: 1px solid #e2e8f0;
       font-size: 14px;
-      color: #666;
+      color: #63738a;
     }
     .fallback a {
-      color: #8B5A3C;
+      color: #175bea;
       word-break: break-all;
     }
     .footer {
       text-align: center;
       margin-top: 40px;
       padding-top: 20px;
-      border-top: 1px solid #eee;
-      font-size: 14px;
-      color: #999;
+      border-top: 1px solid #e2e8f0;
+      color: #63738a;
     }
+    .footer p {
+      margin: 1px;
+      font-size: 12px;
+    }  
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="logo">
-      <div style="width: 200px; height: 48px; background: #8B5A3C; color: white; display: inline-flex; align-items: center; justify-content: center; border-radius: 8px; font-weight: bold; font-size: 18px;">
-        ipinayo
-      </div>
-    </div>
     
     <div class="header">
-      <h1>Welcome to ipinayo</h1>
-      <p>Your Catholic Mass Selections Platform</p>
+      <h1>Ìpínayò</h1>
+      <p>SHARING JOY THROUGH MUSIC</p>
     </div>
     
     <div class="content">
-      <p>Hi <strong>${escapedEmail}</strong>,</p>
-      <p>Click the button below to sign in to your ipinayo Mass Selections account. This link will expire in 24 hours for your security.</p>
-      
-      <div style="text-align: center;">
-        <a href="${url}" class="button">Sign in to ipinayo</a>
+      <p style="margin-bottom: 20px;">Hi <strong>${escapedEmail}</strong>,</p>
+      <div style="margin-bottom: 20px;">
+        <p>Click the button below to sign in to your Ìpínayò account.</p> 
+        <p>This link will expire in 24 hours.</p>
       </div>
-      
-      <p>Once signed in, you'll be able to create, manage, and share your Mass selections with ease.</p>
+
+      <div style="text-align: center;">
+        <a href="${url}" class="button">Sign in to Ìpínayò</a>
+      </div>
     </div>
     
     <div class="fallback">
@@ -153,7 +177,7 @@ function html({ url, email }: { url: string; email: string }) {
     </div>
     
     <div class="footer">
-      <p>This email was sent to ${escapedEmail} from ${escapedHost}</p>
+      <p>This email was sent to ${escapedEmail} from ${from || escapedHost}</p>
       <p>If you didn't request this email, you can safely ignore it.</p>
     </div>
   </div>
@@ -172,7 +196,7 @@ Click the link below to sign in to your Ìpínayò account:
 
 ${url}
 
-This link will expire in 24 hours for your security.
+This link will expire in 24 hours.
 
 If you didn't request this email, you can safely ignore it.
 
