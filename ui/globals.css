@@ -193,3 +193,7 @@
   }
 
 }
+
+@utility primary-gradient {
+  @apply from-primary-light to-primary text-primary-foreground bg-gradient-to-r;
+}
