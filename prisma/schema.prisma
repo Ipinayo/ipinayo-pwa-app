@@ -78,20 +78,19 @@ model UserProfile {
 
 // Catholic Mass Selection models
 model MassSelection {
-  id             String     @id @default(cuid())
-  title          String
-  date           DateTime
-  templateType   String
-  liturgicalYear String?
-  season         String?
-  themes         String?
-  pastoralFocus  String?
-  createdAt      DateTime   @default(now())
-  updatedAt      DateTime   @updatedAt
-  isPublic       Boolean    @default(false)
-  createdById    String
-  createdBy      User       @relation(fields: [createdById], references: [id], onDelete: Cascade)
-  parts          MassPart[]
+  id               String     @id @default(cuid())
+  title            String
+  date             DateTime
+  liturgicalYear   String?
+  liturgicalSeason String?
+  themes           String[]
+  pastoralFocus    String?
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+  isPublic         Boolean    @default(false)
+  createdById      String
+  createdBy        User       @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  parts            MassPart[]
 
   @@index([createdById])
   @@index([isPublic])
@@ -101,10 +100,38 @@ model MassSelection {
 model MassPart {
   id              String        @id @default(cuid())
   partName        String
-  keySignature    String?
+  songTitle       String
+  keySignature    KeySignature?
   notes           String?
   massSelectionId String
   massSelection   MassSelection @relation(fields: [massSelectionId], references: [id], onDelete: Cascade)
 
   @@index([massSelectionId])
+}
+
+enum KeySignature {
+  C_MAJOR
+  G_MAJOR
+  D_MAJOR
+  A_MAJOR
+  E_MAJOR
+  B_MAJOR
+  F_SHARP_MAJOR
+  C_SHARP_MAJOR
+  A_FLAT_MAJOR
+  E_FLAT_MAJOR
+  B_FLAT_MAJOR
+  F_MAJOR
+  C_MINOR
+  G_MINOR
+  D_MINOR
+  A_MINOR
+  E_MINOR
+  B_MINOR
+  F_SHARP_MINOR
+  C_SHARP_MINOR
+  A_FLAT_MINOR
+  E_FLAT_MINOR
+  B_FLAT_MINOR
+  F_MINOR
 }
