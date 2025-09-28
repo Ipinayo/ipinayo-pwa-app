@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/card";
 
 import Image from "next/image";
-import LoginForm from "@/components/login-form";
+import LoginForm from "@/components/app/auth/login-form";
 
 type SearchParams = Promise<{ callbackUrl: string | undefined }>;
 
