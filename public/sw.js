@@ -13,7 +13,7 @@ const STATIC_ASSETS = [
 ]
 
 // Define auth-protected routes
-const PROTECTED_ROUTES = ['/dashboard', '/create', '/edit', '/view']
+const PROTECTED_ROUTES = ['/dashboard', '/create', '/edit', '/view', '/mass-selections']
 
 // Install event - cache static assets
 self.addEventListener("install", (event) => {
