@@ -9,7 +9,7 @@ export type GenerateMassSelection = Prisma.MassSelectionGetPayload<{
     },
 }>
 
-export type MassSelection = Prisma.MassSelectionGetPayload<{}>
+type RawMassSelection = Prisma.MassSelectionGetPayload<{}>
 
 export type MassSelectionWithParts = Prisma.MassSelectionGetPayload<{
     include: {
@@ -17,10 +17,21 @@ export type MassSelectionWithParts = Prisma.MassSelectionGetPayload<{
     }
 }>
 
+export type MassPart = Prisma.MassPartGetPayload<{}>;
+
 export type NewMassSelectionPart = Omit<MassPart, 'massSelectionId'>
 
-export type NewMassSelection = Omit<MassSelection, 'id' | 'createdAt' | 'updatedAt' | 'createdById'> & {
+export type NewMassSelection = Omit<RawMassSelection, 'id' | 'createdAt' | 'updatedAt' | 'createdById'> & {
     parts: NewMassSelectionPart[]
 }
 
-export type MassPart = Prisma.MassPartGetPayload<{}>;
+export type MassSelection = Prisma.MassSelectionGetPayload<{
+    include: {
+        createdBy: {
+            select: { name: true, email: true },
+        },
+        _count: {
+            select: { parts: true },
+        },
+    },
+}>
