@@ -96,7 +96,7 @@ export default function NavLinks({
         className={cn(
           "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium",
           route.active
-            ? "from-primary-light to-primary text-primary-foreground bg-gradient-to-r"
+            ? "primary-gradient"
             : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
           itemClassName
         )}
@@ -117,7 +117,7 @@ export default function NavLinks({
                 className={cn(
                   "flex w-full items-center justify-between gap-3 rounded-md px-3 py-2 text-sm font-medium",
                   route.active
-                    ? "from-primary-light to-primary text-primary-foreground bg-gradient-to-r"
+                    ? "primary-gradient"
                     : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
                   itemClassName
                 )}
