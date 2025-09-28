@@ -260,7 +260,7 @@ export function Dashboard() {
             </p>
           </div>
           <Button asChild className="bg-primary hover:bg-primary/90">
-            <Link href="/create">
+            <Link href="/mass-selections/new">
               <Plus className="mr-2 h-4 w-4" />
               New Selection
             </Link>
@@ -359,7 +359,7 @@ export function Dashboard() {
               </p>
               {!searchQuery && seasonFilter === "all" && (
                 <Button asChild>
-                  <Link href="/create">
+                  <Link href="/mass-selections/new">
                     <Plus className="mr-2 h-4 w-4" />
                     Create Selection
                   </Link>

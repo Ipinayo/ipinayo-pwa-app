@@ -10,5 +10,6 @@ export const config = {
         '/create/:path*',
         '/edit/:path*',
         '/view/:path*',
+        '/mass-selections/:path*',
     ],
 }
