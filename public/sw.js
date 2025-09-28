@@ -5,7 +5,7 @@ const DYNAMIC_CACHE_NAME = "ipinayo-dynamic-v1"
 // Assets to cache on install (only public assets)
 const STATIC_ASSETS = [
   "/",
-  "/auth/signin",
+  "/signin",
   "/manifest.json",
   "/images/logo.png",
   "/offline",

@@ -46,7 +46,7 @@ export default function VerifyRequestPage() {
 
           <div className="pt-4">
             <Button variant="outline" className="w-full bg-transparent" asChild>
-              <Link href="/auth/signin">
+              <Link href="/signin">
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back to sign in
               </Link>

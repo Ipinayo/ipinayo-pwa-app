@@ -22,8 +22,8 @@ export default {
         },
     },
     pages: {
-        signIn: "/auth/signin",
-        verifyRequest: "/auth/verify-request",
+        signIn: "/signin",
+        verifyRequest: "/verify-request",
     },
     session: {
         strategy: "jwt",
