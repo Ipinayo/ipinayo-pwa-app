@@ -3,12 +3,21 @@
 import { ArrowLeft, Eye, Plus, Save } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
+  MassPart,
+  NewMassSelection,
+  NewMassSelectionPart,
+} from "@/types/models";
+import MultipleSelector, {
+  Option,
+} from "@/components/common/multiple-selector";
+import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { liturgicalSeasons, templateParts } from "@/lib/constants";
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
@@ -18,108 +27,19 @@ import { Label } from "@/components/ui/label";
 import { MassPartRow } from "@/components/common/mass-part-row";
 import { Switch } from "@/components/ui/switch";
 
-interface MassPart {
-  id: string;
-  partName: string;
-  keySignature: string;
-  notes: string;
-  songTitle: string;
-}
-
-interface MassSelectionForm {
-  title: string;
-  date: string;
-  liturgicalYear: "A" | "B" | "C" | "";
-  liturgicalSeason: string;
-  themes: string;
-  pastoralFocus: string;
-  liturgy: string;
-  isPublic?: boolean;
-  parts: MassPart[];
-}
-
-const liturgicalSeasons = [
-  "Advent",
-  "Christmas",
-  "Ordinary Time",
-  "Lent",
-  "Easter",
-  "Pentecost",
-];
-
-const templateParts: Record<string, string[]> = {
-  "sunday-mass": [
-    "Entrance Hymn",
-    "Kyrie",
-    "Gloria",
-    "Responsorial Psalm",
-    "Gospel Acclamation",
-    "Offertory Hymn",
-    "Sanctus",
-    "Memorial Acclamation",
-    "Great Amen",
-    "Lamb of God",
-    "Communion Hymn",
-    "Recessional Hymn",
-  ],
-  wedding: [
-    "Prelude",
-    "Processional",
-    "Opening Hymn",
-    "Responsorial Psalm",
-    "Gospel Acclamation",
-    "Offertory Hymn",
-    "Sanctus",
-    "Memorial Acclamation",
-    "Great Amen",
-    "Lamb of God",
-    "Communion Hymn",
-    "Recessional",
-  ],
-  ordination: [
-    "Entrance Hymn",
-    "Kyrie",
-    "Gloria",
-    "Responsorial Psalm",
-    "Gospel Acclamation",
-    "Litany of Saints",
-    "Offertory Hymn",
-    "Sanctus",
-    "Memorial Acclamation",
-    "Great Amen",
-    "Lamb of God",
-    "Communion Hymn",
-    "Te Deum",
-    "Recessional Hymn",
-  ],
-  funeral: [
-    "Entrance Hymn",
-    "Kyrie",
-    "Responsorial Psalm",
-    "Gospel Acclamation",
-    "Offertory Hymn",
-    "Sanctus",
-    "Memorial Acclamation",
-    "Great Amen",
-    "Lamb of God",
-    "Communion Hymn",
-    "Song of Farewell",
-    "Recessional Hymn",
-  ],
-  blank: [],
-};
-
 export default function CreateMassSelectionPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const template = searchParams.get("template") || "blank";
+
+  const [themes, setThemes] = useState<Option[]>([]);
   const [saving, setSaving] = useState(false);
-  const [form, setForm] = useState<MassSelectionForm>({
+  const [form, setForm] = useState<NewMassSelection>({
     title: "",
-    date: new Date().toISOString().split("T")[0],
+    date: new Date(),
     liturgicalYear: "",
     liturgicalSeason: "",
-    themes: "",
+    themes: [],
     pastoralFocus: "",
     liturgy: "",
     isPublic: false,
@@ -129,21 +49,22 @@ export default function CreateMassSelectionPage() {
   useEffect(() => {
     // Initialize form based on template
     const parts = templateParts[template] || [];
-    const initialParts: MassPart[] = parts.map((partName, index) => ({
-      id: (index + 1).toString(),
-      partName,
-      sheetMusicTitle: "",
-      keySignature: "",
-      notes: "",
-      songTitle: "",
-    }));
+    const initialParts: NewMassSelectionPart[] = parts.map(
+      (partName, index) => ({
+        id: (index + 1).toString(),
+        partName,
+        keySignature: null,
+        notes: "",
+        songTitle: "",
+      })
+    );
 
     // If blank template, start with one empty part
     if (parts.length === 0) {
       initialParts.push({
         id: "1",
         partName: "",
-        keySignature: "",
+        keySignature: null,
         notes: "",
         songTitle: "",
       });
@@ -156,10 +77,10 @@ export default function CreateMassSelectionPage() {
   }, [template]);
 
   const addPart = () => {
-    const newPart: MassPart = {
+    const newPart: NewMassSelectionPart = {
       id: Date.now().toString(),
       partName: "",
-      keySignature: "",
+      keySignature: null,
       notes: "",
       songTitle: "",
     };
@@ -283,9 +204,12 @@ export default function CreateMassSelectionPage() {
                 <Input
                   id="date"
                   type="date"
-                  value={form.date}
+                  value={form.date.toISOString().split("T")[0]}
                   onChange={(e) =>
-                    setForm((prev) => ({ ...prev, date: e.target.value }))
+                    setForm((prev) => ({
+                      ...prev,
+                      date: new Date(e.target.value),
+                    }))
                   }
                 />
               </div>
@@ -303,7 +227,7 @@ export default function CreateMassSelectionPage() {
               <div className="space-y-2">
                 <Label htmlFor="liturgicalYear">Liturgical Year</Label>
                 <Select
-                  value={form.liturgicalYear}
+                  value={form.liturgicalYear || undefined}
                   onValueChange={(value: "A" | "B" | "C") =>
                     setForm((prev) => ({ ...prev, liturgicalYear: value }))
                   }
@@ -322,7 +246,7 @@ export default function CreateMassSelectionPage() {
               <div className="space-y-2">
                 <Label htmlFor="liturgicalSeason">Liturgical Season</Label>
                 <Select
-                  value={form.liturgicalSeason}
+                  value={form.liturgicalSeason || undefined}
                   onValueChange={(value) =>
                     setForm((prev) => ({ ...prev, liturgicalSeason: value }))
                   }
@@ -343,13 +267,18 @@ export default function CreateMassSelectionPage() {
 
             <div className="space-y-2">
               <Label htmlFor="themes">Themes</Label>
-              <Input
-                id="themes"
-                value={form.themes}
-                onChange={(e) =>
-                  setForm((prev) => ({ ...prev, themes: e.target.value }))
-                }
+              <MultipleSelector
+                value={themes}
+                defaultOptions={[]}
+                onChange={(selected) => {
+                  setThemes(selected);
+                  setForm((prev) => ({
+                    ...prev,
+                    themes: selected.map((opt) => opt.value),
+                  }));
+                }}
                 placeholder="e.g., Joy, Peace, Resurrection"
+                creatable
               />
             </div>
 
@@ -358,7 +287,7 @@ export default function CreateMassSelectionPage() {
                 <Label htmlFor="pastoralFocus">Pastoral Focus</Label>
                 <Input
                   id="pastoralFocus"
-                  value={form.pastoralFocus}
+                  value={form.pastoralFocus || undefined}
                   onChange={(e) =>
                     setForm((prev) => ({
                       ...prev,
@@ -373,7 +302,7 @@ export default function CreateMassSelectionPage() {
                 <Label htmlFor="liturgy">Liturgy</Label>
                 <Input
                   id="liturgy"
-                  value={form.liturgy}
+                  value={form.liturgy || undefined}
                   onChange={(e) =>
                     setForm((prev) => ({ ...prev, liturgy: e.target.value }))
                   }

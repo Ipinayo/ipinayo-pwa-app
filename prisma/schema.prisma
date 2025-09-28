@@ -83,6 +83,7 @@ model MassSelection {
   date             DateTime
   liturgicalYear   String?
   liturgicalSeason String?
+  liturgy          String?
   themes           String[]
   pastoralFocus    String?
   createdAt        DateTime   @default(now())
@@ -101,37 +102,10 @@ model MassPart {
   id              String        @id @default(cuid())
   partName        String
   songTitle       String
-  keySignature    KeySignature?
+  keySignature    String?
   notes           String?
   massSelectionId String
   massSelection   MassSelection @relation(fields: [massSelectionId], references: [id], onDelete: Cascade)
 
   @@index([massSelectionId])
-}
-
-enum KeySignature {
-  C_MAJOR
-  G_MAJOR
-  D_MAJOR
-  A_MAJOR
-  E_MAJOR
-  B_MAJOR
-  F_SHARP_MAJOR
-  C_SHARP_MAJOR
-  A_FLAT_MAJOR
-  E_FLAT_MAJOR
-  B_FLAT_MAJOR
-  F_MAJOR
-  C_MINOR
-  G_MINOR
-  D_MINOR
-  A_MINOR
-  E_MINOR
-  B_MINOR
-  F_SHARP_MINOR
-  C_SHARP_MINOR
-  A_FLAT_MINOR
-  E_FLAT_MINOR
-  B_FLAT_MINOR
-  F_MINOR
 }

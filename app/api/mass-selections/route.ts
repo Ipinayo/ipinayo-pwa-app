@@ -1,13 +1,11 @@
-import { NextRequest, NextResponse } from "next/server"
-
+import { NextResponse } from "next/server"
 import { auth } from "@/auth"
 import prisma from "@/lib/prisma"
 
 // GET /api/mass-selections - Get paginated list of mass selections
-export async function GET(request: NextRequest) {
+export const GET = auth(async (request) => {
   try {
-    const session = await auth()
-    if (!session?.user?.id) {
+    if (!request.auth?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
@@ -23,7 +21,7 @@ export async function GET(request: NextRequest) {
 
     // Build where clause with search and filter conditions
     const whereClause: any = {
-      OR: [{ createdById: session.user.id }, { isPublic: true }],
+      OR: [{ createdById: request.auth.user.id }, { isPublic: true }],
     }
 
     // Add search functionality
@@ -91,36 +89,36 @@ export async function GET(request: NextRequest) {
     console.error("Error fetching mass selections:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
-}
+})
 
 // POST /api/mass-selections - Create new mass selection
-export async function POST(request: NextRequest) {
+export const POST = auth(async (request) => {
   try {
-    const session = await auth()
-    if (!session?.user?.id) {
+    if (!request.auth?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
     const body = await request.json()
-    const { title, date, templateType, liturgicalYear, season, themes, pastoralFocus, parts, isPublic } = body
+    const { title, date, liturgicalYear, liturgicalSeason, liturgy, themes, pastoralFocus, parts, isPublic } = body
 
     const selection = await prisma.massSelection.create({
       data: {
         title,
         date: new Date(date),
-        templateType,
         liturgicalYear,
-        season,
+        liturgicalSeason,
+        liturgy,
         themes,
         pastoralFocus,
         isPublic: isPublic || false,
-        createdById: session.user.id,
+        createdById: request.auth.user.id,
         parts: {
           create:
             parts?.map((part: any) => ({
               partName: part.partName,
               keySignature: part.keySignature,
               notes: part.notes,
+              songTitle: part.songTitle,
             })) || [],
         },
       },
@@ -137,4 +135,4 @@ export async function POST(request: NextRequest) {
     console.error("Error creating mass selection:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
-}
+})

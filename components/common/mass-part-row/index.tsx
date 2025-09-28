@@ -25,52 +25,19 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { NewMassSelectionPart } from "@/types/models";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
+import { keySignatures } from "@/lib/constants";
 import { useState } from "react";
 
-interface MassPart {
-  id: string;
-  partName: string;
-  keySignature: string;
-  notes: string;
-  songTitle: string;
-}
-
 interface MassPartRowProps {
-  part: MassPart;
+  part: NewMassSelectionPart;
   index: number;
-  onUpdate: (updates: Partial<MassPart>) => void;
+  onUpdate: (updates: Partial<NewMassSelectionPart>) => void;
   onRemove: () => void;
   canRemove: boolean;
 }
-
-const keySignatures = [
-  "C Major",
-  "G Major",
-  "D Major",
-  "A Major",
-  "E Major",
-  "B Major",
-  "F# Major",
-  "Db Major",
-  "Ab Major",
-  "Eb Major",
-  "Bb Major",
-  "F Major",
-  "A Minor",
-  "E Minor",
-  "B Minor",
-  "F# Minor",
-  "C# Minor",
-  "G# Minor",
-  "D# Minor",
-  "Bb Minor",
-  "F Minor",
-  "C Minor",
-  "G Minor",
-  "D Minor",
-];
 
 const commonPartNames = [
   "Entrance Hymn",
@@ -179,7 +146,7 @@ export function MassPartRow({
         <div className="space-y-2">
           <Label>Key Signature</Label>
           <Select
-            value={part.keySignature}
+            value={part.keySignature || undefined}
             onValueChange={(value) => onUpdate({ keySignature: value })}
           >
             <SelectTrigger>
@@ -213,7 +180,7 @@ export function MassPartRow({
         <Label>Notes (Optional)</Label>
         <Textarea
           placeholder="e.g., Verses 1, 2, and 4 only"
-          value={part.notes}
+          value={part.notes || ""}
           onChange={(e) => onUpdate({ notes: e.target.value })}
           rows={2}
         />
