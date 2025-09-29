@@ -1,8 +1,9 @@
-import { Calendar, Download, Edit, Eye, Link } from "lucide-react";
+import { Calendar, Download, Edit, Eye } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import { MassSelection } from "@/types/models";
 
 export default function MassSelectionCard({
