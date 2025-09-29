@@ -35,3 +35,5 @@ export type MassSelection = Prisma.MassSelectionGetPayload<{
         },
     },
 }>
+
+export { KeySignature } from "@/lib/generated/prisma"

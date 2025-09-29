@@ -9,6 +9,7 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
+import { KeySignature, NewMassSelectionPart } from "@/types/models";
 import {
   Popover,
   PopoverContent,
@@ -25,10 +26,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { NewMassSelectionPart } from "@/types/models";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
-import { keySignatures } from "@/lib/constants";
+import { keySignatureItems } from "@/lib/constants";
 import { useState } from "react";
 
 interface MassPartRowProps {
@@ -147,15 +147,18 @@ export function MassPartRow({
           <Label>Key Signature</Label>
           <Select
             value={part.keySignature || undefined}
-            onValueChange={(value) => onUpdate({ keySignature: value })}
+            onValueChange={(value) => {
+              const keySignature = value as KeySignature;
+              onUpdate({ keySignature });
+            }}
           >
             <SelectTrigger>
               <SelectValue placeholder="Select key" />
             </SelectTrigger>
             <SelectContent>
-              {keySignatures.map((key) => (
-                <SelectItem key={key} value={key}>
-                  {key}
+              {keySignatureItems.map((key) => (
+                <SelectItem key={key.value} value={key.value}>
+                  {key.label}
                 </SelectItem>
               ))}
             </SelectContent>
