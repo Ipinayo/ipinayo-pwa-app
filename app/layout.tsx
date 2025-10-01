@@ -7,7 +7,6 @@ import type { Metadata } from "next";
 import { OfflineIndicator } from "@/components/offline-indicator";
 import { PWAInstallPrompt } from "@/components/pwa-install-prompt";
 import { SessionProvider } from "next-auth/react";
-import { Suspense } from "react";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 
@@ -56,21 +55,19 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className={`antialiased`}>
-        <Suspense fallback={<div>Loading...</div>}>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <SessionProvider>
-              {children}
-              <Toaster duration={5000} richColors closeButton expand />
-              <PWAInstallPrompt />
-              <OfflineIndicator />
-            </SessionProvider>
-          </ThemeProvider>
-        </Suspense>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <SessionProvider>
+            {children}
+            <Toaster duration={5000} richColors closeButton expand />
+            <PWAInstallPrompt />
+            <OfflineIndicator />
+          </SessionProvider>
+        </ThemeProvider>
         <Analytics />
         <script
           dangerouslySetInnerHTML={{
