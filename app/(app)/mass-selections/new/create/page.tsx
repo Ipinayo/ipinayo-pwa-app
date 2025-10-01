@@ -4,6 +4,7 @@ import { ArrowLeft, Eye, Plus, Save } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   LiturgicalSeason,
+  LiturgicalYear,
   MassPart,
   NewMassSelection,
   NewMassSelectionPart,
@@ -29,13 +30,9 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { LiturgicalYear } from "../../../../../lib/generated/prisma/index";
 import { MassPartRow } from "@/components/common/mass-part-row";
 import { Switch } from "@/components/ui/switch";
 import { getEnum } from "@/lib/utils";
-
-const seasons = [{ label: "", value: "" }, ...liturgicalSeasonItems];
-const years = [{ label: "", value: "" }, ...liturgicalYearItems];
 
 export default function CreateMassSelectionPage() {
   const router = useRouter();
@@ -237,7 +234,7 @@ export default function CreateMassSelectionPage() {
               <div className="space-y-2">
                 <Label htmlFor="liturgicalYear">Liturgical Year</Label>
                 <Select
-                  value={form.liturgicalYear ?? undefined}
+                  value={form.liturgicalYear ?? ""}
                   onValueChange={(value) =>
                     setForm((prev) => ({
                       ...prev,
@@ -249,11 +246,14 @@ export default function CreateMassSelectionPage() {
                     <SelectValue placeholder="Select year" />
                   </SelectTrigger>
                   <SelectContent>
-                    {years.map((year) => (
+                    {liturgicalYearItems.map((year) => (
                       <SelectItem key={year.value} value={year.value}>
                         {year.label}
                       </SelectItem>
                     ))}
+                    <SelectItem variant="destructive" value="none">
+                      Clear Selection
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -261,7 +261,7 @@ export default function CreateMassSelectionPage() {
               <div className="space-y-2">
                 <Label htmlFor="liturgicalSeason">Liturgical Season</Label>
                 <Select
-                  value={form.liturgicalSeason ?? undefined}
+                  value={form.liturgicalSeason ?? ""}
                   onValueChange={(value) =>
                     setForm((prev) => ({
                       ...prev,
@@ -274,11 +274,14 @@ export default function CreateMassSelectionPage() {
                     <SelectValue placeholder="Select season" />
                   </SelectTrigger>
                   <SelectContent>
-                    {seasons.map((season) => (
+                    {liturgicalSeasonItems.map((season) => (
                       <SelectItem key={season.value} value={season.value}>
                         {season.label}
                       </SelectItem>
                     ))}
+                    <SelectItem variant="destructive" value="none">
+                      Clear Selection
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>

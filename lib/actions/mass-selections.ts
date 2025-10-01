@@ -51,7 +51,6 @@ export async function getSelections({ page = 1, limit = 9, query = '', season, y
         const orderBy = {
             [sortBy]: sortOrder
         }
-        // orderBy[sortBy] = sortOrder
 
         // Get user's own selections + public selections
         const selections = await prisma.massSelection.findMany({
