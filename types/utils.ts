@@ -13,4 +13,12 @@ export enum SortBy {
     DATE = 'date'
 }
 
-export interface MassSelectionFilter { page?: number, limit?: number, query?: string, season?: LiturgicalSeason, year?: LiturgicalYear, sortBy?: SortBy, sortOrder?: SortOrder }
+export interface MassSelectionFilter {
+    page?: number,
+    limit?: number,
+    query?: string,
+    season?: LiturgicalSeason,
+    year?: LiturgicalYear,
+    sortBy?: SortBy,
+    sortOrder?: SortOrder
+}

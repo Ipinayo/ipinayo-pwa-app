@@ -4,10 +4,17 @@ import { MassSelectionFilter, SortBy, SortOrder } from "@/types/utils";
 
 import prisma from "../prisma"
 
-export async function getSelections({ page = 1, limit = 9, query = '', season, year, sortBy = SortBy.UPDATED_AT, sortOrder = SortOrder.DESC }: MassSelectionFilter) {
+export async function getSelections({
+    page = 1,
+    limit = 9,
+    query = '',
+    season,
+    year,
+    sortBy = SortBy.UPDATED_AT,
+    sortOrder = SortOrder.DESC
+}: MassSelectionFilter) {
 
     try {
-
         const skip = (page - 1) * limit
 
         // Build where clause with search and filter conditions
@@ -15,36 +22,34 @@ export async function getSelections({ page = 1, limit = 9, query = '', season, y
             OR: [{ isPublic: true }],
         }
 
+        // Build AND conditions array
+        const andConditions: any[] = []
+
         // Add search functionality
         if (query) {
-            whereClause.AND = [
-                {
-                    OR: [
-                        { title: { contains: query, mode: "insensitive" } },
-                        { themes: { contains: query, mode: "insensitive" } },
-                        { pastoralFocus: { contains: query, mode: "insensitive" } },
-                        { liturgy: { contains: query, mode: "insensitive" } },
-                    ],
-                },
-            ]
+            andConditions.push({
+                OR: [
+                    { title: { contains: query, mode: "insensitive" } },
+                    { themes: { contains: query, mode: "insensitive" } },
+                    { pastoralFocus: { contains: query, mode: "insensitive" } },
+                    { liturgy: { contains: query, mode: "insensitive" } },
+                ],
+            })
         }
 
         // Add season filter
         if (season) {
-            if (whereClause.AND) {
-                whereClause.AND.push({ liturgicalSeason: season })
-            } else {
-                whereClause.AND = [{ liturgicalSeason: season }]
-            }
+            andConditions.push({ liturgicalSeason: season })
         }
 
         // Add year filter
         if (year) {
-            if (whereClause.AND) {
-                whereClause.AND.push({ liturgicalYear: year })
-            } else {
-                whereClause.AND = [{ liturgicalYear: year }]
-            }
+            andConditions.push({ liturgicalYear: year })
+        }
+
+        // Only add AND clause if there are conditions
+        if (andConditions.length > 0) {
+            whereClause.AND = andConditions
         }
 
         // Build order by clause
@@ -52,7 +57,7 @@ export async function getSelections({ page = 1, limit = 9, query = '', season, y
             [sortBy]: sortOrder
         }
 
-        // Get user's own selections + public selections
+        // Get public selections with filters
         const selections = await prisma.massSelection.findMany({
             where: whereClause,
             include: {

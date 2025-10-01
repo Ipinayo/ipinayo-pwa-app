@@ -6,9 +6,11 @@ import Link from "next/link";
 import MassSelectionCard from "./mass-selection-card";
 import { MassSelectionFilter } from "@/types/utils";
 import { UrlPagination } from "@/components/common/url-pagination";
+import { auth } from "@/auth";
 import { getSelections } from "@/lib/actions/mass-selections";
 
 export default async function MassSelectionList(filter: MassSelectionFilter) {
+  const session = await auth();
   const selectionsResponse = await getSelections(filter);
 
   const selectionsPage = selectionsResponse.pagination;
@@ -36,7 +38,11 @@ export default async function MassSelectionList(filter: MassSelectionFilter) {
     <>
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {selections.map((selection) => (
-          <MassSelectionCard key={selection.id} selection={selection} />
+          <MassSelectionCard
+            key={selection.id}
+            selection={selection}
+            isOwner={selection.createdById === session?.user?.id}
+          />
         ))}
       </div>
 
