@@ -238,7 +238,9 @@ export default function MassSelectionCard({
             <span>
               by {selection.createdBy.name || selection.createdBy.email}
             </span>
-            <span>Updated {formatDateLocale(selection.updatedAt)}</span>
+            <span>
+              Updated {formatDateLocale(selection.updatedAt.toString())}
+            </span>
           </div>
         </CardFooter>
       )}

@@ -24,8 +24,10 @@ export const POST = auth(async (request, props: { params: Params }) => {
       return NextResponse.json({ error: "Access denied" }, { status: 403 })
     }
 
+    const { createdBy, createdById, ...rest } = originalSelection
+
     // Clone the selection
-    const clonedSelection = await saveSelection({ ...originalSelection, title: `${originalSelection.title} (Copy)` }, request.auth.user.id)
+    const clonedSelection = await saveSelection({ ...rest, title: `${originalSelection.title} (Copy)`, isPublic: false }, request.auth.user.id)
 
     return NextResponse.json(clonedSelection, { status: 201 })
   } catch (error) {

@@ -7,11 +7,11 @@ import MassSelectionCard from "./mass-selection-card";
 import { MassSelectionFilter } from "@/types/utils";
 import { UrlPagination } from "@/components/common/url-pagination";
 import { auth } from "@/auth";
-import { getSelections } from "@/lib/actions/mass-selections";
+import { getAllSelections } from "@/lib/api/mass-selections";
 
 export default async function MassSelectionList(filter: MassSelectionFilter) {
   const session = await auth();
-  const selectionsResponse = await getSelections(filter);
+  const selectionsResponse = await getAllSelections(filter);
 
   const selectionsPage = selectionsResponse.pagination;
   const selections = selectionsResponse.selections;

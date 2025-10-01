@@ -40,8 +40,10 @@ export const PUT = auth(async (request, props: { params: Params }) => {
       return NextResponse.json({ error: "Mass selection not found" }, { status: 404 })
     }
 
+    const { createdBy, createdById, id, ...rest } = body
+
     // Update selection with parts
-    const selection = await updateSelection(body, params.id)
+    const selection = await updateSelection(rest, params.id)
 
     return NextResponse.json(selection)
   } catch (error) {

@@ -14,7 +14,7 @@ export const GET = auth(async (request) => {
 
     const { searchParams } = new URL(request.url)
     const page = Number.parseInt(searchParams.get("page") || "1")
-    const limit = Number.parseInt(searchParams.get("limit") || "10")
+    const limit = Number.parseInt(searchParams.get("limit") || "9")
     const query = searchParams.get("query") || ""
     const season = getEnum(LiturgicalSeason, searchParams.get("season") || '')
     const sortBy = getEnum(SortBy, searchParams.get("sortBy") || "updatedAt")

@@ -1,5 +1,7 @@
 import { EditMassSelection } from "@/components/edit-mass-selection";
+import { Params } from "@/types/utils";
 
-export default function EditPage({ params }: { params: { id: string } }) {
+export default async function EditPage(props: { params: Params }) {
+  const params = await props.params;
   return <EditMassSelection id={params.id} />;
 }

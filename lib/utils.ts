@@ -51,10 +51,11 @@ export function getEnum<T extends Record<string, string>>(
   return undefined;
 }
 
-export const formatDateLocale = (date: Date) => {
-  if (!date) return '';
+export const formatDateLocale = (dateStr: string) => {
+  if (!dateStr) return '';
 
-  return date.toLocaleDateString('en-GB', {
+  const d = new Date(dateStr);
+  return d.toLocaleDateString('en-GB', {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric'
