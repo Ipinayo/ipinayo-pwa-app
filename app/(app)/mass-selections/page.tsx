@@ -1,4 +1,9 @@
-import { Card, CardContent } from "@/components/ui/card";
+import {
+  LiturgicalSeason,
+  LiturgicalYear,
+} from "../../../lib/generated/prisma/index";
+import { SearchParams, SortBy, SortOrder } from "@/types/utils";
+import { liturgicalSeasonItems, liturgicalYearItems } from "@/lib/constants";
 
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -7,12 +12,15 @@ import MassSelectionListSkeleton from "@/components/app/mass-selections/mass-sel
 import { Plus } from "lucide-react";
 import QueryFilter from "@/components/common/query-filter";
 import SearchBar from "@/components/common/search-bar";
-import { SearchParams } from "@/types/utils";
 import SortFilter from "@/components/app/mass-selections/sort-filter";
 import { Suspense } from "react";
-import { liturgicalSeasons } from "@/lib/constants";
+import { getEnumByValue } from "@/lib/utils";
 
-const seasons = ["All Seasons", ...liturgicalSeasons];
+const seasons = [
+  { label: "All Seasons", value: "all" },
+  ...liturgicalSeasonItems,
+];
+const years = [{ label: "All Years", value: "all" }, ...liturgicalYearItems];
 
 export default async function MassSelectionsPage(props: {
   searchParams: SearchParams;
@@ -21,10 +29,10 @@ export default async function MassSelectionsPage(props: {
 
   const page = Number(filters["page"]) || 1;
   const query = filters["query"] || "";
-  const season = filters["season"] || "All Seasons";
-  const year = filters["year"] || "all";
-  const sort_by = filters["sort_by"] || "updatedAt";
-  const order = filters["order"] || "desc";
+  const season = getEnumByValue(LiturgicalSeason, filters["season"] || "");
+  const year = getEnumByValue(LiturgicalYear, filters["year"] || "");
+  const sort_by = getEnumByValue(SortBy, filters["sort_by"] || "");
+  const order = getEnumByValue(SortOrder, filters["order"] || "");
 
   const searchKey = [page, query, season, year].join("-");
 
@@ -49,16 +57,15 @@ export default async function MassSelectionsPage(props: {
       <div className="flex flex-col sm:flex-row gap-4 mb-6">
         <SearchBar placeholder="Search selections..." />
         <div className="flex gap-2">
-          <QueryFilter selected={season} queryName={"season"} items={seasons} />
           <QueryFilter
-            selected={year}
+            selected={season ?? "all"}
+            queryName={"season"}
+            items={seasons}
+          />
+          <QueryFilter
+            selected={year ?? "all"}
             queryName={"year"}
-            items={[
-              { label: "All Years", value: "all" },
-              { label: "Year A", value: "A" },
-              { label: "Year B", value: "B" },
-              { label: "Year C", value: "C" },
-            ]}
+            items={years}
           />
           <SortFilter sortBy={sort_by} order={order} />
         </div>
@@ -70,6 +77,8 @@ export default async function MassSelectionsPage(props: {
           year={year}
           season={season}
           page={page}
+          sortBy={sort_by}
+          sortOrder={order}
         />
       </Suspense>
     </>

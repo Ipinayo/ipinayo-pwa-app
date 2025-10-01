@@ -13,7 +13,7 @@ export default function AppFilter({
   selected,
   onSelected,
 }: {
-  selected: string;
+  selected?: string;
   items: { label: string; value: string }[] | string[];
   onSelected: (value: string) => void;
 }) {

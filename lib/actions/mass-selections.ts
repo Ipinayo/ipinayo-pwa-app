@@ -1,9 +1,10 @@
 'use server'
 
-import { MassSelectionFilter } from "@/types/utils";
+import { MassSelectionFilter, SortBy, SortOrder } from "@/types/utils";
+
 import prisma from "../prisma"
 
-export async function getSelections({ page = 1, limit = 9, query = '', season = 'all', year = 'all', sortBy = 'updatedAt', sortOrder = 'desc' }: MassSelectionFilter) {
+export async function getSelections({ page = 1, limit = 9, query = '', season, year, sortBy = SortBy.UPDATED_AT, sortOrder = SortOrder.DESC }: MassSelectionFilter) {
 
     try {
 
@@ -29,7 +30,7 @@ export async function getSelections({ page = 1, limit = 9, query = '', season = 
         }
 
         // Add season filter
-        if (!season.toLowerCase().includes("all")) {
+        if (season) {
             if (whereClause.AND) {
                 whereClause.AND.push({ liturgicalSeason: season })
             } else {
@@ -38,7 +39,7 @@ export async function getSelections({ page = 1, limit = 9, query = '', season = 
         }
 
         // Add year filter
-        if (year !== "all") {
+        if (year) {
             if (whereClause.AND) {
                 whereClause.AND.push({ liturgicalYear: year })
             } else {
@@ -47,12 +48,10 @@ export async function getSelections({ page = 1, limit = 9, query = '', season = 
         }
 
         // Build order by clause
-        const orderBy: any = {}
-        if (sortBy === "title" || sortBy === "date" || sortBy === "updatedAt" || sortBy === "createdAt") {
-            orderBy[sortBy] = sortOrder
-        } else {
-            orderBy.updatedAt = "desc"
+        const orderBy = {
+            [sortBy]: sortOrder
         }
+        // orderBy[sortBy] = sortOrder
 
         // Get user's own selections + public selections
         const selections = await prisma.massSelection.findMany({

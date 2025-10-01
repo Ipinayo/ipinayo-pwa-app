@@ -1,12 +1,13 @@
-import { KeySignature } from "@/types/models";
+import { KeySignature, LiturgicalSeason, LiturgicalYear } from "@/types/models";
 
-export const liturgicalSeasons = [
-    "Advent",
-    "Christmas",
-    "Ordinary Time",
-    "Lent",
-    "Easter",
-    "Pentecost",
+export const liturgicalSeasonItems = [
+    { label: "Advent", value: LiturgicalSeason.ADVENT },
+    { label: "Christmas", value: LiturgicalSeason.CHRISTMAS },
+    { label: "Ordinary Time", value: LiturgicalSeason.ORDINARY_TIME },
+    { label: "Lent", value: LiturgicalSeason.LENT },
+    { label: "Easter", value: LiturgicalSeason.EASTER },
+    { label: "Pentecost", value: LiturgicalSeason.PENTECOST },
+    { label: "Easter Triduum", value: LiturgicalSeason.TRIDUUM }
 ];
 
 export const templateParts: Record<string, string[]> = {
@@ -104,3 +105,9 @@ export const keySignatureItems: { label: string; value: KeySignature }[] = [
     { label: "E♭ Minor", value: KeySignature.E_FLAT_MINOR },
     { label: "A♭ Minor", value: KeySignature.A_FLAT_MINOR },
 ];
+
+export const liturgicalYearItems = [
+    { label: "Year A", value: LiturgicalYear.A },
+    { label: "Year B", value: LiturgicalYear.B },
+    { label: "Year C", value: LiturgicalYear.C },
+]

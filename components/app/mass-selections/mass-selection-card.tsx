@@ -16,9 +16,11 @@ export default function MassSelectionCard({
       <CardHeader>
         <CardTitle className="flex items-start justify-between">
           <span className="line-clamp-2">{selection.title}</span>
-          <Badge variant="outline" className="ml-2 shrink-0">
-            Year {selection.liturgicalYear}
-          </Badge>
+          {selection.liturgicalYear && (
+            <Badge variant="outline" className="ml-2 shrink-0">
+              Year {selection.liturgicalYear}
+            </Badge>
+          )}
         </CardTitle>
         <div className="text-muted-foreground flex items-center gap-2 text-sm">
           <Calendar className="h-4 w-4" />
@@ -33,12 +35,14 @@ export default function MassSelectionCard({
             <span className="font-medium">{selection._count.parts}</span>
           </div>
 
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-muted-foreground">Season:</span>
-            <Badge variant="secondary">{selection.liturgicalSeason}</Badge>
-          </div>
+          {selection.liturgicalSeason && (
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-muted-foreground">Season:</span>
+              <Badge variant="secondary">{selection.liturgicalSeason}</Badge>
+            </div>
+          )}
 
-          {selection.themes && (
+          {selection.themes.length > 0 && (
             <div className="text-sm">
               <span className="text-muted-foreground">Themes:</span>
               <p className="mt-1 line-clamp-2 text-xs">

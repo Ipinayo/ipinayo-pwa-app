@@ -63,7 +63,6 @@ interface MassSelection {
   id: string;
   title: string;
   date: string;
-  templateType: string;
   liturgicalYear?: string;
   season?: string;
   themes?: string;
@@ -457,7 +456,7 @@ export function Dashboard() {
                   <div className="space-y-3">
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <Music className="h-3 w-3" />
-                      {selection._count.parts} parts • {selection.templateType}
+                      {selection._count.parts} parts
                     </div>
 
                     {selection.season && (

@@ -1,5 +1,5 @@
 // import { PrismaClient } from '@prisma/client'
-import { KeySignature, PrismaClient } from '@/lib/generated/prisma'
+import { KeySignature, LiturgicalSeason, LiturgicalYear, PrismaClient } from '@/lib/generated/prisma'
 
 const prisma = new PrismaClient()
 
@@ -177,8 +177,8 @@ async function main() {
             data: {
                 title: '2nd Sunday of Advent - Hope and Preparation',
                 date: seasonDates.advent,
-                liturgicalYear: 'Year B',
-                liturgicalSeason: 'Advent',
+                liturgicalYear: LiturgicalYear.A,
+                liturgicalSeason: LiturgicalSeason.ADVENT,
                 liturgy: 'Sunday Mass',
                 themes: ['Hope', 'John the Baptist', 'Preparation', 'Waiting'],
                 pastoralFocus: 'Preparing hearts for Christ\'s coming, emphasis on hope and repentance',
@@ -201,8 +201,8 @@ async function main() {
             data: {
                 title: 'Feast of the Holy Family - Christmas Season',
                 date: seasonDates.christmas,
-                liturgicalYear: 'Year B',
-                liturgicalSeason: 'Christmas',
+                liturgicalYear: LiturgicalYear.B,
+                liturgicalSeason: LiturgicalSeason.CHRISTMAS,
                 liturgy: 'Sunday Mass',
                 themes: ['Holy Family', 'Christmas Joy', 'Family Values', 'Christ Child'],
                 pastoralFocus: 'Celebrating family bonds and the example of the Holy Family',
@@ -228,8 +228,8 @@ async function main() {
             data: {
                 title: '5th Sunday of Lent - Preparation for Holy Week',
                 date: seasonDates.lent,
-                liturgicalYear: 'Year B',
-                liturgicalSeason: 'Lent',
+                liturgicalYear: LiturgicalYear.A,
+                liturgicalSeason: LiturgicalSeason.LENT,
                 liturgy: 'Sunday Mass',
                 themes: ['Death and Life', 'Preparation', 'Sacrifice', 'Conversion'],
                 pastoralFocus: 'Final preparation for Holy Week, focus on dying to self and rising in Christ',
@@ -258,8 +258,8 @@ async function main() {
             data: {
                 title: 'Youth Sunday - 7th Sunday of Easter',
                 date: seasonDates.easter,
-                liturgicalYear: 'Year B',
-                liturgicalSeason: 'Easter',
+                liturgicalYear: LiturgicalYear.B,
+                liturgicalSeason: LiturgicalSeason.EASTER,
                 liturgy: 'Youth Mass',
                 themes: ['New Life', 'Young Disciples', 'Mission', 'Joy'],
                 pastoralFocus: 'Engaging young people in liturgy, emphasis on mission and discipleship',
@@ -277,8 +277,8 @@ async function main() {
             data: {
                 title: '25th Sunday in Ordinary Time - Family Life',
                 date: seasonDates.ordinary2,
-                liturgicalYear: 'Year B',
-                liturgicalSeason: 'Ordinary Time',
+                liturgicalYear: LiturgicalYear.C,
+                liturgicalSeason: LiturgicalSeason.ORDINARY_TIME,
                 liturgy: 'Family Mass',
                 themes: ['Service', 'Humility', 'Community', 'Discipleship'],
                 pastoralFocus: 'Teaching about true greatness through service, family-friendly approach',
@@ -304,8 +304,8 @@ async function main() {
             data: {
                 title: 'Christmas Eve Midnight Mass - DRAFT',
                 date: new Date(2024, 11, 24, 23, 30), // Dec 24, 2024 at 11:30 PM
-                liturgicalYear: 'Year C',
-                liturgicalSeason: 'Christmas',
+                liturgicalYear: LiturgicalYear.A,
+                liturgicalSeason: LiturgicalSeason.CHRISTMAS,
                 liturgy: 'Midnight Mass',
                 themes: ['Nativity', 'Light in Darkness', 'Emmanuel', 'Wonder'],
                 pastoralFocus: 'Celebrating the birth of Christ at the sacred hour, maximum beauty and reverence',
@@ -331,8 +331,8 @@ async function main() {
             data: {
                 title: 'Solemnity of Christ the King - Cathedral High Mass',
                 date: seasonDates.allSaints,
-                liturgicalYear: 'Year B',
-                liturgicalSeason: 'Ordinary Time',
+                liturgicalYear: LiturgicalYear.B,
+                liturgicalSeason: LiturgicalSeason.ORDINARY_TIME,
                 liturgy: 'Solemn High Mass',
                 themes: ['Christ the King', 'Kingdom of God', 'Final Judgment', 'Majesty'],
                 pastoralFocus: 'Celebrating Christ\'s kingship with full cathedral ceremonial and musical splendor',
@@ -362,8 +362,8 @@ async function main() {
             data: {
                 title: 'All Saints Day - Polyphony and Chant',
                 date: new Date(2024, 10, 1), // November 1, 2024
-                liturgicalYear: 'Year B',
-                liturgicalSeason: 'Ordinary Time',
+                liturgicalYear: LiturgicalYear.C,
+                liturgicalSeason: LiturgicalSeason.ORDINARY_TIME,
                 liturgy: 'Solemnity',
                 themes: ['Communion of Saints', 'Heavenly Glory', 'Eternal Life', 'Intercession'],
                 pastoralFocus: 'Honoring all saints with the highest forms of sacred music',
@@ -394,8 +394,8 @@ async function main() {
             data: {
                 title: 'Domingo de la Sagrada Familia / Holy Family Sunday',
                 date: seasonDates.christmas,
-                liturgicalYear: 'Year B',
-                liturgicalSeason: 'Christmas / Navidad',
+                liturgicalYear: LiturgicalYear.C,
+                liturgicalSeason: LiturgicalSeason.CHRISTMAS,
                 liturgy: 'Misa Dominical Bilingüe',
                 themes: ['Sagrada Familia', 'Unidad Familiar', 'Holy Family', 'Family Unity'],
                 pastoralFocus: 'Celebrating family values in bilingual community, honoring cultural traditions',
@@ -413,8 +413,8 @@ async function main() {
             data: {
                 title: 'Misa de Todos los Santos / All Saints Day Memorial',
                 date: new Date(2024, 10, 2), // November 2, 2024 (All Souls Day)
-                liturgicalYear: 'Year B',
-                liturgicalSeason: 'Ordinary Time / Tiempo Ordinario',
+                liturgicalYear: LiturgicalYear.B,
+                liturgicalSeason: LiturgicalSeason.ORDINARY_TIME,
                 liturgy: 'Misa de Difuntos / Memorial Mass',
                 themes: ['Remembrance', 'Eternal Life', 'Recuerdo', 'Vida Eterna', 'Community of Saints'],
                 pastoralFocus: 'Honoring deceased family members and friends, blending Mexican traditions with Catholic liturgy',
@@ -441,8 +441,8 @@ async function main() {
             data: {
                 title: 'Nuestra Señora de Guadalupe - Feast Day Mass',
                 date: new Date(2024, 11, 12), // December 12, 2024
-                liturgicalYear: 'Year B',
-                liturgicalSeason: 'Advent / Adviento',
+                liturgicalYear: LiturgicalYear.A,
+                liturgicalSeason: LiturgicalSeason.ADVENT,
                 liturgy: 'Misa Festiva',
                 themes: ['Guadalupe', 'Mexican Heritage', 'Apparitions', 'Indigenous Culture', 'Mary'],
                 pastoralFocus: 'Celebrating patroness of Americas, honoring Mexican and indigenous heritage',
@@ -471,8 +471,8 @@ async function main() {
             data: {
                 title: 'Misa de Quinceañera - Maria Elena Gonzalez',
                 date: new Date(2024, 5, 15), // June 15, 2024
-                liturgicalYear: 'Year B',
-                liturgicalSeason: 'Ordinary Time',
+                liturgicalYear: LiturgicalYear.C,
+                liturgicalSeason: LiturgicalSeason.ORDINARY_TIME,
                 liturgy: 'Misa de Acción de Gracias',
                 themes: ['Coming of Age', 'Gratitude', 'Womanhood', 'Family Celebration'],
                 pastoralFocus: 'Celebrating transition to womanhood with thanksgiving and commitment to faith',
@@ -501,8 +501,8 @@ async function main() {
             data: {
                 title: 'My First Mass Planning - 6th Sunday in Ordinary Time',
                 date: seasonDates.ordinary1,
-                liturgicalYear: 'Year B',
-                liturgicalSeason: 'Ordinary Time',
+                liturgicalYear: LiturgicalYear.A,
+                liturgicalSeason: LiturgicalSeason.ORDINARY_TIME,
                 liturgy: 'Sunday Mass',
                 themes: ['Healing', 'Compassion', 'Outreach', 'Community'],
                 pastoralFocus: 'Simple, accessible music that builds confidence in new parish music ministry',
@@ -520,8 +520,8 @@ async function main() {
             data: {
                 title: 'Practice Planning - Easter Vigil Ideas',
                 date: new Date(2024, 3, 30), // March 30, 2024 (Holy Saturday)
-                liturgicalYear: 'Year B',
-                liturgicalSeason: 'Easter Triduum',
+                liturgicalYear: LiturgicalYear.C,
+                liturgicalSeason: LiturgicalSeason.TRIDUUM,
                 liturgy: 'Easter Vigil',
                 themes: ['Resurrection', 'New Life', 'Baptism', 'Light'],
                 pastoralFocus: 'Learning to plan the most important liturgy - need mentor guidance!',
@@ -547,8 +547,8 @@ async function main() {
             data: {
                 title: 'Johnson-Smith Wedding Mass - June 22',
                 date: new Date(2024, 5, 22), // June 22, 2024
-                liturgicalYear: 'Year B',
-                liturgicalSeason: 'Ordinary Time',
+                liturgicalYear: LiturgicalYear.C,
+                liturgicalSeason: LiturgicalSeason.ORDINARY_TIME,
                 liturgy: 'Nuptial Mass',
                 themes: ['Love', 'Unity', 'Commitment', 'Sacrament of Marriage'],
                 pastoralFocus: 'Beautiful wedding liturgy focused on sacramental marriage and Christian love',
@@ -577,8 +577,8 @@ async function main() {
             data: {
                 title: 'Memorial Mass - Mrs. Dorothy Williams',
                 date: new Date(2024, 2, 15), // March 15, 2024
-                liturgicalYear: 'Year B',
-                liturgicalSeason: 'Lent',
+                liturgicalYear: LiturgicalYear.A,
+                liturgicalSeason: LiturgicalSeason.LENT,
                 liturgy: 'Funeral Mass',
                 themes: ['Eternal Life', 'Resurrection Hope', 'Comfort', 'Remembrance'],
                 pastoralFocus: 'Providing comfort to grieving family while celebrating hope of resurrection',
@@ -610,8 +610,8 @@ async function main() {
             data: {
                 title: 'Future Planning - Palm Sunday 2025',
                 date: new Date(2025, 3, 13), // April 13, 2025
-                liturgicalYear: 'Year C',
-                liturgicalSeason: 'Holy Week',
+                liturgicalYear: LiturgicalYear.B,
+                liturgicalSeason: LiturgicalSeason.LENT,
                 liturgy: 'Palm Sunday Mass',
                 themes: ['Passion', 'Triumph', 'Palm Branches', 'Hosanna'],
                 pastoralFocus: 'Long-term planning for major liturgical celebration',
@@ -635,8 +635,8 @@ async function main() {
             data: {
                 title: 'Simple Weekday Mass',
                 date: new Date(2024, 1, 14), // February 14, 2024 (Valentine\'s Day)
-                liturgicalYear: 'Year B',
-                liturgicalSeason: 'Ordinary Time',
+                liturgicalYear: LiturgicalYear.C,
+                liturgicalSeason: LiturgicalSeason.ORDINARY_TIME,
                 liturgy: 'Weekday Mass',
                 themes: ['Love', 'Charity', 'Saint Valentine'],
                 pastoralFocus: 'Simple weekday celebration with minimal music',
@@ -660,8 +660,8 @@ async function main() {
             data: {
                 title: 'Solemn Pontifical Mass - Bishop\'s Visit',
                 date: new Date(2024, 9, 20), // October 20, 2024
-                liturgicalYear: 'Year B',
-                liturgicalSeason: 'Ordinary Time',
+                liturgicalYear: LiturgicalYear.B,
+                liturgicalSeason: LiturgicalSeason.ORDINARY_TIME,
                 liturgy: 'Pontifical High Mass',
                 themes: ['Episcopal Visit', 'Unity', 'Teaching Authority', 'Apostolic Succession'],
                 pastoralFocus: 'Welcoming bishop with full ceremonial honors and musical splendor',

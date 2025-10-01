@@ -36,4 +36,4 @@ export type MassSelection = Prisma.MassSelectionGetPayload<{
     },
 }>
 
-export { KeySignature } from "@/lib/generated/prisma"
+export { KeySignature, LiturgicalSeason, LiturgicalYear } from "@/lib/generated/prisma"

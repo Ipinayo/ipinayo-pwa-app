@@ -11,7 +11,7 @@ export default function QueryFilter({
   selected,
   queryName,
 }: {
-  selected: string;
+  selected?: string;
   queryName: string;
   items: { label: string; value: string }[] | string[];
 }) {

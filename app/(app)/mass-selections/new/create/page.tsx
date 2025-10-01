@@ -3,6 +3,7 @@
 import { ArrowLeft, Eye, Plus, Save } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
+  LiturgicalSeason,
   MassPart,
   NewMassSelection,
   NewMassSelectionPart,
@@ -17,15 +18,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { liturgicalSeasons, templateParts } from "@/lib/constants";
+import {
+  liturgicalSeasonItems,
+  liturgicalYearItems,
+  templateParts,
+} from "@/lib/constants";
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { LiturgicalYear } from "../../../../../lib/generated/prisma/index";
 import { MassPartRow } from "@/components/common/mass-part-row";
 import { Switch } from "@/components/ui/switch";
+import { getEnum } from "@/lib/utils";
+
+const seasons = [{ label: "", value: "" }, ...liturgicalSeasonItems];
+const years = [{ label: "", value: "" }, ...liturgicalYearItems];
 
 export default function CreateMassSelectionPage() {
   const router = useRouter();
@@ -37,8 +47,8 @@ export default function CreateMassSelectionPage() {
   const [form, setForm] = useState<NewMassSelection>({
     title: "",
     date: new Date(),
-    liturgicalYear: "",
-    liturgicalSeason: "",
+    liturgicalYear: null,
+    liturgicalSeason: null,
     themes: [],
     pastoralFocus: "",
     liturgy: "",
@@ -227,18 +237,23 @@ export default function CreateMassSelectionPage() {
               <div className="space-y-2">
                 <Label htmlFor="liturgicalYear">Liturgical Year</Label>
                 <Select
-                  value={form.liturgicalYear || undefined}
-                  onValueChange={(value: "A" | "B" | "C") =>
-                    setForm((prev) => ({ ...prev, liturgicalYear: value }))
+                  value={form.liturgicalYear ?? undefined}
+                  onValueChange={(value) =>
+                    setForm((prev) => ({
+                      ...prev,
+                      liturgicalYear: getEnum(LiturgicalYear, value) ?? null,
+                    }))
                   }
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select year" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="A">Year A</SelectItem>
-                    <SelectItem value="B">Year B</SelectItem>
-                    <SelectItem value="C">Year C</SelectItem>
+                    {years.map((year) => (
+                      <SelectItem key={year.value} value={year.value}>
+                        {year.label}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -246,18 +261,22 @@ export default function CreateMassSelectionPage() {
               <div className="space-y-2">
                 <Label htmlFor="liturgicalSeason">Liturgical Season</Label>
                 <Select
-                  value={form.liturgicalSeason || undefined}
+                  value={form.liturgicalSeason ?? undefined}
                   onValueChange={(value) =>
-                    setForm((prev) => ({ ...prev, liturgicalSeason: value }))
+                    setForm((prev) => ({
+                      ...prev,
+                      liturgicalSeason:
+                        getEnum(LiturgicalSeason, value) ?? null,
+                    }))
                   }
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select season" />
                   </SelectTrigger>
                   <SelectContent>
-                    {liturgicalSeasons.map((season) => (
-                      <SelectItem key={season} value={season}>
-                        {season}
+                    {seasons.map((season) => (
+                      <SelectItem key={season.value} value={season.value}>
+                        {season.label}
                       </SelectItem>
                     ))}
                   </SelectContent>
