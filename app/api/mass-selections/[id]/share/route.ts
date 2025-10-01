@@ -1,45 +1,37 @@
-import { NextRequest, NextResponse } from "next/server"
+import { findSelection, updateSelection } from "@/db/mass-selections";
 
+import { NextResponse } from "next/server"
+import { Params } from "@/types/utils";
 import { auth } from "@/auth"
-import prisma from "@/lib/prisma";
 
 // POST /api/mass-selections/[id]/share - Generate shareable link
-export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
+export const POST = auth(async (request, props: { params: Params }) => {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+    if (!request.auth?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const selection = await prisma.massSelection.findUnique({
-      where: { id: params.id },
-      include: {
-        createdBy: {
-          select: { name: true, email: true },
-        },
-      },
-    })
+    const params = await props.params;
+
+    const selection = await findSelection(params.id)
 
     if (!selection) {
       return NextResponse.json({ error: "Mass selection not found" }, { status: 404 })
     }
 
-    // Check ownership
-    if (selection.createdById !== session.user.id) {
+    // Check ownership or public
+    if (selection.createdById !== request.auth.user.id && !selection.isPublic) {
       return NextResponse.json({ error: "Access denied" }, { status: 403 })
     }
 
     // Make selection public if it isn't already
     if (!selection.isPublic) {
-      await prisma.massSelection.update({
-        where: { id: params.id },
-        data: { isPublic: true },
-      })
+      await updateSelection({ isPublic: true }, params.id)
     }
 
     // Generate shareable URLs
-    const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000"
-    const shareableLink = `${baseUrl}/view/${params.id}`
+    const baseUrl = process.env.AUTH_URL || "http://localhost:3000"
+    const shareableLink = `${baseUrl}/mass-selections/${params.id}`
     const pdfLink = `${baseUrl}/api/mass-selections/${params.id}/pdf`
 
     return NextResponse.json({
@@ -51,4 +43,4 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
     console.error("Error creating shareable link:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
-}
+})

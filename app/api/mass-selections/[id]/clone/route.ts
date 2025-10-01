@@ -1,61 +1,35 @@
-import { NextRequest, NextResponse } from "next/server"
+import { findSelectionWithParts, saveSelection } from "@/db/mass-selections";
 
+import { NextResponse } from "next/server"
+import { Params } from "@/types/utils";
 import { auth } from "@/auth";
-import prisma from "@/lib/prisma";
 
 // POST /api/mass-selections/[id]/clone - Clone a mass selection
-export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
+export const POST = auth(async (request, props: { params: Params }) => {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+    if (!request.auth?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const originalSelection = await prisma.massSelection.findUnique({
-      where: { id: params.id },
-      include: { parts: true },
-    })
+    const params = await props.params;
+
+    const originalSelection = await findSelectionWithParts(params.id)
 
     if (!originalSelection) {
       return NextResponse.json({ error: "Mass selection not found" }, { status: 404 })
     }
 
     // Check access: owner or public selection
-    if (originalSelection.createdById !== session.user.id && !originalSelection.isPublic) {
+    if (originalSelection.createdById !== request.auth.user.id && !originalSelection.isPublic) {
       return NextResponse.json({ error: "Access denied" }, { status: 403 })
     }
 
     // Clone the selection
-    const clonedSelection = await prisma.massSelection.create({
-      data: {
-        title: `${originalSelection.title} (Copy)`,
-        date: originalSelection.date,
-        templateType: originalSelection.templateType,
-        liturgicalYear: originalSelection.liturgicalYear,
-        season: originalSelection.season,
-        themes: originalSelection.themes,
-        pastoralFocus: originalSelection.pastoralFocus,
-        isPublic: false, // Clones are private by default
-        createdById: session.user.id,
-        parts: {
-          create: originalSelection.parts.map((part) => ({
-            partName: part.partName,
-            keySignature: part.keySignature,
-            notes: part.notes,
-          })),
-        },
-      },
-      include: {
-        parts: true,
-        createdBy: {
-          select: { name: true, email: true },
-        },
-      },
-    })
+    const clonedSelection = await saveSelection({ ...originalSelection, title: `${originalSelection.title} (Copy)` }, request.auth.user.id)
 
     return NextResponse.json(clonedSelection, { status: 201 })
   } catch (error) {
     console.error("Error cloning mass selection:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
-}
+})

@@ -2,6 +2,8 @@ import { LiturgicalSeason, LiturgicalYear } from "./models";
 
 export type SearchParams = Promise<{ [key: string]: string | undefined }>;
 
+export type Params = Promise<{ id: string }>;
+
 export enum SortOrder {
     DESC = 'desc',
     ASC = 'asc'

@@ -70,9 +70,8 @@ export async function generateMassSelectionPDF(selection: GenerateMassSelection)
 
   const details = [
     `Date: ${formatDate(selection.date.toISOString())}`,
-    `Template: ${selection.templateType}`,
     selection.liturgicalYear ? `Liturgical Year: Year ${selection.liturgicalYear}` : null,
-    selection.season ? `Season: ${selection.season}` : null,
+    selection.liturgicalSeason ? `Liturgical Season: ${selection.liturgicalSeason}` : null,
   ].filter(Boolean)
 
   for (const detail of details) {
@@ -99,7 +98,7 @@ export async function generateMassSelectionPDF(selection: GenerateMassSelection)
     })
     yPosition -= 18
 
-    const themesLines = wrapText(selection.themes, 70)
+    const themesLines = wrapText(selection.themes.join(', '), 70)
     for (const line of themesLines) {
       page.drawText(line, {
         x: 50,

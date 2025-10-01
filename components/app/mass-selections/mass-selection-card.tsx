@@ -94,7 +94,7 @@ export default function MassSelectionCard({
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem asChild>
-                    <Link href={`/view/${selection.id}`}>
+                    <Link href={`/mass-selections/${selection.id}`}>
                       <Eye className="mr-2 h-4 w-4" />
                       View
                     </Link>
@@ -190,15 +190,20 @@ export default function MassSelectionCard({
 
         {publicView && (
           <div className="flex gap-2 pt-2 mt-auto">
-            <Button
-              variant="outline"
-              size="sm"
-              className="flex-1 gap-2 bg-transparent"
-              // onClick={() => handleDownloadPDF(selection.id, selection.title)}
+            <Link
+              href={`/mass-selections/${selection.id}/pdf`}
+              target="_blank"
+              className="flex-1"
             >
-              <Download className="h-4 w-4" />
-              PDF
-            </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full gap-2 bg-transparent"
+              >
+                <Download className="h-4 w-4" />
+                PDF
+              </Button>
+            </Link>
 
             <Link href={`/mass-selections/${selection.id}`} className="flex-1">
               <Button

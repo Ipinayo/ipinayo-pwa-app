@@ -1,33 +1,19 @@
-import { NextRequest, NextResponse } from "next/server"
+import { deleteSelection, findSelectionWithParts, findUserSelection, updateSelection } from "@/db/mass-selections"
 
+import { NextResponse } from "next/server"
+import { Params } from "@/types/utils"
 import { auth } from "@/auth"
-import prisma from "@/lib/prisma"
 
 // GET /api/mass-selections/[id] - Get single mass selection
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export const GET = auth(async (request, props: { params: Params }) => {
   try {
-    const session = await auth()
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-    }
 
-    const selection = await prisma.massSelection.findUnique({
-      where: { id: params.id },
-      include: {
-        parts: true,
-        createdBy: {
-          select: { name: true, email: true },
-        },
-      },
-    })
+    const params = await props.params;
+
+    const selection = await findSelectionWithParts(params.id)
 
     if (!selection) {
       return NextResponse.json({ error: "Mass selection not found" }, { status: 404 })
-    }
-
-    // Check access: owner or public selection
-    if (selection.createdById !== session.user.id && !selection.isPublic) {
-      return NextResponse.json({ error: "Access denied" }, { status: 403 })
     }
 
     return NextResponse.json(selection)
@@ -35,97 +21,56 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     console.error("Error fetching mass selection:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
-}
+})
 
 // PUT /api/mass-selections/[id] - Update mass selection
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export const PUT = auth(async (request, props: { params: Params }) => {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+    if (!request.auth?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const body = await request.json()
-    const { title, date, templateType, liturgicalYear, season, themes, pastoralFocus, parts, isPublic } = body
+    const params = await props.params;
+    const body = await request.json();
 
     // Check ownership
-    const existingSelection = await prisma.massSelection.findUnique({
-      where: { id: params.id },
-    })
+    const existingSelection = await findUserSelection(params.id, request.auth.user.id)
 
     if (!existingSelection) {
       return NextResponse.json({ error: "Mass selection not found" }, { status: 404 })
     }
 
-    if (existingSelection.createdById !== session.user.id) {
-      return NextResponse.json({ error: "Access denied" }, { status: 403 })
-    }
-
     // Update selection with parts
-    const selection = await prisma.massSelection.update({
-      where: { id: params.id },
-      data: {
-        title,
-        date: new Date(date),
-        templateType,
-        liturgicalYear,
-        season,
-        themes,
-        pastoralFocus,
-        isPublic: isPublic || false,
-        parts: {
-          deleteMany: {}, // Remove existing parts
-          create:
-            parts?.map((part: any) => ({
-              partName: part.partName,
-              keySignature: part.keySignature,
-              notes: part.notes,
-            })) || [],
-        },
-      },
-      include: {
-        parts: true,
-        createdBy: {
-          select: { name: true, email: true },
-        },
-      },
-    })
+    const selection = await updateSelection(body, params.id)
 
     return NextResponse.json(selection)
   } catch (error) {
     console.error("Error updating mass selection:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
-}
+})
 
 // DELETE /api/mass-selections/[id] - Delete mass selection
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export const DELETE = auth(async (request, props: { params: Params }) => {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+    if (!request.auth?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
+    const params = await props.params;
+
     // Check ownership
-    const existingSelection = await prisma.massSelection.findUnique({
-      where: { id: params.id },
-    })
+    const existingSelection = await findUserSelection(params.id, request.auth.user.id)
 
     if (!existingSelection) {
       return NextResponse.json({ error: "Mass selection not found" }, { status: 404 })
     }
 
-    if (existingSelection.createdById !== session.user.id) {
-      return NextResponse.json({ error: "Access denied" }, { status: 403 })
-    }
-
-    await prisma.massSelection.delete({
-      where: { id: params.id },
-    })
+    await deleteSelection(params.id)
 
     return NextResponse.json({ message: "Mass selection deleted successfully" })
   } catch (error) {
     console.error("Error deleting mass selection:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
-}
+})

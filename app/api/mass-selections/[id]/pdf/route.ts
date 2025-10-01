@@ -1,33 +1,27 @@
-import { NextRequest, NextResponse } from "next/server";
-
+import { NextResponse } from "next/server";
+import { Params } from "@/types/utils";
 import { auth } from "@/auth";
+import { findSelectionWithParts } from "@/db/mass-selections";
 import { generateMassSelectionPDF } from "@/lib/pdf-generator"
-import prisma from "@/lib/prisma";
 
 // GET /api/mass-selections/[id]/pdf - Generate and download PDF
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export const GET = auth(async (request, props: { params: Params }) => {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+
+    if (!request.auth?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const selection = await prisma.massSelection.findUnique({
-      where: { id: params.id },
-      include: {
-        parts: true,
-        createdBy: {
-          select: { name: true, email: true },
-        },
-      },
-    })
+    const params = await props.params;
+
+    const selection = await findSelectionWithParts(params.id)
 
     if (!selection) {
       return NextResponse.json({ error: "Mass selection not found" }, { status: 404 })
     }
 
-    // Check access: owner or public selection
-    if (selection.createdById !== session.user.id && !selection.isPublic) {
+    // Check access
+    if (selection.createdById !== request.auth.user.id && !selection.isPublic) {
       return NextResponse.json({ error: "Access denied" }, { status: 403 })
     }
 
@@ -35,8 +29,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     const pdfBytes = await generateMassSelectionPDF(selection)
 
     // Create filename
-    const filename = `${selection.title.replace(/[^a-zA-Z0-9]/g, "_")}_${new Date(selection.date).toISOString().split("T")[0]
-      }.pdf`
+    const filename = `${selection.title.replace(/[^a-zA-Z0-9]/g, "_")}_ipinayo.pdf`
 
     return new NextResponse(Buffer.from(pdfBytes), {
       headers: {
@@ -49,4 +42,4 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     console.error("Error generating PDF:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
-}
+})
