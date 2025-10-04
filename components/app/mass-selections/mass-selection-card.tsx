@@ -2,7 +2,6 @@
 
 import {
   Calendar,
-  Copy,
   Edit,
   Eye,
   Globe,
@@ -27,6 +26,7 @@ import { formatDateLocale, getLabelForValue } from "@/lib/utils";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import CloneButton from "@/components/common/clone-button";
 import Link from "next/link";
 import { MassSelection } from "@/types/models";
 import PDFDownloadButton from "@/components/common/pdf-download-button";
@@ -41,35 +41,6 @@ export default function MassSelectionCard({
   isOwner: boolean;
   publicView?: boolean;
 }) {
-  // const handleClone = async (id: string) => {
-  //   try {
-  //     const response = await fetch(`/api/mass-selections/${id}/clone`, {
-  //       method: "POST",
-  //     });
-  //     if (response.ok) {
-  //       // fetchSelections(); // Refresh the list
-  //     }
-  //   } catch (error) {
-  //     console.error("Error cloning selection:", error);
-  //   }
-  // };
-
-  // const handleDelete = async (id: string) => {
-  //   if (!confirm("Are you sure you want to delete this mass selection?"))
-  //     return;
-
-  //   try {
-  //     const response = await fetch(`/api/mass-selections/${id}`, {
-  //       method: "DELETE",
-  //     });
-  //     if (response.ok) {
-  //       // fetchSelections(); // Refresh the list
-  //     }
-  //   } catch (error) {
-  //     console.error("Error deleting selection:", error);
-  //   }
-  // };
-
   return (
     <Card className="transition-shadow hover:shadow-lg">
       <CardHeader>
@@ -101,15 +72,18 @@ export default function MassSelectionCard({
                   </DropdownMenuItem>
                   {isOwner && (
                     <DropdownMenuItem asChild>
-                      <Link href={`/edit/${selection.id}`}>
+                      <Link href={`/mass-selections/edit/${selection.id}`}>
                         <Edit className="mr-2 h-4 w-4" />
                         Edit
                       </Link>
                     </DropdownMenuItem>
                   )}
-                  <DropdownMenuItem>
-                    <Copy className="mr-2 h-4 w-4" />
-                    Clone
+                  <DropdownMenuItem asChild>
+                    <CloneButton
+                      variant="ghost"
+                      className="w-full h-fit inline-flex justify-start items-start [&:has(>svg)]:px-2 "
+                      selectionId={selection.id}
+                    />
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <PDFDownloadButton
@@ -201,19 +175,12 @@ export default function MassSelectionCard({
               </Button>
             </Link>
 
-            <Link
-              href={`/mass-selections/${selection.id}/clone`}
-              className="flex-1"
-            >
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full gap-2 bg-transparent"
-              >
-                <Copy className="h-4 w-4" />
-                Clone
-              </Button>
-            </Link>
+            <CloneButton
+              variant="outline"
+              size="sm"
+              className="w-full gap-2 bg-transparent flex-1"
+              selectionId={selection.id}
+            />
           </div>
         )}
       </CardContent>
