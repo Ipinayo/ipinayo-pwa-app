@@ -181,8 +181,8 @@ export default function MassSelectionCard({
           {selection.themes.length > 0 && (
             <div className="flex items-center justify-between text-sm gap-5">
               <span className="text-muted-foreground">Themes:</span>
-              <p className="mt-1 line-clamp-2 text-xs text-right font-medium">
-                {selection.themes.join(", ")}
+              <p className="mt-1 capitalize line-clamp-2 text-xs text-right font-medium">
+                {selection.themes.map((theme) => theme.name).join(", ")}
               </p>
             </div>
           )}

@@ -5,6 +5,7 @@ import { createMassSelectionSchema, updateMassSelectionSchema } from "@/types/ap
 import {
     deleteSelection as deleteSelectionDb,
     findAllSelections,
+    findAllThemes,
     findAllUserSelections,
     findSelectionWithParts,
     findUserSelection,
@@ -318,14 +319,21 @@ export async function cloneSelection(id: string) {
             throw new Error("Access denied");
         }
 
-        const { createdBy, createdById, ...rest } = originalSelection;
+        const { createdBy, createdById, themes, ...rest } = originalSelection;
         return await saveSelection({
             ...rest,
             title: `${originalSelection.title} (Copy)`,
-            isPublic: false
+            isPublic: false,
+            themes: themes.map(theme => theme.name)
         }, session.user.id);
     } catch (error: any) {
         console.error("Error cloning mass selection:", error);
         throw new Error("Error cloning mass selection: " + error?.message);
     }
+}
+
+export async function getThemes() {
+    const themes = await findAllThemes()
+
+    return themes.map(theme => theme.name)
 }

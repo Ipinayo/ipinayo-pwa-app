@@ -1,7 +1,15 @@
-// import { PrismaClient } from '@prisma/client'
 import { KeySignature, LiturgicalSeason, LiturgicalYear, PrismaClient } from '@/lib/generated/prisma'
 
 const prisma = new PrismaClient()
+
+function connectOrCreateThemes(themeNames: string[]) {
+    return {
+        connectOrCreate: themeNames.map(name => ({
+            where: { name: name.toLowerCase() },
+            create: { name: name.toLowerCase() }
+        }))
+    }
+}
 
 async function main() {
     console.log('Starting database seeding...')
@@ -180,7 +188,7 @@ async function main() {
                 liturgicalYear: LiturgicalYear.A,
                 liturgicalSeason: LiturgicalSeason.ADVENT,
                 liturgy: 'Sunday Mass',
-                themes: ['Hope', 'John the Baptist', 'Preparation', 'Waiting'],
+                themes: connectOrCreateThemes(['hope', 'john the baptist', 'preparation', 'waiting']),
                 pastoralFocus: 'Preparing hearts for Christ\'s coming, emphasis on hope and repentance',
                 isPublic: true,
                 createdById: users[0].id,
@@ -204,7 +212,7 @@ async function main() {
                 liturgicalYear: LiturgicalYear.B,
                 liturgicalSeason: LiturgicalSeason.CHRISTMAS,
                 liturgy: 'Sunday Mass',
-                themes: ['Holy Family', 'Christmas Joy', 'Family Values', 'Christ Child'],
+                themes: connectOrCreateThemes(['holy family', 'christmas joy', 'family values', 'christ child']),
                 pastoralFocus: 'Celebrating family bonds and the example of the Holy Family',
                 isPublic: true,
                 createdById: users[0].id,
@@ -231,7 +239,7 @@ async function main() {
                 liturgicalYear: LiturgicalYear.A,
                 liturgicalSeason: LiturgicalSeason.LENT,
                 liturgy: 'Sunday Mass',
-                themes: ['Death and Life', 'Preparation', 'Sacrifice', 'Conversion'],
+                themes: connectOrCreateThemes(['death and life', 'preparation', 'sacrifice', 'conversion']),
                 pastoralFocus: 'Final preparation for Holy Week, focus on dying to self and rising in Christ',
                 isPublic: true,
                 createdById: users[0].id,
@@ -261,7 +269,7 @@ async function main() {
                 liturgicalYear: LiturgicalYear.B,
                 liturgicalSeason: LiturgicalSeason.EASTER,
                 liturgy: 'Youth Mass',
-                themes: ['New Life', 'Young Disciples', 'Mission', 'Joy'],
+                themes: connectOrCreateThemes(['new life', 'young disciples', 'mission', 'joy']),
                 pastoralFocus: 'Engaging young people in liturgy, emphasis on mission and discipleship',
                 isPublic: true,
                 createdById: users[1].id,
@@ -280,7 +288,7 @@ async function main() {
                 liturgicalYear: LiturgicalYear.C,
                 liturgicalSeason: LiturgicalSeason.ORDINARY_TIME,
                 liturgy: 'Family Mass',
-                themes: ['Service', 'Humility', 'Community', 'Discipleship'],
+                themes: connectOrCreateThemes(['service', 'humility', 'community', 'discipleship']),
                 pastoralFocus: 'Teaching about true greatness through service, family-friendly approach',
                 isPublic: true,
                 createdById: users[1].id,
@@ -307,7 +315,7 @@ async function main() {
                 liturgicalYear: LiturgicalYear.A,
                 liturgicalSeason: LiturgicalSeason.CHRISTMAS,
                 liturgy: 'Midnight Mass',
-                themes: ['Nativity', 'Light in Darkness', 'Emmanuel', 'Wonder'],
+                themes: connectOrCreateThemes(['nativity', 'light in darkness', 'emmanuel', 'wonder']),
                 pastoralFocus: 'Celebrating the birth of Christ at the sacred hour, maximum beauty and reverence',
                 isPublic: false, // Private planning
                 createdById: users[1].id,
@@ -334,7 +342,7 @@ async function main() {
                 liturgicalYear: LiturgicalYear.B,
                 liturgicalSeason: LiturgicalSeason.ORDINARY_TIME,
                 liturgy: 'Solemn High Mass',
-                themes: ['Christ the King', 'Kingdom of God', 'Final Judgment', 'Majesty'],
+                themes: connectOrCreateThemes(['christ the king', 'kingdom of god', 'final judgment', 'majesty']),
                 pastoralFocus: 'Celebrating Christ\'s kingship with full cathedral ceremonial and musical splendor',
                 isPublic: true,
                 createdById: users[2].id,
@@ -365,7 +373,7 @@ async function main() {
                 liturgicalYear: LiturgicalYear.C,
                 liturgicalSeason: LiturgicalSeason.ORDINARY_TIME,
                 liturgy: 'Solemnity',
-                themes: ['Communion of Saints', 'Heavenly Glory', 'Eternal Life', 'Intercession'],
+                themes: connectOrCreateThemes(['communion of saints', 'heavenly glory', 'eternal life', 'intercession']),
                 pastoralFocus: 'Honoring all saints with the highest forms of sacred music',
                 isPublic: true,
                 createdById: users[2].id,
@@ -397,7 +405,7 @@ async function main() {
                 liturgicalYear: LiturgicalYear.C,
                 liturgicalSeason: LiturgicalSeason.CHRISTMAS,
                 liturgy: 'Misa Dominical Bilingüe',
-                themes: ['Sagrada Familia', 'Unidad Familiar', 'Holy Family', 'Family Unity'],
+                themes: connectOrCreateThemes(['sagrada familia', 'unidad familiar', 'holy family', 'family unity']),
                 pastoralFocus: 'Celebrating family values in bilingual community, honoring cultural traditions',
                 isPublic: true,
                 createdById: users[3].id,
@@ -416,7 +424,7 @@ async function main() {
                 liturgicalYear: LiturgicalYear.B,
                 liturgicalSeason: LiturgicalSeason.ORDINARY_TIME,
                 liturgy: 'Misa de Difuntos / Memorial Mass',
-                themes: ['Remembrance', 'Eternal Life', 'Recuerdo', 'Vida Eterna', 'Community of Saints'],
+                themes: connectOrCreateThemes(['remembrance', 'eternal life', 'recuerdo', 'vida eterna', 'community of saints']),
                 pastoralFocus: 'Honoring deceased family members and friends, blending Mexican traditions with Catholic liturgy',
                 isPublic: true,
                 createdById: users[3].id,
@@ -444,7 +452,7 @@ async function main() {
                 liturgicalYear: LiturgicalYear.A,
                 liturgicalSeason: LiturgicalSeason.ADVENT,
                 liturgy: 'Misa Festiva',
-                themes: ['Guadalupe', 'Mexican Heritage', 'Apparitions', 'Indigenous Culture', 'Mary'],
+                themes: connectOrCreateThemes(['Guadalupe', 'Mexican Heritage', 'Apparitions', 'Indigenous Culture', 'Mary']),
                 pastoralFocus: 'Celebrating patroness of Americas, honoring Mexican and indigenous heritage',
                 isPublic: true,
                 createdById: users[3].id,
@@ -474,7 +482,7 @@ async function main() {
                 liturgicalYear: LiturgicalYear.C,
                 liturgicalSeason: LiturgicalSeason.ORDINARY_TIME,
                 liturgy: 'Misa de Acción de Gracias',
-                themes: ['Coming of Age', 'Gratitude', 'Womanhood', 'Family Celebration'],
+                themes: connectOrCreateThemes(['Coming of Age', 'Gratitude', 'Womanhood', 'Family Celebration']),
                 pastoralFocus: 'Celebrating transition to womanhood with thanksgiving and commitment to faith',
                 isPublic: false, // Private family event
                 createdById: users[3].id,
@@ -504,7 +512,7 @@ async function main() {
                 liturgicalYear: LiturgicalYear.A,
                 liturgicalSeason: LiturgicalSeason.ORDINARY_TIME,
                 liturgy: 'Sunday Mass',
-                themes: ['Healing', 'Compassion', 'Outreach', 'Community'],
+                themes: connectOrCreateThemes(['Healing', 'Compassion', 'Outreach', 'Community']),
                 pastoralFocus: 'Simple, accessible music that builds confidence in new parish music ministry',
                 isPublic: true,
                 createdById: users[4].id,
@@ -523,7 +531,7 @@ async function main() {
                 liturgicalYear: LiturgicalYear.C,
                 liturgicalSeason: LiturgicalSeason.TRIDUUM,
                 liturgy: 'Easter Vigil',
-                themes: ['Resurrection', 'New Life', 'Baptism', 'Light'],
+                themes: connectOrCreateThemes(['Resurrection', 'New Life', 'Baptism', 'Light']),
                 pastoralFocus: 'Learning to plan the most important liturgy - need mentor guidance!',
                 isPublic: false, // Still learning/drafting
                 createdById: users[4].id,
@@ -550,7 +558,7 @@ async function main() {
                 liturgicalYear: LiturgicalYear.C,
                 liturgicalSeason: LiturgicalSeason.ORDINARY_TIME,
                 liturgy: 'Nuptial Mass',
-                themes: ['Love', 'Unity', 'Commitment', 'Sacrament of Marriage'],
+                themes: connectOrCreateThemes(['Love', 'Unity', 'Commitment', 'Sacrament of Marriage']),
                 pastoralFocus: 'Beautiful wedding liturgy focused on sacramental marriage and Christian love',
                 isPublic: false, // Private wedding
                 createdById: users[4].id,
@@ -580,7 +588,7 @@ async function main() {
                 liturgicalYear: LiturgicalYear.A,
                 liturgicalSeason: LiturgicalSeason.LENT,
                 liturgy: 'Funeral Mass',
-                themes: ['Eternal Life', 'Resurrection Hope', 'Comfort', 'Remembrance'],
+                themes: connectOrCreateThemes(['Eternal Life', 'Resurrection Hope', 'Comfort', 'Remembrance']),
                 pastoralFocus: 'Providing comfort to grieving family while celebrating hope of resurrection',
                 isPublic: false, // Private funeral
                 createdById: users[4].id,
@@ -613,7 +621,7 @@ async function main() {
                 liturgicalYear: LiturgicalYear.B,
                 liturgicalSeason: LiturgicalSeason.LENT,
                 liturgy: 'Palm Sunday Mass',
-                themes: ['Passion', 'Triumph', 'Palm Branches', 'Hosanna'],
+                themes: connectOrCreateThemes(['Passion', 'Triumph', 'Palm Branches', 'Hosanna']),
                 pastoralFocus: 'Long-term planning for major liturgical celebration',
                 isPublic: false,
                 createdById: users[0].id,
@@ -638,7 +646,7 @@ async function main() {
                 liturgicalYear: LiturgicalYear.C,
                 liturgicalSeason: LiturgicalSeason.ORDINARY_TIME,
                 liturgy: 'Weekday Mass',
-                themes: ['Love', 'Charity', 'Saint Valentine'],
+                themes: connectOrCreateThemes(['Love', 'Charity', 'Saint Valentine']),
                 pastoralFocus: 'Simple weekday celebration with minimal music',
                 isPublic: true,
                 createdById: users[4].id,
@@ -663,7 +671,7 @@ async function main() {
                 liturgicalYear: LiturgicalYear.B,
                 liturgicalSeason: LiturgicalSeason.ORDINARY_TIME,
                 liturgy: 'Pontifical High Mass',
-                themes: ['Episcopal Visit', 'Unity', 'Teaching Authority', 'Apostolic Succession'],
+                themes: connectOrCreateThemes(['Episcopal Visit', 'Unity', 'Teaching Authority', 'Apostolic Succession']),
                 pastoralFocus: 'Welcoming bishop with full ceremonial honors and musical splendor',
                 isPublic: true,
                 createdById: users[2].id, // Margaret - cathedral director

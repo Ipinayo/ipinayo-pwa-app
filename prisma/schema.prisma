@@ -84,7 +84,7 @@ model MassSelection {
   liturgicalYear   LiturgicalYear?
   liturgicalSeason LiturgicalSeason?
   liturgy          String?
-  themes           String[]
+  themes           Theme[]
   pastoralFocus    String?
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @updatedAt
@@ -108,6 +108,12 @@ model MassPart {
   massSelection   MassSelection @relation(fields: [massSelectionId], references: [id], onDelete: Cascade)
 
   @@index([massSelectionId])
+}
+
+model Theme {
+  id             String          @id @default(cuid())
+  name           String          @unique
+  massSelections MassSelection[]
 }
 
 enum KeySignature {

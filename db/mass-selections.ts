@@ -1,12 +1,14 @@
 import { MassSelectionFilter, SortBy, SortOrder } from "@/types/utils";
 
 import { NewMassSelection } from "@/types/models";
+import { Prisma } from "@/lib/generated/prisma";
 import prisma from "@/lib/prisma";
 
 export async function findSelectionWithParts(id: string) {
     return await prisma.massSelection.findUnique({
         where: { id },
         include: {
+            themes: true,
             parts: true,
             createdBy: {
                 select: { name: true, email: true },
@@ -19,6 +21,7 @@ export async function findUserSelectionWithParts(id: string, userId: string) {
     return await prisma.massSelection.findUnique({
         where: { id, createdById: userId },
         include: {
+            themes: true,
             parts: true,
             createdBy: {
                 select: { name: true, email: true },
@@ -52,19 +55,19 @@ export async function findAllSelections({
     const skip = (page - 1) * limit
 
     // Build where clause with search and filter conditions
-    const whereClause: any = {
-        OR: [{ isPublic: true }],
+    const whereClause: Prisma.MassSelectionWhereInput = {
+        isPublic: true, // Base condition - only public selections
     }
 
     // Build AND conditions array
-    const andConditions: any[] = []
+    const andConditions: Prisma.MassSelectionWhereInput[] = []
 
     // Add search functionality
     if (query) {
         andConditions.push({
             OR: [
                 { title: { contains: query, mode: "insensitive" } },
-                { themes: { contains: query, mode: "insensitive" } },
+                { themes: { some: { name: { contains: query } } } },
                 { pastoralFocus: { contains: query, mode: "insensitive" } },
                 { liturgy: { contains: query, mode: "insensitive" } },
             ],
@@ -95,6 +98,7 @@ export async function findAllSelections({
     const selections = await prisma.massSelection.findMany({
         where: whereClause,
         include: {
+            themes: true,
             createdBy: {
                 select: { name: true, email: true },
             },
@@ -127,19 +131,19 @@ export async function findAllUserSelections({
     const skip = (page - 1) * limit
 
     // Build where clause with search and filter conditions
-    const whereClause: any = {
-        OR: [{ createdById: userId }],
+    const whereClause: Prisma.MassSelectionWhereInput = {
+        createdById: userId, // Base condition - only user selections
     }
 
     // Build AND conditions array
-    const andConditions: any[] = []
+    const andConditions: Prisma.MassSelectionWhereInput[] = []
 
     // Add search functionality
     if (query) {
         andConditions.push({
             OR: [
                 { title: { contains: query, mode: "insensitive" } },
-                { themes: { contains: query, mode: "insensitive" } },
+                { themes: { some: { name: { contains: query } } } },
                 { pastoralFocus: { contains: query, mode: "insensitive" } },
                 { liturgy: { contains: query, mode: "insensitive" } },
             ],
@@ -170,6 +174,7 @@ export async function findAllUserSelections({
     const selections = await prisma.massSelection.findMany({
         where: whereClause,
         include: {
+            themes: true,
             createdBy: {
                 select: { name: true, email: true },
             },
@@ -198,7 +203,12 @@ export async function saveSelection(selection: NewMassSelection, userId: string)
             liturgicalYear: selection.liturgicalYear,
             liturgicalSeason: selection.liturgicalSeason,
             liturgy: selection.liturgy,
-            themes: selection.themes,
+            themes: {
+                connectOrCreate: selection.themes.map(name => ({
+                    where: { name: name.toLowerCase() },
+                    create: { name: name.toLowerCase() }
+                }))
+            },
             pastoralFocus: selection.pastoralFocus,
             isPublic: selection.isPublic,
             createdById: userId,
@@ -226,13 +236,22 @@ export async function updateSelection(
     selection: Partial<NewMassSelection>,
     id: string,
 ) {
-    const { parts, date, ...rest } = selection
+    const { parts, date, themes, ...rest } = selection
 
     return await prisma.massSelection.update({
         where: { id },
         data: {
             ...rest,
             ...(date && { date: new Date(date) }),
+            ...(themes && {
+                themes: {
+                    set: [], // Disconnect all existing
+                    connectOrCreate: themes.map(name => ({
+                        where: { name: name.toLowerCase() },
+                        create: { name: name.toLowerCase() }
+                    }))
+                }
+            }),
             ...(parts && {
                 parts: {
                     deleteMany: {},
@@ -257,5 +276,11 @@ export async function updateSelection(
 export async function deleteSelection(id: string) {
     return await prisma.massSelection.delete({
         where: { id },
+    })
+}
+
+export async function findAllThemes() {
+    return await prisma.theme.findMany({
+        orderBy: { name: 'asc' }
     })
 }
