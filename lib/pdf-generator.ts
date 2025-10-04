@@ -98,7 +98,7 @@ export async function generateMassSelectionPDF(selection: GenerateMassSelection)
     })
     yPosition -= 18
 
-    const themesLines = wrapText(selection.themes.join(', '), 70)
+    const themesLines = wrapText(selection.themes.map(theme => theme.name).join(', '), 70)
     for (const line of themesLines) {
       page.drawText(line, {
         x: 50,

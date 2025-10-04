@@ -3,7 +3,6 @@
 import {
   Calendar,
   Copy,
-  Download,
   Edit,
   Eye,
   Globe,
@@ -30,6 +29,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { MassSelection } from "@/types/models";
+import PDFDownloadButton from "@/components/common/pdf-download-button";
 import { liturgicalSeasonItems } from "@/lib/constants";
 
 export default function MassSelectionCard({
@@ -41,34 +41,34 @@ export default function MassSelectionCard({
   isOwner: boolean;
   publicView?: boolean;
 }) {
-  const handleClone = async (id: string) => {
-    try {
-      const response = await fetch(`/api/mass-selections/${id}/clone`, {
-        method: "POST",
-      });
-      if (response.ok) {
-        // fetchSelections(); // Refresh the list
-      }
-    } catch (error) {
-      console.error("Error cloning selection:", error);
-    }
-  };
+  // const handleClone = async (id: string) => {
+  //   try {
+  //     const response = await fetch(`/api/mass-selections/${id}/clone`, {
+  //       method: "POST",
+  //     });
+  //     if (response.ok) {
+  //       // fetchSelections(); // Refresh the list
+  //     }
+  //   } catch (error) {
+  //     console.error("Error cloning selection:", error);
+  //   }
+  // };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this mass selection?"))
-      return;
+  // const handleDelete = async (id: string) => {
+  //   if (!confirm("Are you sure you want to delete this mass selection?"))
+  //     return;
 
-    try {
-      const response = await fetch(`/api/mass-selections/${id}`, {
-        method: "DELETE",
-      });
-      if (response.ok) {
-        // fetchSelections(); // Refresh the list
-      }
-    } catch (error) {
-      console.error("Error deleting selection:", error);
-    }
-  };
+  //   try {
+  //     const response = await fetch(`/api/mass-selections/${id}`, {
+  //       method: "DELETE",
+  //     });
+  //     if (response.ok) {
+  //       // fetchSelections(); // Refresh the list
+  //     }
+  //   } catch (error) {
+  //     console.error("Error deleting selection:", error);
+  //   }
+  // };
 
   return (
     <Card className="transition-shadow hover:shadow-lg">
@@ -107,27 +107,20 @@ export default function MassSelectionCard({
                       </Link>
                     </DropdownMenuItem>
                   )}
-                  <DropdownMenuItem onClick={() => handleClone(selection.id)}>
+                  <DropdownMenuItem>
                     <Copy className="mr-2 h-4 w-4" />
                     Clone
                   </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() =>
-                      window.open(
-                        `/api/mass-selections/${selection.id}/pdf`,
-                        "_blank"
-                      )
-                    }
-                  >
-                    <Download className="mr-2 h-4 w-4" />
-                    Download PDF
+                  <DropdownMenuItem asChild>
+                    <PDFDownloadButton
+                      variant="ghost"
+                      className="w-full h-fit inline-flex justify-start items-start [&:has(>svg)]:px-2 "
+                      selectionId={selection.id}
+                    />
                   </DropdownMenuItem>
                   {isOwner && (
-                    <DropdownMenuItem
-                      onClick={() => handleDelete(selection.id)}
-                      className="text-destructive"
-                    >
-                      <Trash2 className="mr-2 h-4 w-4" />
+                    <DropdownMenuItem className="text-destructive">
+                      <Trash2 className="mr-2 h-4 w-4 text-destructive" />
                       Delete
                     </DropdownMenuItem>
                   )}
@@ -190,20 +183,12 @@ export default function MassSelectionCard({
 
         {publicView && (
           <div className="flex gap-2 pt-2 mt-auto">
-            <Link
-              href={`/mass-selections/${selection.id}/pdf`}
-              target="_blank"
-              className="flex-1"
-            >
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full gap-2 bg-transparent"
-              >
-                <Download className="h-4 w-4" />
-                PDF
-              </Button>
-            </Link>
+            <PDFDownloadButton
+              variant="outline"
+              size="sm"
+              className="w-full gap-2 bg-transparent flex-1"
+              selectionId={selection.id}
+            />
 
             <Link href={`/mass-selections/${selection.id}`} className="flex-1">
               <Button
