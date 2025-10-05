@@ -1,13 +1,4 @@
-"use client";
-
-import {
-  Calendar,
-  Edit,
-  Eye,
-  Globe,
-  Lock,
-  MoreVertical,
-} from "lucide-react";
+import { Calendar, Eye, Globe, Lock } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -15,30 +6,22 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { formatDateLocale, getLabelForValue } from "@/lib/utils";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import CloneButton from "@/components/common/clone-button";
-import DeleteButton from "@/components/common/delete-button";
+import CloneButton from "@/components/app/mass-selections/clone-button";
+import DownloadButton from "@/components/app/mass-selections/download-button";
 import Link from "next/link";
 import { MassSelection } from "@/types/models";
-import PDFDownloadButton from "@/components/common/pdf-download-button";
+import Options from "./options";
 import { liturgicalSeasonItems } from "@/lib/constants";
 
 export default function MassSelectionCard({
   selection,
-  isOwner = false,
   publicView = true,
 }: {
   selection: MassSelection;
-  isOwner: boolean;
   publicView?: boolean;
 }) {
   return (
@@ -57,52 +40,7 @@ export default function MassSelectionCard({
           </div>
           {!publicView && (
             <div className="flex items-center">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                    <MoreVertical className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem asChild>
-                    <Link href={`/mass-selections/${selection.id}`}>
-                      <Eye className="mr-2 h-4 w-4" />
-                      View
-                    </Link>
-                  </DropdownMenuItem>
-                  {isOwner && (
-                    <DropdownMenuItem asChild>
-                      <Link href={`/mass-selections/edit/${selection.id}`}>
-                        <Edit className="mr-2 h-4 w-4" />
-                        Edit
-                      </Link>
-                    </DropdownMenuItem>
-                  )}
-                  <DropdownMenuItem asChild>
-                    <CloneButton
-                      variant="ghost"
-                      className="w-full h-fit inline-flex justify-start items-start [&:has(>svg)]:px-2 "
-                      selectionId={selection.id}
-                    />
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <PDFDownloadButton
-                      variant="ghost"
-                      className="w-full h-fit inline-flex justify-start items-start [&:has(>svg)]:px-2 "
-                      selectionId={selection.id}
-                    />
-                  </DropdownMenuItem>
-                  {isOwner && (
-                    <DropdownMenuItem asChild>
-                      <DeleteButton
-                        variant="ghost"
-                        className="w-full h-fit flex justify-start items-start [&:has(>svg)]:px-2 text-destructive hover:bg-destructive/10 dark:hover:bg-destructive/20 hover:text-destructive "
-                        selectionId={selection.id}
-                      />
-                    </DropdownMenuItem>
-                  )}
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <Options selection={selection} />
             </div>
           )}
         </div>
@@ -160,7 +98,7 @@ export default function MassSelectionCard({
 
         {publicView && (
           <div className="flex gap-2 pt-2 mt-auto">
-            <PDFDownloadButton
+            <DownloadButton
               variant="outline"
               size="sm"
               className="w-full gap-2 bg-transparent flex-1"

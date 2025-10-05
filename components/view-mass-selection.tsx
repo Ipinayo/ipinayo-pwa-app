@@ -22,9 +22,9 @@ import { useEffect, useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import DownloadButton from "@/components/app/mass-selections/download-button";
 import Image from "next/image";
 import Link from "next/link";
-import PDFDownloadButton  from "@/components/common/pdf-download-button";
 import type React from "react";
 import { Separator } from "@/components/ui/separator";
 import { ShareDialog } from "@/components/share-dialog";
@@ -214,7 +214,7 @@ export function ViewMassSelection({ id }: ViewMassSelectionProps) {
                 <Copy className="mr-2 h-4 w-4" />
                 Clone
               </Button>
-              <PDFDownloadButton selectionId={id} variant="outline" />
+              <DownloadButton selectionId={id} variant="outline" />
               {isOwner && (
                 <ShareDialog
                   selectionId={id}

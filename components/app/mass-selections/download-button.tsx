@@ -15,7 +15,7 @@ interface PDFDownloadButtonProps {
   className?: string;
 }
 
-export default function PDFDownloadButton({
+export default function DownloadButton({
   selectionId,
   variant = "outline",
   size = "default",
