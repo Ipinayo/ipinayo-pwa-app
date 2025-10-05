@@ -36,7 +36,7 @@ export default async function MassSelectionList(filter: MassSelectionFilter) {
     </Card>
   ) : (
     <>
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-6 lg:gap-3 xl:gap-6 md:grid-cols-2 lg:grid-cols-3">
         {selections.map((selection) => (
           <MassSelectionCard
             key={selection.id}
