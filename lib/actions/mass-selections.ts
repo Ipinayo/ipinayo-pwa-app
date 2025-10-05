@@ -3,12 +3,12 @@
 import { MassSelectionFilter, SortBy, SortOrder } from "@/types/utils";
 import { createMassSelectionSchema, updateMassSelectionSchema } from "@/types/api/mass-selections";
 import {
-    deleteSelection as deleteSelectionDb,
     findAllSelections,
     findAllThemes,
     findAllUserSelections,
     findSelectionWithParts,
     findUserSelection,
+    removeSelection,
     saveSelection,
     updateSelection as updateSelectionDb
 } from "@/db/mass-selections";
@@ -293,7 +293,7 @@ export async function deleteSelection(id: string) {
             throw new Error("Mass selection not found");
         }
 
-        await deleteSelectionDb(id);
+        await removeSelection(id);
         return { message: "Mass selection deleted successfully" };
     } catch (error: any) {
         console.error("Error deleting mass selection:", error);

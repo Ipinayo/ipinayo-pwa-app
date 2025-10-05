@@ -1,4 +1,4 @@
-import { deleteSelection, findSelectionWithParts, findUserSelection, updateSelection } from "@/db/mass-selections"
+import { findSelectionWithParts, findUserSelection, removeSelection, updateSelection } from "@/db/mass-selections"
 
 import { NextResponse } from "next/server"
 import { Params } from "@/types/utils"
@@ -68,7 +68,7 @@ export const DELETE = auth(async (request, props: { params: Params }) => {
       return NextResponse.json({ error: "Mass selection not found" }, { status: 404 })
     }
 
-    await deleteSelection(params.id)
+    await removeSelection(params.id)
 
     return NextResponse.json({ message: "Mass selection deleted successfully" })
   } catch (error) {

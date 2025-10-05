@@ -7,7 +7,6 @@ import {
   Globe,
   Lock,
   MoreVertical,
-  Trash2,
 } from "lucide-react";
 import {
   Card,
@@ -27,6 +26,7 @@ import { formatDateLocale, getLabelForValue } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import CloneButton from "@/components/common/clone-button";
+import DeleteButton from "@/components/common/delete-button";
 import Link from "next/link";
 import { MassSelection } from "@/types/models";
 import PDFDownloadButton from "@/components/common/pdf-download-button";
@@ -93,9 +93,12 @@ export default function MassSelectionCard({
                     />
                   </DropdownMenuItem>
                   {isOwner && (
-                    <DropdownMenuItem className="text-destructive">
-                      <Trash2 className="mr-2 h-4 w-4 text-destructive" />
-                      Delete
+                    <DropdownMenuItem asChild>
+                      <DeleteButton
+                        variant="ghost"
+                        className="w-full h-fit flex justify-start items-start [&:has(>svg)]:px-2 text-destructive hover:bg-destructive/10 dark:hover:bg-destructive/20 hover:text-destructive "
+                        selectionId={selection.id}
+                      />
                     </DropdownMenuItem>
                   )}
                 </DropdownMenuContent>

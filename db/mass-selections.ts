@@ -273,7 +273,7 @@ export async function updateSelection(
     })
 }
 
-export async function deleteSelection(id: string) {
+export async function removeSelection(id: string) {
     return await prisma.massSelection.delete({
         where: { id },
     })
