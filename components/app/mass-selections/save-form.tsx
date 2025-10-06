@@ -1,6 +1,5 @@
 "use client";
 
-import { CalendarIcon, Plus, Save } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Form,
@@ -16,11 +15,7 @@ import {
   MassSelectionWithParts,
   NewMassSelection,
 } from "@/types/models";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Plus, Save } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -29,15 +24,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  cn,
+  createSelection,
+  updateSelection,
+} from "@/lib/actions/mass-selections";
+import {
   getEnum,
   getValuesFromOptions,
   transformStringsToOptions,
 } from "@/lib/utils";
-import {
-  createSelection,
-  updateSelection,
-} from "@/lib/actions/mass-selections";
 import {
   liturgicalSeasonItems,
   liturgicalYearItems,
@@ -46,13 +40,12 @@ import {
 import { useFieldArray, useForm } from "react-hook-form";
 
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
+import DateSelect from "@/components/common/date-select";
 import { Input } from "@/components/ui/input";
 import { MassPartRow } from "./mass-part-row";
 import MultipleSelector from "@/components/common/multiple-selector";
 import { Switch } from "@/components/ui/switch";
 import { createMassSelectionSchema } from "@/types/api/mass-selections";
-import { format } from "date-fns";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { withToast } from "@/lib/with-toast";
@@ -219,34 +212,12 @@ export default function SaveForm(props: SaveFormProps) {
                     <FormLabel>
                       Date<span className="text-destructive">*</span>
                     </FormLabel>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <FormControl>
-                          <Button
-                            variant={"outline"}
-                            className={cn(
-                              "w-full pl-3 text-left font-normal",
-                              !field.value && "text-muted-foreground"
-                            )}
-                          >
-                            {field.value ? (
-                              format(field.value, "PPP")
-                            ) : (
-                              <span>Pick a date</span>
-                            )}
-                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                          </Button>
-                        </FormControl>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={field.value}
-                          onSelect={field.onChange}
-                          endMonth={undefined}
-                        />
-                      </PopoverContent>
-                    </Popover>
+                    <FormControl>
+                      <DateSelect
+                        value={field.value}
+                        onChange={field.onChange}
+                      />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}

@@ -1,14 +1,5 @@
 "use client";
 
-import { Check, ChevronDown, Trash2 } from "lucide-react";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
 import { Control, useController } from "react-hook-form";
 import {
   FormControl,
@@ -19,22 +10,19 @@ import {
 } from "@/components/ui/form";
 import { KeySignature, NewMassSelection } from "@/types/models";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { cn, getEnumByKey } from "@/lib/utils";
+import { cn, getEnumByKey, transformStringsToOptions } from "@/lib/utils";
 
 import { Button } from "@/components/ui/button";
+import CreatableSelect from "@/components/common/creatable-select";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Trash2 } from "lucide-react";
 import { keySignatureItems } from "@/lib/constants";
 import { useState } from "react";
 
@@ -105,64 +93,27 @@ export function MassPartRow({
         <FormField
           control={control}
           name={`parts.${index}.partName`}
-          render={({ field }) => (
+          render={({ field, fieldState }) => (
             <FormItem>
               <FormLabel>
                 Part Name <span className="text-destructive">*</span>
               </FormLabel>
-              <Popover open={partNameOpen} onOpenChange={setPartNameOpen}>
-                <PopoverTrigger asChild>
-                  <FormControl>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      role="combobox"
-                      aria-expanded={partNameOpen}
-                      className="w-full justify-between bg-transparent"
-                    >
-                      {field.value || "Select or type part name..."}
-                      <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                    </Button>
-                  </FormControl>
-                </PopoverTrigger>
-                <PopoverContent className="w-full p-0">
-                  <Command>
-                    <CommandInput
-                      placeholder="Search part names..."
-                      value={field.value}
-                      onValueChange={field.onChange}
-                    />
-                    <CommandList>
-                      <CommandEmpty>No part names found.</CommandEmpty>
-                      <CommandGroup>
-                        {commonPartNames
-                          .filter((name) =>
-                            name
-                              .toLowerCase()
-                              .includes(field.value.toLowerCase())
-                          )
-                          .map((partName) => (
-                            <CommandItem
-                              key={partName}
-                              value={partName}
-                              onSelect={() => handlePartNameSelect(partName)}
-                            >
-                              <Check
-                                className={cn(
-                                  "mr-2 h-4 w-4",
-                                  field.value === partName
-                                    ? "opacity-100"
-                                    : "opacity-0"
-                                )}
-                              />
-                              {partName}
-                            </CommandItem>
-                          ))}
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
-                </PopoverContent>
-              </Popover>
+              <FormControl>
+                <CreatableSelect
+                  value={field.value || undefined}
+                  onValueChange={field.onChange}
+                  options={transformStringsToOptions(commonPartNames)}
+                  placeholder="Select or type part name..."
+                  className={cn(
+                    "capitalize",
+                    fieldState.invalid
+                      ? "ring-destructive/20 dark:ring-destructive/40 border-destructive"
+                      : ""
+                  )}
+                  dropdownClassName="capitalize"
+                  inputProps={{ className: "capitalize" }}
+                />
+              </FormControl>
               <FormMessage />
             </FormItem>
           )}

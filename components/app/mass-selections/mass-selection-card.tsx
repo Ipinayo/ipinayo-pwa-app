@@ -6,7 +6,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { formatDateLocale, getLabelForValue } from "@/lib/utils";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -15,6 +14,8 @@ import DownloadButton from "@/components/app/mass-selections/download-button";
 import Link from "next/link";
 import { MassSelection } from "@/types/models";
 import Options from "./options";
+import { format } from "date-fns";
+import { getLabelForValue } from "@/lib/utils";
 import { liturgicalSeasonItems } from "@/lib/constants";
 
 export default function MassSelectionCard({
@@ -46,7 +47,7 @@ export default function MassSelectionCard({
         </div>
         <div className="text-muted-foreground flex items-center gap-2 text-sm">
           <Calendar className="h-4 w-4" />
-          {new Date(selection.date).toLocaleDateString()}
+          {format(selection.date, "PPP")}
         </div>
       </CardHeader>
 
@@ -131,9 +132,7 @@ export default function MassSelectionCard({
             <span>
               by {selection.createdBy.name || selection.createdBy.email}
             </span>
-            <span>
-              Updated {formatDateLocale(selection.updatedAt.toString())}
-            </span>
+            <span>Updated: {format(selection.updatedAt, "PPP")}</span>
           </div>
         </CardFooter>
       )}

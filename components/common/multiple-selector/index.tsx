@@ -447,7 +447,7 @@ const MultipleSelector = React.forwardRef<
           commandProps?.onKeyDown?.(e);
         }}
         className={cn(
-          "h-auto overflow-visible bg-transparent",
+          "h-auto overflow-visible dark:bg-input/30 bg-transparent",
           commandProps?.className
         )}
         shouldFilter={
@@ -533,7 +533,7 @@ const MultipleSelector = React.forwardRef<
                   : placeholder
               }
               className={cn(
-                "placeholder:text-muted-foreground flex-1 bg-transparent outline-none",
+                "placeholder:text-muted-foreground flex-1  bg-transparent outline-none",
                 {
                   "w-full": hidePlaceholderWhenSelected,
                   "px-3 py-2": selected.length === 0,
