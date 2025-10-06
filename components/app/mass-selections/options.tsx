@@ -13,10 +13,14 @@ import CloneButton from "./clone-button";
 import DeleteButton from "./delete-button";
 import DownloadButton from "./download-button";
 import Link from "next/link";
-import { MassSelection } from "@/types/models";
+import { SingleMassSelection } from "@/types/models";
 import { useSession } from "next-auth/react";
 
-export default function Options({ selection }: { selection: MassSelection }) {
+export default function Options({
+  selection,
+}: {
+  selection: SingleMassSelection;
+}) {
   const { data: session } = useSession();
   const isOwner = selection.createdById === session?.user?.id;
 

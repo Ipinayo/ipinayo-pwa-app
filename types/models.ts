@@ -10,7 +10,7 @@ export type GenerateMassSelection = Prisma.MassSelectionGetPayload<{
     },
 }>
 
-type RawMassSelection = Prisma.MassSelectionGetPayload<{}>
+export type SingleMassSelection = Prisma.MassSelectionGetPayload<{}>
 
 export type MassSelectionWithParts = Prisma.MassSelectionGetPayload<{
     include: {
@@ -23,7 +23,7 @@ export type MassPart = Prisma.MassPartGetPayload<{}>;
 
 export type NewMassSelectionPart = Omit<MassPart, 'massSelectionId'>
 
-export type NewMassSelection = Omit<RawMassSelection, 'id' | 'createdAt' | 'updatedAt' | 'createdById' | 'themes'> & {
+export type NewMassSelection = Omit<SingleMassSelection, 'id' | 'createdAt' | 'updatedAt' | 'createdById' | 'themes'> & {
     themes: string[]
     parts: NewMassSelectionPart[]
 }
