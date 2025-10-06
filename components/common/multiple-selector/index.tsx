@@ -63,6 +63,7 @@ interface MultipleSelectorProps {
   /** Group the options base on provided key. */
   groupBy?: string;
   className?: string;
+  dropdownClassName?: string;
   badgeClassName?: string;
   /**
    * First item selected is a default behavior by cmdk. That is why the default is true.
@@ -197,6 +198,7 @@ const MultipleSelector = React.forwardRef<
       disabled,
       groupBy,
       className,
+      dropdownClassName,
       badgeClassName,
       selectFirstItem = true,
       creatable = false,
@@ -611,6 +613,7 @@ const MultipleSelector = React.forwardRef<
                               }}
                               className={cn(
                                 "cursor-pointer",
+                                dropdownClassName,
                                 option.disable &&
                                   "text-muted-foreground cursor-default"
                               )}

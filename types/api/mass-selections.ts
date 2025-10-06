@@ -19,9 +19,9 @@ export const createMassSelectionSchema = z.object({
     liturgicalYear: z.enum(LiturgicalYear).nullable(),
     liturgicalSeason: z.enum(LiturgicalSeason).nullable(),
     liturgy: z.string().nullable(),
-    themes: z.array(z.string()).default([]),
+    themes: z.array(z.string()),
     pastoralFocus: z.string().nullable(),
-    isPublic: z.boolean().default(false),
+    isPublic: z.boolean(),
     parts: z.array(massSelectionPartSchema).min(1, "At least one part is required"),
 });
 

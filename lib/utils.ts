@@ -1,6 +1,7 @@
 import { clsx, type ClassValue } from "clsx"
 import { ReadonlyURLSearchParams } from "next/navigation";
 import { twMerge } from "tailwind-merge"
+import { Option } from "../components/common/multiple-selector"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -68,4 +69,15 @@ export function getLabelForValue(
   fallback = ""
 ): string {
   return items.find((item) => item.value === value)?.label ?? fallback;
+}
+
+export function transformStringsToOptions(strings: string[]): Option[] {
+  return strings.map((str) => ({
+    label: str,
+    value: str,
+  }));
+}
+
+export function getValuesFromOptions(options: Option[]) {
+  return options.map((opt) => opt.value)
 }
