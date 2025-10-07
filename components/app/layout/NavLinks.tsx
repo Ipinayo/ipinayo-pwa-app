@@ -5,9 +5,7 @@ import {
   ChevronRight,
   Home,
   Library,
-  Music,
   Settings,
-  Upload,
   User,
 } from "lucide-react";
 import {
@@ -75,14 +73,9 @@ export default function NavLinks({
       active: pathname === "/settings" || pathname.startsWith("/settings/"),
       children: [
         {
-          href: "/profile",
+          href: "/settings/profile",
           label: "Profile",
           icon: User,
-        },
-        {
-          href: "/account",
-          label: "Account",
-          icon: Settings,
         },
       ],
     },
@@ -140,6 +133,7 @@ export default function NavLinks({
                   "space-y-1 pl-5 pt-1",
                   collapsibleContentClassName
                 )}
+                aria-describedby="navigation links"
               >
                 {route.children.map((child) => (
                   <RouteLink key={child.href} route={child} />

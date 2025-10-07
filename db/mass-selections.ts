@@ -44,7 +44,7 @@ export async function findUserSelection(id: string, userId: string) {
 
 export async function findAllSelections({
     page = 1,
-    limit = 9,
+    limit = 12,
     query = '',
     season,
     year,
@@ -120,7 +120,7 @@ export async function findAllSelections({
 
 export async function findAllUserSelections({
     page = 1,
-    limit = 9,
+    limit = 12,
     query = '',
     season,
     year,

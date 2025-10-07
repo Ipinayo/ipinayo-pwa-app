@@ -13,11 +13,11 @@ export default function SideNav({ isMobileMenuOpen }: SideNavProps) {
       {/* Mobile Navigation - In TopNav component */}
       <div
         className={cn(
-          "flex h-full flex-col",
-          isMobileMenuOpen ? "block" : "hidden"
+          " h-full ",
+          isMobileMenuOpen ? "flex flex-col py-10" : "hidden"
         )}
       >
-        <NavLinks className="pt-10" />
+        <NavLinks />
         <div className="mt-auto px-3 py-4">
           <LazyThemeToggle className="mb-2 w-full justify-start py-2" />
           <SignoutButton />

@@ -67,7 +67,7 @@ type ValidationError = {
 // Get all selections (public)
 export async function getSelections({
     page = 1,
-    limit = 9,
+    limit = 12,
     query = '',
     season,
     year,

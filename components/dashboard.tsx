@@ -65,7 +65,7 @@ interface MassSelection {
   date: string;
   liturgicalYear?: string;
   season?: string;
-  themes?: string;
+  themes?: { id: string; name: string }[];
   pastoralFocus?: string;
   isPublic: boolean;
   createdAt: string;
@@ -92,7 +92,7 @@ export function Dashboard() {
   const [selections, setSelections] = useState<MassSelection[]>([]);
   const [pagination, setPagination] = useState<PaginationInfo>({
     page: 1,
-    limit: 10,
+    limit: 12,
     total: 0,
     pages: 0,
   });
@@ -467,7 +467,7 @@ export function Dashboard() {
 
                     {selection.themes && (
                       <p className="text-sm text-muted-foreground line-clamp-2">
-                        {selection.themes}
+                        {selection.themes.map((theme) => theme.name).join(", ")}
                       </p>
                     )}
 

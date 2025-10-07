@@ -9,26 +9,24 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Menu, Search, Settings, User, X } from "lucide-react";
 import {
   Sheet,
   SheetContent,
+  SheetDescription,
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
 
 import { Button } from "@/components/ui/button";
-import Form from "next/form";
 import Image from "next/image";
-import { Input } from "@/components/ui/input";
 import Link from "next/link";
+import { Menu } from "lucide-react";
 import SideNav from "./SideNav";
 import SignoutButton from "./SignoutButton";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
 
 export default function Header() {
-  const [searchOpen, setSearchOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const { data: session } = useSession();
@@ -46,8 +44,15 @@ export default function Header() {
               <span className="sr-only">Toggle menu</span>
             </Button>
           </SheetTrigger>
-          <SheetTitle className="sr-only">Side Navigation</SheetTitle>
-          <SheetContent side="left" className="p-0">
+          <SheetContent
+            side="left"
+            className="p-0"
+            aria-describedby="side navigation"
+          >
+            <SheetTitle className="sr-only">Side Navigation</SheetTitle>
+            <SheetDescription className="sr-only">
+              Side Navigation
+            </SheetDescription>
             <SideNav isMobileMenuOpen={mobileMenuOpen} />
           </SheetContent>
         </Sheet>
@@ -58,7 +63,7 @@ export default function Header() {
             alt="Ipinayo Logo"
             width={120}
             height={40}
-            className="h-auto"
+            className="h-auto w-auto"
           />
         </Link>
 
@@ -100,15 +105,6 @@ export default function Header() {
                       </p>
                     </div>
                   </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem>
-                    <User className="mr-2 h-4 w-4" />
-                    <span>Profile</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Settings className="mr-2 h-4 w-4" />
-                    <span>Settings</span>
-                  </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem>
                     <SignoutButton className="border-none p-0 has-[>svg]:px-0" />
