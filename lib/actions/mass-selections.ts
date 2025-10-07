@@ -15,6 +15,7 @@ import {
 
 import { NewMassSelection } from "@/types/models";
 import { auth } from "@/auth";
+import { revalidatePath } from "next/cache";
 import z from "zod";
 
 function parseFormData(formData: FormData): Record<string, any> {
@@ -168,7 +169,12 @@ export async function createSelection(data: NewMassSelection) {
             throw new Error(validationResult.error.message);
         }
 
-        return await saveSelection(validationResult.data, session.user.id);
+        const result = await saveSelection(validationResult.data, session.user.id);
+
+        revalidatePath('/mass-selections');
+        revalidatePath('/dashboard');
+
+        return result;
     } catch (error: any) {
         console.error("Error creating mass selection:", error);
         throw new Error("Error creating mass selection: " + error?.message);
@@ -199,6 +205,10 @@ export async function createSelectionFromForm(formData: FormData) {
         }
 
         const result = await saveSelection(validationResult.data, session.user.id);
+
+        revalidatePath('/mass-selections');
+        revalidatePath('/dashboard');
+
         return { success: true, data: result };
     } catch (error: any) {
         console.error("Error creating mass selection:", error);
@@ -229,7 +239,13 @@ export async function updateSelection(id: string, data: Partial<NewMassSelection
             throw new Error(validationResult.error.message);
         }
 
-        return await updateSelectionDb(validationResult.data, id);
+        const result = await updateSelectionDb(validationResult.data, id);
+
+        revalidatePath('/mass-selections');
+        revalidatePath(`/mass-selections/${id}`);
+        revalidatePath('/dashboard');
+
+        return result;
     } catch (error: any) {
         console.error("Error updating mass selection:", error);
         throw new Error("Error updating mass selection: " + error?.message);
@@ -269,6 +285,11 @@ export async function updateSelectionFromForm(id: string, formData: FormData) {
         }
 
         const result = await updateSelectionDb(validationResult.data, id);
+
+        revalidatePath('/mass-selections');
+        revalidatePath(`/mass-selections/${id}`);
+        revalidatePath('/dashboard');
+
         return { success: true, data: result };
     } catch (error: any) {
         console.error("Error updating mass selection:", error);
@@ -294,6 +315,10 @@ export async function deleteSelection(id: string) {
         }
 
         await removeSelection(id);
+
+        revalidatePath('/mass-selections');
+        revalidatePath('/dashboard');
+
         return { message: "Mass selection deleted successfully" };
     } catch (error: any) {
         console.error("Error deleting mass selection:", error);
@@ -320,12 +345,18 @@ export async function cloneSelection(id: string) {
         }
 
         const { createdBy, createdById, themes, ...rest } = originalSelection;
-        return await saveSelection({
+        const result = await saveSelection({
             ...rest,
             title: `${originalSelection.title} (Copy)`,
-            isPublic: false,
+            isPublic: true,
             themes: themes.map(theme => theme.name)
         }, session.user.id);
+
+        revalidatePath('/mass-selections');
+        revalidatePath('/dashboard');
+
+        return result;
+
     } catch (error: any) {
         console.error("Error cloning mass selection:", error);
         throw new Error("Error cloning mass selection: " + error?.message);
