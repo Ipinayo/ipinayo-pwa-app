@@ -3,12 +3,11 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { cn, formatDate } from "@/lib/utils";
 
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { CalendarIcon } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { format } from "date-fns";
 
 export default function DateSelect({
   value,
@@ -27,7 +26,7 @@ export default function DateSelect({
             !value && "text-muted-foreground"
           )}
         >
-          {value ? format(value, "PPP") : <span>Pick a date</span>}
+          {value ? formatDate(value) : <span>Pick a date</span>}
           <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
         </Button>
       </PopoverTrigger>

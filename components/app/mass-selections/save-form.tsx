@@ -75,8 +75,8 @@ const getDefaultValues = (props: SaveFormProps): NewMassSelection => {
     };
   }
 
-  const parts =
-    liturgyTemplates.find((temp) => temp.id === props.template)?.parts || [];
+  const liturgy = liturgyTemplates.find((temp) => temp.id === props.template);
+  const parts = liturgy?.parts || [];
 
   const initialParts =
     parts.length > 0
@@ -102,9 +102,9 @@ const getDefaultValues = (props: SaveFormProps): NewMassSelection => {
     date: new Date(),
     liturgicalYear: null,
     liturgicalSeason: null,
-    themes: [],
+    themes: liturgy?.themes || [],
     pastoralFocus: "",
-    liturgy: "",
+    liturgy: liturgy?.liturgy || "",
     isPublic: true,
     parts: initialParts,
   };

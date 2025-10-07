@@ -1,4 +1,4 @@
-import { Church, FileText, Flower, Heart, Users } from "lucide-react";
+import { Church, FileText, Flower, Heart, Music2, Users } from "lucide-react";
 import { KeySignature, LiturgicalSeason, LiturgicalYear } from "@/types/models";
 
 export const liturgicalSeasonItems = [
@@ -17,6 +17,11 @@ export const liturgyTemplates = [
         name: "Sunday Mass",
         description: "Standard Sunday liturgy with common Mass parts",
         icon: Church,
+        liturgy: "Sunday Mass",
+        themes: [
+            "Sunday Mass",
+            "Ordinary Time"
+        ],
         parts: [
             "Entrance Hymn",
             "Kyrie",
@@ -27,7 +32,7 @@ export const liturgyTemplates = [
             "Sanctus",
             "Memorial Acclamation",
             "Great Amen",
-            "Lamb of God",
+            "Agnus Dei",
             "Communion Hymn",
             "Recessional Hymn",
         ],
@@ -37,6 +42,13 @@ export const liturgyTemplates = [
         name: "Wedding",
         description: "Wedding ceremony with processional and recessional",
         icon: Heart,
+        liturgy: "Matrimony",
+        themes: [
+            "Wedding",
+            "Matrimony",
+            "Love and Unity",
+            "Sacred Union"
+        ],
         parts: [
             "Prelude",
             "Processional",
@@ -47,7 +59,7 @@ export const liturgyTemplates = [
             "Sanctus",
             "Memorial Acclamation",
             "Great Amen",
-            "Lamb of God",
+            "Agnus Dei",
             "Communion Hymn",
             "Recessional",
         ],
@@ -57,6 +69,15 @@ export const liturgyTemplates = [
         name: "Ordination",
         description: "Ordination ceremony with special liturgical parts",
         icon: Users,
+        liturgy: "Ordination",
+        themes: [
+            "Ordination",
+            "Holy Orders",
+            "Vocation",
+            "Holy Spirit",
+            "Ministry",
+            "Priest"
+        ],
         parts: [
             "Entrance Hymn",
             "Kyrie",
@@ -68,7 +89,7 @@ export const liturgyTemplates = [
             "Sanctus",
             "Memorial Acclamation",
             "Great Amen",
-            "Lamb of God",
+            "Agnus Dei",
             "Communion Hymn",
             "Te Deum",
             "Recessional Hymn",
@@ -79,6 +100,14 @@ export const liturgyTemplates = [
         name: "Funeral",
         description: "Funeral Mass with appropriate liturgical selections",
         icon: Flower,
+        liturgy: "Requiem Mass",
+        themes: [
+            "Funeral",
+            "Requiem Mass",
+            "Eternal Rest",
+            "Resurrection",
+            "Comfort"
+        ],
         parts: [
             "Entrance Hymn",
             "Kyrie",
@@ -88,10 +117,28 @@ export const liturgyTemplates = [
             "Sanctus",
             "Memorial Acclamation",
             "Great Amen",
-            "Lamb of God",
+            "Agnus Dei",
             "Communion Hymn",
             "Song of Farewell",
             "Recessional Hymn",
+        ],
+    },
+    {
+        id: "weekday-mass",
+        name: "Weekday Mass",
+        description: "Weekday Mass with only essential Mass parts",
+        icon: Music2,
+        liturgy: "Mass",
+        themes: [
+            "Weekday Mass",
+            "Mass",
+            "Daily Mass"
+        ],
+        parts: [
+            "Entrance Hymn",
+            "Offertory Hymn",
+            "Communion Hymn",
+            "Recessional Hymn"
         ],
     },
     {
@@ -99,71 +146,11 @@ export const liturgyTemplates = [
         name: "Blank Template",
         description: "Start with an empty template and add your own parts",
         icon: FileText,
+        liturgy: "",
+        themes: [],
         parts: [],
     },
 ];
-
-// export const templateParts: Record<string, string[]> = {
-//     "sunday-mass": [
-//         "Entrance Hymn",
-//         "Kyrie",
-//         "Gloria",
-//         "Responsorial Psalm",
-//         "Gospel Acclamation",
-//         "Offertory Hymn",
-//         "Sanctus",
-//         "Memorial Acclamation",
-//         "Great Amen",
-//         "Lamb of God",
-//         "Communion Hymn",
-//         "Recessional Hymn",
-//     ],
-//     wedding: [
-//         "Prelude",
-//         "Processional",
-//         "Opening Hymn",
-//         "Responsorial Psalm",
-//         "Gospel Acclamation",
-//         "Offertory Hymn",
-//         "Sanctus",
-//         "Memorial Acclamation",
-//         "Great Amen",
-//         "Lamb of God",
-//         "Communion Hymn",
-//         "Recessional",
-//     ],
-//     ordination: [
-//         "Entrance Hymn",
-//         "Kyrie",
-//         "Gloria",
-//         "Responsorial Psalm",
-//         "Gospel Acclamation",
-//         "Litany of Saints",
-//         "Offertory Hymn",
-//         "Sanctus",
-//         "Memorial Acclamation",
-//         "Great Amen",
-//         "Lamb of God",
-//         "Communion Hymn",
-//         "Te Deum",
-//         "Recessional Hymn",
-//     ],
-//     funeral: [
-//         "Entrance Hymn",
-//         "Kyrie",
-//         "Responsorial Psalm",
-//         "Gospel Acclamation",
-//         "Offertory Hymn",
-//         "Sanctus",
-//         "Memorial Acclamation",
-//         "Great Amen",
-//         "Lamb of God",
-//         "Communion Hymn",
-//         "Song of Farewell",
-//         "Recessional Hymn",
-//     ],
-//     blank: [],
-// };
 
 export const keySignatureItems: { label: string; value: KeySignature }[] = [
     { label: "C Major", value: KeySignature.C_MAJOR },

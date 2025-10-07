@@ -2,6 +2,8 @@ import { clsx, type ClassValue } from "clsx"
 import { ReadonlyURLSearchParams } from "next/navigation";
 import { twMerge } from "tailwind-merge"
 import { Option } from "../components/common/multiple-selector"
+import { format } from "date-fns";
+import { enGB } from "date-fns/locale";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -52,15 +54,10 @@ export function getEnum<T extends Record<string, string>>(
   return undefined;
 }
 
-export const formatDateLocale = (dateStr: string) => {
-  if (!dateStr) return '';
+export const formatDate = (date: string | Date) => {
+  if (!date) return '';
 
-  const d = new Date(dateStr);
-  return d.toLocaleDateString('en-GB', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric'
-  });
+  return format(date, 'PPP', { locale: enGB })
 };
 
 export function getLabelForValue(

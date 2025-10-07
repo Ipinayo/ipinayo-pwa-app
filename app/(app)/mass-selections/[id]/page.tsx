@@ -8,6 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { formatDate, getLabelForValue } from "@/lib/utils";
 import { keySignatureItems, liturgicalSeasonItems } from "@/lib/constants";
 
 import BackButton from "@/components/common/back-button";
@@ -19,8 +20,6 @@ import DownloadButton from "@/components/app/mass-selections/download-button";
 import Link from "next/link";
 import { Params } from "@/types/utils";
 import { auth } from "@/auth";
-import { format } from "date-fns";
-import { getLabelForValue } from "@/lib/utils";
 import { getSelectionById } from "@/lib/actions/mass-selections";
 
 export default async function ViewPage(props: { params: Params }) {
@@ -53,7 +52,7 @@ export default async function ViewPage(props: { params: Params }) {
           <div className="flex flex-col w-full sm:flex-row items-start sm:items-center gap-1 sm:gap-4 text-muted-foreground">
             <div className="flex items-center gap-1">
               <Calendar className="h-4 w-4" />
-              {format(selection.date, "PPP")}
+              {formatDate(selection.date)}
             </div>
             <div className="flex items-center gap-1">
               <Music className="h-4 w-4" />
@@ -178,7 +177,7 @@ export default async function ViewPage(props: { params: Params }) {
                   Created
                 </label>
                 <p className="mt-1 text-sm text-right">
-                  {new Date(selection.createdAt).toLocaleDateString()}
+                  {formatDate(selection.createdAt)}
                 </p>
               </div>
               <div className="flex items-center justify-between text-sm gap-5">
@@ -186,7 +185,7 @@ export default async function ViewPage(props: { params: Params }) {
                   Last updated
                 </label>
                 <p className="mt-1 text-sm text-right">
-                  {new Date(selection.updatedAt).toLocaleDateString()}
+                  {formatDate(selection.updatedAt)}
                 </p>
               </div>
               <div className="flex items-center justify-between text-sm gap-5">
