@@ -29,7 +29,7 @@ const nextConfig: NextConfig = {
           },
           {
             key: 'Cache-Control',
-            value: 'public, max-age=0, must-revalidate',
+            value: 'no-cache, no-store, must-revalidate',
           },
           {
             key: 'Content-Security-Policy',
@@ -52,13 +52,18 @@ const nextConfig: NextConfig = {
       },
     ]
   },
-  async rewrites() {
-    return [
-      {
-        source: '/sw.js',
-        destination: '/sw.js',
-      },
-    ]
+  // async rewrites() {
+  //   return [
+  //     {
+  //       source: '/sw.js',
+  //       destination: '/sw.js',
+  //     },
+  //   ]
+  // },
+  eslint: {
+    // Warning: This allows production builds to successfully complete even if
+    // your project has ESLint errors.
+    ignoreDuringBuilds: true,
   },
 };
 

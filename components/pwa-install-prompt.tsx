@@ -1,7 +1,5 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -10,10 +8,30 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Download, X } from "lucide-react";
+import { useEffect, useState } from "react";
+
+import { Button } from "@/components/ui/button";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
   userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
+}
+
+const DISMISSAL_KEY = "pwa-install-dismissed";
+const DISMISSAL_DAYS = 2;
+
+// Helper function to check if dismissal period is still active
+function isDismissalActive(): boolean {
+  if (typeof window === "undefined") return false;
+
+  const dismissed = localStorage.getItem(DISMISSAL_KEY);
+  if (!dismissed) return false;
+
+  const dismissedTime = Number.parseInt(dismissed);
+  const daysSinceDismissal =
+    (Date.now() - dismissedTime) / (1000 * 60 * 60 * 24);
+
+  return daysSinceDismissal < DISMISSAL_DAYS;
 }
 
 export function PWAInstallPrompt() {
@@ -25,6 +43,13 @@ export function PWAInstallPrompt() {
     const handleBeforeInstallPrompt = (e: Event) => {
       // Prevent the mini-infobar from appearing on mobile
       e.preventDefault();
+
+      // Check if user dismissed recently before showing
+      if (isDismissalActive()) {
+        console.log("PWA install prompt dismissed recently, not showing");
+        return;
+      }
+
       // Save the event so it can be triggered later
       setDeferredPrompt(e as BeforeInstallPromptEvent);
       // Show the install prompt
@@ -35,6 +60,8 @@ export function PWAInstallPrompt() {
       console.log("PWA was installed");
       setShowPrompt(false);
       setDeferredPrompt(null);
+      // Clear dismissal when app is installed
+      localStorage.removeItem(DISMISSAL_KEY);
     };
 
     window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
@@ -60,6 +87,8 @@ export function PWAInstallPrompt() {
 
     if (outcome === "accepted") {
       console.log("User accepted the install prompt");
+      // Clear dismissal on acceptance
+      localStorage.removeItem(DISMISSAL_KEY);
     } else {
       console.log("User dismissed the install prompt");
     }
@@ -71,23 +100,13 @@ export function PWAInstallPrompt() {
 
   const handleDismiss = () => {
     setShowPrompt(false);
+    setDeferredPrompt(null);
     // Store dismissal in localStorage to avoid showing again for a while
-    localStorage.setItem("pwa-install-dismissed", Date.now().toString());
+    localStorage.setItem(DISMISSAL_KEY, Date.now().toString());
+    console.log(
+      `PWA install prompt dismissed, will not show for ${DISMISSAL_DAYS} days`
+    );
   };
-
-  // Check if user has dismissed recently
-  useEffect(() => {
-    const dismissed = localStorage.getItem("pwa-install-dismissed");
-    if (dismissed) {
-      const dismissedTime = Number.parseInt(dismissed);
-      const daysSinceDismissal =
-        (Date.now() - dismissedTime) / (1000 * 60 * 60 * 24);
-      if (daysSinceDismissal < 7) {
-        // Don't show for 7 days after dismissal
-        setShowPrompt(false);
-      }
-    }
-  }, []);
 
   if (!showPrompt || !deferredPrompt) {
     return null;
@@ -109,8 +128,7 @@ export function PWAInstallPrompt() {
             </Button>
           </div>
           <CardDescription>
-            Install Ìpínayò on your device for quick access to your Mass
-            selections, even when offline.
+            Install Ìpínayò on your device for a more seamless experience.
           </CardDescription>
         </CardHeader>
         <CardContent className="pt-0">

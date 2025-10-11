@@ -1,19 +1,23 @@
-const CACHE_NAME = "ipinayo-v1"
-const STATIC_CACHE_NAME = "ipinayo-static-v1"
-const DYNAMIC_CACHE_NAME = "ipinayo-dynamic-v1"
+const CACHE_NAME = "ipinayo"
+const STATIC_CACHE_NAME = "ipinayo-static"
+const DYNAMIC_CACHE_NAME = "ipinayo-dynamic"
 
 // Assets to cache on install (only public assets)
 const STATIC_ASSETS = [
   "/",
   "/signin",
   "/manifest.json",
-  "/images/logo.png",
   "/offline",
-  // Add other critical public assets
+  "/images/logo.png",
 ]
 
-// Define auth-protected routes
-const PROTECTED_ROUTES = ['/dashboard', '/create', '/edit', '/view', '/mass-selections']
+// Dynamic assets that need to be cached during runtime
+const CACHE_PATTERNS = {
+  css: /\.(css)$/,
+  js: /\.(js)$/,
+  fonts: /\.(woff|woff2|ttf|eot)$/,
+  images: /\.(png|jpg|jpeg|svg|gif|webp|ico)$/,
+}
 
 // Install event - cache static assets
 self.addEventListener("install", (event) => {
@@ -23,7 +27,15 @@ self.addEventListener("install", (event) => {
       .open(STATIC_CACHE_NAME)
       .then((cache) => {
         console.log("[SW] Caching static assets")
-        return cache.addAll(STATIC_ASSETS)
+        // Cache assets individually to avoid failing entire install if one fails
+        return Promise.allSettled(
+          STATIC_ASSETS.map(url =>
+            cache.add(url).catch(err => {
+              console.warn(`[SW] Failed to cache ${url}:`, err)
+              return null
+            })
+          )
+        )
       })
       .then(() => {
         console.log("[SW] Static assets cached")
@@ -58,12 +70,12 @@ self.addEventListener("activate", (event) => {
   )
 })
 
-// Fetch event - handle caching strategies
+// Fetch event - simple network-first with offline fallback
 self.addEventListener("fetch", (event) => {
   const { request } = event
   const url = new URL(request.url)
 
-  // Skip non-GET requests
+  // Only handle GET requests
   if (request.method !== "GET") {
     return
   }
@@ -73,125 +85,78 @@ self.addEventListener("fetch", (event) => {
     return
   }
 
-  // Check if route is protected (for offline fallback logic)
-  const isProtectedRoute = PROTECTED_ROUTES.some(route => url.pathname.startsWith(route))
+  // Check if this is a CSS, JS, font, or image file
+  const isStaticAsset =
+    CACHE_PATTERNS.css.test(url.pathname) ||
+    CACHE_PATTERNS.js.test(url.pathname) ||
+    CACHE_PATTERNS.fonts.test(url.pathname) ||
+    CACHE_PATTERNS.images.test(url.pathname)
 
-  // Handle API requests
-  if (url.pathname.startsWith("/api/")) {
+  // For static assets (CSS, JS, fonts, images), use cache-first strategy
+  if (isStaticAsset) {
     event.respondWith(
-      fetch(request)
-        .then((response) => {
-          // Cache successful API responses for offline access
-          if (response.ok && request.method === "GET") {
+      caches.match(request).then((cachedResponse) => {
+        if (cachedResponse) {
+          console.log("[SW] Serving from cache:", url.pathname)
+          return cachedResponse
+        }
+
+        // If not in cache, fetch and cache it
+        return fetch(request).then((response) => {
+          if (response.ok && response.status === 200) {
             const responseClone = response.clone()
-            caches.open(DYNAMIC_CACHE_NAME).then((cache) => {
+            caches.open(STATIC_CACHE_NAME).then((cache) => {
               cache.put(request, responseClone)
+              console.log("[SW] Cached static asset:", url.pathname)
             })
           }
           return response
+        }).catch((error) => {
+          console.error("[SW] Failed to fetch static asset:", url.pathname, error)
+          throw error
         })
-        .catch(() => {
-          // Return cached API response if available
-          return caches.match(request).then((cachedResponse) => {
-            if (cachedResponse) {
-              return cachedResponse
-            }
-            // Return offline response for API requests
-            return new Response(JSON.stringify({ error: "Offline - data not available" }), {
-              status: 503,
-              statusText: "Service Unavailable",
-              headers: { "Content-Type": "application/json" },
-            })
-          })
-        }),
+      })
     )
     return
   }
 
-  // Network-first strategy for all page requests
+  // Skip API routes and server actions - let them fail naturally
+  if (url.pathname.startsWith('/_next/') ||
+    url.pathname.startsWith('/api/') ||
+    request.headers.get('RSC') || // React Server Component requests
+    request.headers.get('Next-Router-State-Tree')) { // Next.js router requests
+    return
+  }
+
+  // Network-first strategy for navigation requests
   event.respondWith(
     fetch(request)
       .then((response) => {
-        // Cache all successful responses (not redirects)
+        // Only cache successful page responses
         if (response.ok && response.status === 200 && !response.redirected) {
-          console.log("[SW] Caching page:", url.pathname)
           const responseClone = response.clone()
           caches.open(DYNAMIC_CACHE_NAME).then((cache) => {
             cache.put(request, responseClone)
           })
-        } else {
-          console.log("[SW] Not caching response:", response.status, response.redirected)
         }
         return response
       })
       .catch(async (error) => {
-        console.log("[SW] Network failed, checking cache:", url.pathname)
-        // Fallback to cache when network fails
+        console.log("[SW] Network failed for:", url.pathname)
+
+        // Try to serve from cache first
         const cachedResponse = await caches.match(request)
         if (cachedResponse) {
           console.log("[SW] Serving cached page:", url.pathname)
           return cachedResponse
         }
-        // For protected routes or navigation requests that aren't cached, show offline page
-        if (isProtectedRoute || request.mode === "navigate") {
-          console.log("[SW] Showing offline page for:", url.pathname)
-          return caches.match("/offline")
-        }
-        return new Response("Offline", {
-          status: 503,
-          statusText: "Service Unavailable",
-        })
+
+        // If nothing in cache, show offline page
+        console.log("[SW] Showing offline page")
+        return caches.match("/offline")
       })
   )
 })
-
-// Background sync for offline actions
-self.addEventListener("sync", (event) => {
-  console.log("[SW] Background sync:", event.tag)
-
-  if (event.tag === "sync-mass-selections") {
-    event.waitUntil(syncMassSelections())
-  }
-})
-
-// Sync offline mass selections when back online
-async function syncMassSelections() {
-  try {
-    // Get offline data from IndexedDB or localStorage
-    const offlineData = await getOfflineData()
-
-    if (offlineData && offlineData.length > 0) {
-      for (const data of offlineData) {
-        try {
-          await fetch("/api/mass-selections", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data),
-          })
-          // Remove from offline storage after successful sync
-          await removeOfflineData(data.id)
-          console.log("[SW] Synced mass selection:", data.id)
-        } catch (error) {
-          console.error("[SW] Error syncing mass selection:", error)
-        }
-      }
-    }
-  } catch (error) {
-    console.error("[SW] Error in background sync:", error)
-  }
-}
-
-// Helper functions for offline data management
-async function getOfflineData() {
-  // Implementation would depend on your offline storage strategy
-  // This is a placeholder for the actual implementation
-  return []
-}
-
-async function removeOfflineData(id) {
-  // Implementation would depend on your offline storage strategy
-  // This is a placeholder for the actual implementation
-}
 
 // Push notification handling
 self.addEventListener("push", (event) => {
@@ -231,5 +196,14 @@ self.addEventListener("notificationclick", (event) => {
 
   if (event.action === "explore") {
     event.waitUntil(clients.openWindow("/dashboard"))
+  }
+})
+
+// Message handling from clients
+self.addEventListener("message", (event) => {
+  console.log("[SW] Message received:", event.data)
+
+  if (event.data.type === "SKIP_WAITING") {
+    self.skipWaiting()
   }
 })

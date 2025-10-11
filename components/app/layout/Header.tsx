@@ -18,7 +18,6 @@ import {
 } from "@/components/ui/sheet";
 
 import { Button } from "@/components/ui/button";
-import Image from "next/image";
 import Link from "next/link";
 import { Menu } from "lucide-react";
 import SideNav from "./SideNav";
@@ -58,12 +57,10 @@ export default function Header() {
         </Sheet>
 
         <Link href="/" className="flex items-center">
-          <Image
+          <img
             src="/images/logo.png"
             alt="Ipinayo Logo"
-            width={120}
-            height={40}
-            className="h-auto w-auto"
+            className="h-11 w-auto"
           />
         </Link>
 
@@ -115,7 +112,7 @@ export default function Header() {
           ) : (
             <div className="flex items-center gap-2">
               <Button variant="ghost" size="sm" asChild>
-                <Link href="/login">Sign In</Link>
+                <Link href="/signin">Sign In</Link>
               </Button>
             </div>
           )}

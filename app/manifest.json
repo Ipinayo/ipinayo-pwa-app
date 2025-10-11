@@ -68,21 +68,5 @@
         }
       ]
     }
-  ],
-  "screenshots": [
-    {
-      "src": "/images/screenshot-wide.png",
-      "sizes": "1280x720",
-      "type": "image/png",
-      "form_factor": "wide",
-      "label": "Ìpínayò Dashboard"
-    },
-    {
-      "src": "/images/screenshot-narrow.png",
-      "sizes": "640x1136",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Ìpínayò Mobile View"
-    }
   ]
 }
