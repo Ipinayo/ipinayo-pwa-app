@@ -1,9 +1,9 @@
 import "../ui/globals.css";
 
+import type { Metadata, Viewport } from "next";
 import { geistMono, pattaya, playfairDisplay, sourceSans } from "../ui/fonts";
 
 import { Analytics } from "@vercel/analytics/next";
-import type { Metadata } from "next";
 import { OfflineIndicator } from "@/components/offline-indicator";
 import { PWAInstallPrompt } from "@/components/pwa-install-prompt";
 import { SessionProvider } from "next-auth/react";
@@ -43,6 +43,10 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport: Viewport = {
+  themeColor: "#175bea",
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -69,23 +73,6 @@ export default function RootLayout({
           </SessionProvider>
         </ThemeProvider>
         <Analytics />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              if ('serviceWorker' in navigator) {
-                window.addEventListener('load', function() {
-                  navigator.serviceWorker.register('/sw.js')
-                    .then(function(registration) {
-                      console.log('SW registered: ', registration);
-                    })
-                    .catch(function(registrationError) {
-                      console.log('SW registration failed: ', registrationError);
-                    });
-                });
-              }
-            `,
-          }}
-        />
       </body>
     </html>
   );

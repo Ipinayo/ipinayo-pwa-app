@@ -1,6 +1,19 @@
-import type { NextConfig } from "next";
+import withSerwistInit from "@serwist/next";
 
-const nextConfig: NextConfig = {
+const withSerwist = withSerwistInit({
+  swSrc: "app/sw.ts",
+  swDest: "public/sw.js",
+  cacheOnNavigation: true,
+  reloadOnOnline: true,
+  register: true,
+  scope: "/",
+  additionalPrecacheEntries: [
+    { url: "/offline", revision: "1" },
+    { url: "/images/logo.png", revision: "1" },
+  ]
+});
+
+export default withSerwist({
   async headers() {
     return [
       {
@@ -52,19 +65,7 @@ const nextConfig: NextConfig = {
       },
     ]
   },
-  // async rewrites() {
-  //   return [
-  //     {
-  //       source: '/sw.js',
-  //       destination: '/sw.js',
-  //     },
-  //   ]
-  // },
   eslint: {
-    // Warning: This allows production builds to successfully complete even if
-    // your project has ESLint errors.
     ignoreDuringBuilds: true,
   },
-};
-
-export default nextConfig;
+});
