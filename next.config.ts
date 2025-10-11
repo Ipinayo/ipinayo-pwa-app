@@ -10,7 +10,8 @@ const withSerwist = withSerwistInit({
   additionalPrecacheEntries: [
     { url: "/offline", revision: "1" },
     { url: "/images/logo.png", revision: "1" },
-  ]
+  ],
+  disable: false
 });
 
 export default withSerwist({
