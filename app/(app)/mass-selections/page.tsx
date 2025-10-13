@@ -37,7 +37,7 @@ export default async function MassSelectionsPage(props: {
   const searchKey = [page, query, season, year].join("-");
 
   return (
-    <>
+    <div className="max-w-full w-full">
       <div className="mb-8 flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Mass Selections</h1>
@@ -81,6 +81,6 @@ export default async function MassSelectionsPage(props: {
           sortOrder={order}
         />
       </Suspense>
-    </>
+    </div>
   );
 }
