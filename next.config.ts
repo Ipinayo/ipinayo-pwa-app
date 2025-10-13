@@ -11,7 +11,7 @@ const withSerwist = withSerwistInit({
     { url: "/offline", revision: "1" },
     { url: "/images/logo.png", revision: "1" },
   ],
-  disable: false
+  disable: process.env.NODE_ENV === "development"
 });
 
 export default withSerwist({
