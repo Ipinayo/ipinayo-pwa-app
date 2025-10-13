@@ -40,7 +40,7 @@ export default function Options({
         </DropdownMenuItem>
         {isOwner && (
           <DropdownMenuItem asChild>
-            <Link href={`/mass-selections/edit/${selection.id}`}>
+            <Link href={`/mass-selections/${selection.id}/edit`}>
               <Edit className="mr-2 h-4 w-4" />
               Edit
             </Link>

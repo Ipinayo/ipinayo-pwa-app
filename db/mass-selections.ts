@@ -1,6 +1,6 @@
 import { MassSelectionFilter, SortBy, SortOrder } from "@/types/utils";
+import { MassSelectionStats, NewMassSelection } from "@/types/models";
 
-import { NewMassSelection } from "@/types/models";
 import { Prisma } from "@/lib/generated/prisma";
 import prisma from "@/lib/prisma";
 
@@ -283,4 +283,22 @@ export async function findAllThemes() {
     return await prisma.theme.findMany({
         orderBy: { name: 'asc' }
     })
+}
+
+export async function findMassSelectionStats(
+    userId: string
+): Promise<MassSelectionStats> {
+    const stats = await prisma.$queryRaw<MassSelectionStats[]>`
+    SELECT
+      COUNT(*)::int AS total,
+      COUNT(*) FILTER (WHERE "isPublic" = true)::int AS public,
+      COUNT(*) FILTER (WHERE "isPublic" = false)::int AS private,
+      COUNT(*) FILTER (WHERE "createdAt" >= date_trunc('month', now()))::int AS "thisMonth",
+      COUNT(*) FILTER (WHERE "createdAt" >= date_trunc('week', now()))::int AS "thisWeek"
+    FROM "MassSelection"
+    WHERE "createdById" = ${userId};
+  `
+
+    // $queryRaw returns an array of rows, so we take the first one
+    return stats[0]
 }

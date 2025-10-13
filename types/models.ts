@@ -40,4 +40,12 @@ export type MassSelection = Prisma.MassSelectionGetPayload<{
     },
 }>
 
+export interface MassSelectionStats {
+    total: number
+    public: number
+    private: number
+    thisMonth: number
+    thisWeek: number
+}
+
 export { KeySignature, LiturgicalSeason, LiturgicalYear } from "@/lib/generated/prisma"

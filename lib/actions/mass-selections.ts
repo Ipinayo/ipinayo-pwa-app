@@ -6,6 +6,7 @@ import {
     findAllSelections,
     findAllThemes,
     findAllUserSelections,
+    findMassSelectionStats,
     findSelectionWithParts,
     findUserSelection,
     removeSelection,
@@ -367,4 +368,13 @@ export async function getThemes() {
     const themes = await findAllThemes()
 
     return themes.map(theme => theme.name)
+}
+
+export async function getMassSelectionStats() {
+    const session = await auth();
+    if (!session?.user?.id) {
+        throw new Error("Unauthorized");
+    }
+
+    return findMassSelectionStats(session.user.id)
 }

@@ -1,8 +1,16 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
-export default function MassSelectionListSkeleton() {
+import { cn } from "@/lib/utils";
+
+export default function MassSelectionListSkeleton({
+  className,
+}: {
+  className?: string;
+}) {
   return (
-    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+    <div
+      className={cn(className ?? "grid gap-6 md:grid-cols-2 lg:grid-cols-3")}
+    >
       {[1, 2, 3, 4, 5, 6].map((i) => (
         <Card key={i} className="animate-pulse">
           <CardHeader>

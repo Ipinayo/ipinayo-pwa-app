@@ -17,6 +17,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Menu } from "lucide-react";
@@ -91,7 +92,7 @@ export default function Header() {
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56" align="end" forceMount>
+                <DropdownMenuContent className="w-56" align="end">
                   <DropdownMenuLabel className="font-normal">
                     <div className="flex flex-col space-y-1">
                       <p className="text-sm font-medium leading-none">
@@ -100,6 +101,9 @@ export default function Header() {
                       <p className="text-muted-foreground text-xs leading-none">
                         {user.email}
                       </p>
+                      <Badge variant="secondary" className="w-fit text-xs mt-1">
+                        Composer
+                      </Badge>
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />

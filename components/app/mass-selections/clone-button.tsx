@@ -29,7 +29,7 @@ export default function CloneButton({
     setIsCloning(true);
     try {
       const clonedSelection = await cloneSelection(selectionId);
-      router.push(`/mass-selections/edit/${clonedSelection.id}`);
+      router.push(`/mass-selections/${clonedSelection.id}/edit`);
     } catch (error) {
       console.error("Error cloning selection:", error);
       toast.error("Error cloning selection, please try again");
