@@ -78,3 +78,19 @@ export function transformStringsToOptions(strings: string[]): Option[] {
 export function getValuesFromOptions(options: Option[]) {
   return options.map((opt) => opt.value)
 }
+
+export function capitalize(sentence: string): string {
+  if (!sentence) {
+    return "";
+  }
+
+  return sentence
+    .split(" ")
+    .map((word: string) => {
+      if (word.length === 0) {
+        return "";
+      }
+      return word.charAt(0).toUpperCase() + word.slice(1);
+    })
+    .join(" ");
+}
