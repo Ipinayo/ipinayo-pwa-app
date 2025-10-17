@@ -24,6 +24,7 @@ export default {
     pages: {
         signIn: "/signin",
         verifyRequest: "/verify-request",
+        error: "/signin/error"
     },
     session: {
         strategy: "jwt",
