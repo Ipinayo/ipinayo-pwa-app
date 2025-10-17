@@ -4,29 +4,101 @@ import { keySignatureItems, liturgicalSeasonItems } from "./constants"
 
 import { GenerateMassSelection } from "@/types/models"
 
+// Helper function to sanitize text for PDF (WinAnsi encoding)
+function sanitizeForPdf(text: string): string {
+  return text
+    .replace(/♭/g, 'b')
+    .replace(/♯/g, '#')
+    .replace(/♮/g, '')
+    .replace(/[^\x00-\x7F]/g, (char) => {
+      // Map common special characters
+      const charMap: Record<string, string> = {
+        'à': 'a', 'á': 'a', 'â': 'a', 'ã': 'a', 'ä': 'a', 'å': 'a',
+        'è': 'e', 'é': 'e', 'ê': 'e', 'ë': 'e',
+        'ì': 'i', 'í': 'i', 'î': 'i', 'ï': 'i',
+        'ò': 'o', 'ó': 'o', 'ô': 'o', 'õ': 'o', 'ö': 'o',
+        'ù': 'u', 'ú': 'u', 'û': 'u', 'ü': 'u',
+        'ñ': 'n', 'ç': 'c',
+        'À': 'A', 'Á': 'A', 'Â': 'A', 'Ã': 'A', 'Ä': 'A', 'Å': 'A',
+        'È': 'E', 'É': 'E', 'Ê': 'E', 'Ë': 'E',
+        'Ì': 'I', 'Í': 'I', 'Î': 'I', 'Ï': 'I',
+        'Ò': 'O', 'Ó': 'O', 'Ô': 'O', 'Õ': 'O', 'Ö': 'O',
+        'Ù': 'U', 'Ú': 'U', 'Û': 'U', 'Ü': 'U',
+        'Ñ': 'N', 'Ç': 'C',
+        '–': '-', '—': '-', '‘': "'", '’': "'", '“': '"', '”': '"',
+        '…': '...', '•': '*'
+      }
+      return charMap[char] || ''
+    })
+}
+
+// Helper function to wrap text with better word breaking
+function wrapText(text: string, maxCharsPerLine: number): string[] {
+  const words = text.split(" ")
+  const lines: string[] = []
+  let currentLine = ""
+
+  for (const word of words) {
+    const testLine = currentLine ? `${currentLine} ${word}` : word
+
+    if (testLine.length <= maxCharsPerLine) {
+      currentLine = testLine
+    } else {
+      if (currentLine) {
+        lines.push(currentLine)
+      }
+      // Handle very long words
+      if (word.length > maxCharsPerLine) {
+        let remainingWord = word
+        while (remainingWord.length > maxCharsPerLine) {
+          lines.push(remainingWord.substring(0, maxCharsPerLine))
+          remainingWord = remainingWord.substring(maxCharsPerLine)
+        }
+        currentLine = remainingWord
+      } else {
+        currentLine = word
+      }
+    }
+  }
+
+  if (currentLine) {
+    lines.push(currentLine)
+  }
+
+  return lines.length > 0 ? lines : [""]
+}
+
 export async function generateMassSelectionPDF(selection: GenerateMassSelection): Promise<Uint8Array> {
   const pdfDoc = await PDFDocument.create()
+
+  // Constants
   const pageWidth = 612
   const pageHeight = 792
   const margin = 50
   const footerHeight = 60
+  const contentWidth = pageWidth - 2 * margin
 
+  // Fonts
   const titleFont = await pdfDoc.embedFont(StandardFonts.HelveticaBoldOblique)
   const headerFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold)
   const bodyFont = await pdfDoc.embedFont(StandardFonts.Helvetica)
 
-  const primaryColor = rgb(0, 0.77, 0.98) // #00c5fb (cyan)
+  // Colors
+  const primaryColor = rgb(0, 0.77, 0.98) // #00c5fb
   const textColor = rgb(0.2, 0.2, 0.2)
   const lightGray = rgb(0.95, 0.95, 0.95)
   const borderColor = rgb(0.9, 0.9, 0.9)
   const white = rgb(1, 1, 1)
+  const footerTextColor = rgb(0.5, 0.5, 0.5)
 
   let currentPage = pdfDoc.addPage([pageWidth, pageHeight])
   let yPosition = pageHeight - margin
 
+  // Footer function
   const addFooterToPage = (page: PDFPage) => {
     const footerY = 25
 
+    // Footer background
     page.drawRectangle({
       x: 0,
       y: 0,
@@ -35,6 +107,7 @@ export async function generateMassSelectionPDF(selection: GenerateMassSelection)
       color: lightGray,
     })
 
+    // Top border
     page.drawRectangle({
       x: 0,
       y: footerY + 23,
@@ -50,10 +123,12 @@ export async function generateMassSelectionPDF(selection: GenerateMassSelection)
       y: footerY,
       size: 8,
       font: bodyFont,
-      color: rgb(0.5, 0.5, 0.5),
+      color: footerTextColor,
     })
 
-    const creatorText = `Created by: ${selection.createdBy.name || selection.createdBy.email}`
+    const creatorText = sanitizeForPdf(
+      `Created by: ${selection.createdBy.name || selection.createdBy.email}`
+    )
     const creatorWidth = bodyFont.widthOfTextAtSize(creatorText, 8)
 
     page.drawText(creatorText, {
@@ -61,11 +136,12 @@ export async function generateMassSelectionPDF(selection: GenerateMassSelection)
       y: footerY,
       size: 8,
       font: bodyFont,
-      color: rgb(0.5, 0.5, 0.5),
+      color: footerTextColor,
     })
   }
 
-  const checkNewPage = (requiredSpace: number) => {
+  // Page management
+  const checkNewPage = (requiredSpace: number): boolean => {
     if (yPosition - requiredSpace < footerHeight + 20) {
       addFooterToPage(currentPage)
       currentPage = pdfDoc.addPage([pageWidth, pageHeight])
@@ -75,11 +151,12 @@ export async function generateMassSelectionPDF(selection: GenerateMassSelection)
     return false
   }
 
-  const titleLines = wrapText(selection.title, 50)
+  // Title section
+  const sanitizedTitle = sanitizeForPdf(selection.title)
+  const titleLines = wrapText(sanitizedTitle, 50)
   const titleHeight = titleLines.length * 18
   checkNewPage(titleHeight + 10)
 
-  const contentWidth = pageWidth - 2 * margin
   titleLines.forEach((line, idx) => {
     const textWidth = titleFont.widthOfTextAtSize(line, 16)
     const centeredX = margin + (contentWidth - textWidth) / 2
@@ -94,29 +171,43 @@ export async function generateMassSelectionPDF(selection: GenerateMassSelection)
 
   yPosition -= titleHeight + 12
 
+  // Liturgical information section
   const liturgicalInfoItems = [
-    {
-      label: "Date",
-      value: formatDate(selection.date),
-    },
-    ...(selection.liturgicalYear ? [{ label: "Liturgical Year", value: `Year ${selection.liturgicalYear}` }] : []),
-    ...(selection.liturgicalSeason ? [{
-      label: "Season", value: getLabelForValue(
-        liturgicalSeasonItems,
-        selection.liturgicalSeason
-      )
-    }] : []),
-    ...(selection.liturgy ? [{ label: "Liturgy", value: selection.liturgy }] : []),
-    ...(selection.themes && selection.themes.length > 0
-      ? [{ label: "Themes", value: selection.themes.map((t) => capitalize(t.name)).join(", ") }]
-      : []),
-    ...(selection.pastoralFocus ? [{ label: "Pastoral Focus", value: selection.pastoralFocus }] : []),
+    { label: "Date", value: formatDate(selection.date) },
+    ...(selection.liturgicalYear
+      ? [{ label: "Liturgical Year", value: `Year ${selection.liturgicalYear}` }]
+      : []
+    ),
+    ...(selection.liturgicalSeason
+      ? [{
+        label: "Season",
+        value: getLabelForValue(liturgicalSeasonItems, selection.liturgicalSeason)
+      }]
+      : []
+    ),
+    ...(selection.liturgy
+      ? [{ label: "Liturgy", value: selection.liturgy }]
+      : []
+    ),
+    ...(selection.themes?.length
+      ? [{
+        label: "Themes",
+        value: selection.themes.map((t) => capitalize(t.name)).join(", ")
+      }]
+      : []
+    ),
+    ...(selection.pastoralFocus
+      ? [{ label: "Pastoral Focus", value: selection.pastoralFocus }]
+      : []
+    ),
   ]
 
   checkNewPage(liturgicalInfoItems.length * 25 + 20)
 
   liturgicalInfoItems.forEach((item) => {
-    // Label
+    const sanitizedValue = sanitizeForPdf(item.value)
+    const valueLines = wrapText(sanitizedValue, 80)
+
     currentPage.drawText(item.label, {
       x: margin,
       y: yPosition,
@@ -125,8 +216,6 @@ export async function generateMassSelectionPDF(selection: GenerateMassSelection)
       color: textColor,
     })
 
-    // Value
-    const valueLines = wrapText(item.value, 80)
     valueLines.forEach((line, idx) => {
       currentPage.drawText(line, {
         x: margin + 120,
@@ -142,6 +231,7 @@ export async function generateMassSelectionPDF(selection: GenerateMassSelection)
 
   yPosition -= 1
 
+  // Table header
   checkNewPage(50)
 
   const colPositions = [margin, margin + 120, margin + 280, margin + 380]
@@ -149,13 +239,14 @@ export async function generateMassSelectionPDF(selection: GenerateMassSelection)
   currentPage.drawRectangle({
     x: margin - 5,
     y: yPosition - 25,
-    width: pageWidth - 2 * margin + 10,
+    width: contentWidth + 10,
     height: 25,
     color: primaryColor,
   })
 
   const headers = ["Song Title", "Key", "Notes"]
   const headerPositions = [colPositions[1], colPositions[2], colPositions[3]]
+
   headers.forEach((header, index) => {
     currentPage.drawText(header, {
       x: headerPositions[index],
@@ -168,20 +259,36 @@ export async function generateMassSelectionPDF(selection: GenerateMassSelection)
 
   yPosition -= 30
 
+  // Table rows
   selection.parts.forEach((part) => {
-    // Calculate required height for this row
-    const partNameLines = wrapText(part.partName, 18)
-    const songTitleLines = wrapText(part.songTitle, 20)
-    const notesLines = part.notes ? wrapText(part.notes, 15) : []
-    const maxLines = Math.max(partNameLines.length, songTitleLines.length, notesLines.length, 1)
+    // Sanitize all text fields
+    const sanitizedPartName = sanitizeForPdf(part.partName)
+    const sanitizedSongTitle = sanitizeForPdf(part.songTitle)
+    const sanitizedNotes = part.notes ? sanitizeForPdf(part.notes) : ""
+    const sanitizedKey = part.keySignature
+      ? sanitizeForPdf(getLabelForValue(keySignatureItems, part.keySignature))
+      : ""
+
+    // Calculate wrapped lines
+    const partNameLines = wrapText(sanitizedPartName, 18)
+    const songTitleLines = wrapText(sanitizedSongTitle, 20)
+    const notesLines = sanitizedNotes ? wrapText(sanitizedNotes, 15) : []
+
+    const maxLines = Math.max(
+      partNameLines.length,
+      songTitleLines.length,
+      notesLines.length,
+      1
+    )
     const rowHeight = Math.max(40, maxLines * 12 + 10)
 
     checkNewPage(rowHeight + 10)
 
+    // Row background
     currentPage.drawRectangle({
       x: margin - 5,
       y: yPosition - rowHeight,
-      width: pageWidth - 2 * margin + 10,
+      width: contentWidth + 10,
       height: rowHeight,
       color: white,
       borderColor: borderColor,
@@ -190,7 +297,7 @@ export async function generateMassSelectionPDF(selection: GenerateMassSelection)
 
     const verticalCenter = yPosition - rowHeight / 2
 
-    // Part name - vertically centered
+    // Part name
     partNameLines.forEach((line, lineIdx) => {
       const lineOffset = (partNameLines.length - 1) * 5.5
       currentPage.drawText(line, {
@@ -202,7 +309,7 @@ export async function generateMassSelectionPDF(selection: GenerateMassSelection)
       })
     })
 
-    // Song title - vertically centered
+    // Song title
     songTitleLines.forEach((line, lineIdx) => {
       const lineOffset = (songTitleLines.length - 1) * 5.5
       currentPage.drawText(line, {
@@ -214,13 +321,9 @@ export async function generateMassSelectionPDF(selection: GenerateMassSelection)
       })
     })
 
-    // Key signature - vertically centered
-    if (part.keySignature) {
-      currentPage.drawText(getLabelForValue(
-        keySignatureItems,
-        part.keySignature
-      ).replace(/♭/g, 'b')
-        .replace(/♯/g, '#'), {
+    // Key signature
+    if (sanitizedKey) {
+      currentPage.drawText(sanitizedKey, {
         x: colPositions[2],
         y: verticalCenter,
         size: 9,
@@ -229,8 +332,8 @@ export async function generateMassSelectionPDF(selection: GenerateMassSelection)
       })
     }
 
-    // Notes - vertically centered
-    if (part.notes) {
+    // Notes
+    if (notesLines.length > 0) {
       notesLines.forEach((line, lineIdx) => {
         const lineOffset = (notesLines.length - 1) * 4
         currentPage.drawText(line, {
@@ -246,33 +349,8 @@ export async function generateMassSelectionPDF(selection: GenerateMassSelection)
     yPosition -= rowHeight
   })
 
-  const pages = pdfDoc.getPages()
-  pages.forEach((page) => {
-    addFooterToPage(page)
-  })
+  // Add footers to all pages
+  pdfDoc.getPages().forEach(addFooterToPage)
 
   return await pdfDoc.save()
-}
-
-function wrapText(text: string, maxCharsPerLine: number): string[] {
-  const words = text.split(" ")
-  const lines: string[] = []
-  let currentLine = ""
-
-  for (const word of words) {
-    if ((currentLine + word).length <= maxCharsPerLine) {
-      currentLine += (currentLine ? " " : "") + word
-    } else {
-      if (currentLine) {
-        lines.push(currentLine)
-      }
-      currentLine = word
-    }
-  }
-
-  if (currentLine) {
-    lines.push(currentLine)
-  }
-
-  return lines
 }
