@@ -77,7 +77,7 @@ export default async function ViewPage(props: { params: Params }) {
                 <TableHeader>
                   <TableRow>
                     <TableHead className="w-[200px]">Part</TableHead>
-                    <TableHead>Sheet Music</TableHead>
+                    <TableHead>Song Title</TableHead>
                     <TableHead className="w-[120px]">Key</TableHead>
                     <TableHead>Notes</TableHead>
                   </TableRow>
