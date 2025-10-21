@@ -3,24 +3,28 @@
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { useRouter } from "next/navigation";
+import { useAppNavigation } from "@/contexts/AppNavigationContext";
 
 function BackButton({
+  to,
   fallback = "/",
   backText = "Back",
   className,
 }: {
+  to?: string;
   fallback?: string;
   backText?: string;
   className?: string;
 }) {
-  const router = useRouter();
+  const { canGoBack, handleBack, navigateTo } = useAppNavigation();
 
-  const handleBack = () => {
-    if (window.history.length > 1) {
-      router.back();
+  const onBack = () => {
+    if (to) {
+      navigateTo(to);
+    } else if (canGoBack) {
+      handleBack();
     } else {
-      router.push(fallback);
+      navigateTo(fallback);
     }
   };
 
@@ -28,7 +32,7 @@ function BackButton({
     <Button
       variant="ghost"
       size="sm"
-      onClick={handleBack}
+      onClick={onBack}
       className={cn("gap-2", className)}
     >
       <ArrowLeft className="h-4 w-4" />

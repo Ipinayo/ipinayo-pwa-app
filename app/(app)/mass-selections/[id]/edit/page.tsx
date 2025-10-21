@@ -1,8 +1,6 @@
 import { getSelectionById, getThemes } from "@/lib/actions/mass-selections";
 
-import { ArrowLeft } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import BackButton from "@/components/common/back-button";
 import { Params } from "@/types/utils";
 import SaveForm from "@/components/app/mass-selections/save-form";
 
@@ -15,12 +13,10 @@ export default async function EditPage(props: { params: Params }) {
   return (
     <div className="container mx-auto max-w-4xl px-4 py-8">
       <div className="mb-8 flex items-center gap-4">
-        <Button variant="ghost" size="sm" className="gap-2" asChild>
-          <Link href={`/mass-selections/${params.id}`}>
-            <ArrowLeft className="h-4 w-4" />
-            Back to View
-          </Link>
-        </Button>
+        <BackButton
+          to={`/mass-selections/${params.id}`}
+          backText="Back to View"
+        />
         <div>
           <h1 className="text-3xl font-bold">Edit: {selection.title}</h1>
           <p className="text-muted-foreground mt-1">

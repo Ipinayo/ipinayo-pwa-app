@@ -4,6 +4,7 @@ import type { Metadata, Viewport } from "next";
 import { geistMono, pattaya, playfairDisplay, sourceSans } from "../ui/fonts";
 
 import { Analytics } from "@vercel/analytics/next";
+import { AppNavigationProvider } from "@/contexts/AppNavigationContext";
 import { OfflineIndicator } from "@/components/offline-indicator";
 import { PWAInstallPrompt } from "@/components/pwa-install-prompt";
 import { SessionProvider } from "next-auth/react";
@@ -471,10 +472,12 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <SessionProvider>
-            {children}
-            <Toaster duration={5000} richColors closeButton expand />
-            <PWAInstallPrompt />
-            <OfflineIndicator />
+            <AppNavigationProvider>
+              {children}
+              <Toaster duration={5000} richColors closeButton expand />
+              <PWAInstallPrompt />
+              <OfflineIndicator />
+            </AppNavigationProvider>
           </SessionProvider>
         </ThemeProvider>
         <Analytics />

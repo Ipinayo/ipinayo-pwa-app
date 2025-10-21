@@ -1,6 +1,4 @@
-import { ArrowLeft } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import BackButton from "@/components/common/back-button";
 import SaveForm from "@/components/app/mass-selections/save-form";
 import { SearchParams } from "@/types/utils";
 import { getThemes } from "@/lib/actions/mass-selections";
@@ -22,12 +20,7 @@ export default async function CreateMassSelectionPage(props: {
     <div className="w-full">
       <div className="mx-auto max-w-4xl">
         <div className="mb-8 flex items-center gap-4">
-          <Button variant="ghost" size="sm" className="gap-2" asChild>
-            <Link href={"/mass-selections/new"}>
-              <ArrowLeft className="h-4 w-4" />
-              Back
-            </Link>
-          </Button>
+          <BackButton to="/mass-selections/new" backText="Back to Templates" />
           <div>
             <h1 className="text-3xl font-bold">Create Mass Selection</h1>
             <p className="text-muted-foreground mt-1">

@@ -6,7 +6,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-import { ArrowLeft } from "lucide-react";
+import BackButton from "@/components/common/back-button";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { liturgyTemplates } from "@/lib/constants";
@@ -16,12 +16,7 @@ export default function SelectLiturgyTemplatePage() {
     <div className="w-full">
       <div className="mx-auto max-w-4xl">
         <div className="flex items-center gap-4 mb-8">
-          <Button variant="ghost" size="sm" className="gap-2" asChild>
-            <Link href={"/mass-selections"}>
-              <ArrowLeft className="h-4 w-4" />
-              Back
-            </Link>
-          </Button>
+          <BackButton fallback="/mass-selections" />
           <div>
             <h1 className="text-3xl font-bold">Create Mass Selection</h1>
             <p className="text-muted-foreground mt-1">
