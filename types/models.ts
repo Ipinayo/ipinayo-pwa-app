@@ -23,11 +23,14 @@ export type MassSelectionWithParts = Prisma.MassSelectionGetPayload<{
 
 export type MassPart = Prisma.MassPartGetPayload<{}>;
 
-export type NewMassSelectionPart = Omit<Prisma.MassPartCreateInput, 'massSelection'>
+export type NewMassSelectionPart = Omit<Prisma.MassPartCreateInput, 'id' | 'massSelection'> & {
+    id: string
+};
 
 export type NewLocation = Omit<Prisma.LocationCreateInput, 'id' | 'massSelections' | 'userProfiles' | 'createdAt' | 'updatedAt'>;
 
-export type NewMassSelection = Omit<Prisma.MassSelectionCreateInput, 'id' | 'createdAt' | 'updatedAt' | 'createdById' | 'themes' | 'parishLocation'> & {
+export type NewMassSelection = Omit<Prisma.MassSelectionCreateInput, 'id' | 'createdAt' | 'updatedAt' | 'createdBy' | 'themes' | 'parishLocation' | 'date'> & {
+    date: Date
     themes: string[]
     parts: NewMassSelectionPart[]
     parishLocation?: NewLocation | null

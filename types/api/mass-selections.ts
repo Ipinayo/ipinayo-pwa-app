@@ -8,20 +8,35 @@ export const massSelectionPartSchema = z.object({
     id: z.string(),
     partName: z.string().min(1, "Part name is required"),
     songTitle: z.string().min(1, "Song title is required"),
-    keySignature: z.enum(KeySignature).nullable(),
-    notes: z.string().nullable(),
+    keySignature: z.enum(KeySignature).nullable().optional(),
+    notes: z.string().nullable().optional(),
+});
+
+// Schema for location
+const locationSchema = z.object({
+    country: z.string().min(1, "Country is required"),
+    countryCode: z.string().optional().nullable(),
+    state: z.string().optional().nullable(),
+    stateCode: z.string().optional().nullable(),
+    city: z.string().min(1, "City is required"),
+    latitude: z.number().optional().nullable(),
+    longitude: z.number().optional().nullable(),
+    timezone: z.string().optional().nullable(),
 });
 
 // Schema for creating a new mass selection
 export const createMassSelectionSchema = z.object({
     title: z.string().min(1, "Title is required"),
     date: z.date("Invalid date"),
-    liturgicalYear: z.enum(LiturgicalYear).nullable(),
-    liturgicalSeason: z.enum(LiturgicalSeason).nullable(),
-    liturgy: z.string().nullable(),
+    liturgicalYear: z.enum(LiturgicalYear).nullable().optional(),
+    liturgicalSeason: z.enum(LiturgicalSeason).nullable().optional(),
+    liturgy: z.string().nullable().optional(),
     themes: z.array(z.string()),
-    pastoralFocus: z.string().nullable(),
-    isPublic: z.boolean(),
+    pastoralFocus: z.string().nullable().optional(),
+    isPublic: z.boolean().default(false),
+    parishName: z.string().nullable().optional(),
+    choirName: z.string().nullable().optional(),
+    parishLocation: locationSchema.nullable().optional(),
     parts: z.array(massSelectionPartSchema).min(1, "At least one part is required"),
 });
 

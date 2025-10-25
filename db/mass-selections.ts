@@ -212,6 +212,29 @@ export async function saveSelection(selection: NewMassSelection, userId: string)
             pastoralFocus: selection.pastoralFocus,
             isPublic: selection.isPublic,
             createdById: userId,
+            ...(selection.parishLocation && {
+                location: {
+                    connectOrCreate: {
+                        where: {
+                            country_state_city: {
+                                country: selection.parishLocation.country,
+                                state: selection.parishLocation.state || '',
+                                city: selection.parishLocation.city,
+                            }
+                        },
+                        create: {
+                            country: selection.parishLocation.country,
+                            countryCode: selection.parishLocation.countryCode,
+                            state: selection.parishLocation.state,
+                            stateCode: selection.parishLocation.stateCode,
+                            city: selection.parishLocation.city,
+                            latitude: selection.parishLocation.latitude,
+                            longitude: selection.parishLocation.longitude,
+                            timezone: selection.parishLocation.timezone,
+                        }
+                    }
+                }
+            }),
             parts: {
                 create:
                     selection.parts?.map((part) => ({
@@ -222,12 +245,14 @@ export async function saveSelection(selection: NewMassSelection, userId: string)
                     })) || [],
             },
         },
-        include: {
-            parts: true,
-            createdBy: {
-                select: { name: true, email: true },
-            },
-        },
+        // include: {
+        //     parts: true,
+        //     themes: true,
+        //     parishLocation: true,
+        //     createdBy: {
+        //         select: { name: true, email: true },
+        //     },
+        // },
     })
 
 }
@@ -236,7 +261,7 @@ export async function updateSelection(
     selection: Partial<NewMassSelection>,
     id: string,
 ) {
-    const { parts, date, themes, ...rest } = selection
+    const { parts, date, themes, parishLocation, ...rest } = selection
 
     return await prisma.massSelection.update({
         where: { id },
@@ -252,6 +277,30 @@ export async function updateSelection(
                     }))
                 }
             }),
+            // Handle location update
+            ...(parishLocation && {
+                parishLocation: {
+                    connectOrCreate: {
+                        where: {
+                            country_state_city: {
+                                country: parishLocation.country,
+                                state: parishLocation.state || '',
+                                city: parishLocation.city || '',
+                            }
+                        },
+                        create: {
+                            country: parishLocation.country,
+                            countryCode: parishLocation.countryCode,
+                            state: parishLocation.state,
+                            stateCode: parishLocation.stateCode,
+                            city: parishLocation.city,
+                            latitude: parishLocation.latitude,
+                            longitude: parishLocation.longitude,
+                            timezone: parishLocation.timezone,
+                        }
+                    }
+                }
+            }),
             ...(parts && {
                 parts: {
                     deleteMany: {},
@@ -264,12 +313,14 @@ export async function updateSelection(
                 },
             }),
         },
-        include: {
-            parts: true,
-            createdBy: {
-                select: { name: true, email: true },
-            },
-        },
+        // include: {
+        //     parts: true,
+        //     themes: true,
+        //     parishLocation: true,
+        //     createdBy: {
+        //         select: { name: true, email: true },
+        //     },
+        // },
     })
 }
 

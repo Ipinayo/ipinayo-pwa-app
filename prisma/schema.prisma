@@ -130,9 +130,9 @@ model Location {
   id             String          @id @default(cuid())
   country        String
   countryCode    String?
-  state          String?
+  state          String          @default("")
   stateCode      String?
-  city           String
+  city           String          @default("")
   latitude       Float?
   longitude      Float?
   timezone       String?
