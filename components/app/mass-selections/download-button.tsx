@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { generateMassSelectionPDF } from "@/lib/pdf-generator";
 import { getSelectionById } from "@/lib/actions/mass-selections";
 import { toast } from "sonner";
+import { useSession } from "next-auth/react";
 import { useState } from "react";
 
 interface PDFDownloadButtonProps {
@@ -22,12 +23,14 @@ export default function DownloadButton({
   className,
 }: PDFDownloadButtonProps) {
   const [isGenerating, setIsGenerating] = useState(false);
+  const { data: session } = useSession();
 
   const handleDownload = async () => {
     setIsGenerating(true);
     try {
       const selection = await getSelectionById(selectionId);
-      const pdfBytes = await generateMassSelectionPDF(selection);
+      const isOwner = selection.createdById === session?.user?.id;
+      const pdfBytes = await generateMassSelectionPDF(selection, isOwner);
 
       const blob = new Blob([Buffer.from(pdfBytes)], { type: "" });
       const url = window.URL.createObjectURL(blob);

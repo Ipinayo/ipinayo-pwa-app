@@ -1,4 +1,4 @@
-import { Calendar, Edit, Globe, Lock, Music, User } from "lucide-react";
+import { Calendar, Globe, Lock, Music, User } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
@@ -8,23 +8,17 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { formatDate, getLabelForValue } from "@/lib/utils";
+import { formatDate, formatParishInfo, getLabelForValue } from "@/lib/utils";
 import { keySignatureItems, liturgicalSeasonItems } from "@/lib/constants";
 
 import BackButton from "@/components/common/back-button";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import CloneButton from "@/components/app/mass-selections/clone-button";
-import DeleteButton from "@/components/app/mass-selections/delete-button";
-import DownloadButton from "@/components/app/mass-selections/download-button";
-import Link from "next/link";
+import Options from "@/components/app/mass-selections/options";
 import { Params } from "@/types/utils";
-import { auth } from "@/auth";
 import { getSelectionById } from "@/lib/actions/mass-selections";
 
 export default async function ViewPage(props: { params: Params }) {
   const params = await props.params;
-  const session = await auth();
 
   const selection = await getSelectionById(params.id);
 
@@ -48,6 +42,7 @@ export default async function ViewPage(props: { params: Params }) {
                 Private
               </Badge>
             )}
+            <Options selection={selection} />
           </div>
           <div className="flex flex-col w-full sm:flex-row items-start sm:items-center gap-1 sm:gap-4 text-muted-foreground">
             <div className="flex items-center gap-1">
@@ -113,6 +108,35 @@ export default async function ViewPage(props: { params: Params }) {
         <div className="space-y-6">
           <Card>
             <CardHeader>
+              <CardTitle>Parish and choir information</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              <div className="flex items-center justify-between text-sm gap-5">
+                <label className="text-muted-foreground font-medium">
+                  Choir Name
+                </label>
+                <p className="mt-1 text-sm text-right">
+                  {selection.choirName || "Unnamed Choir"}
+                </p>
+              </div>
+              <div className="flex items-center justify-between text-sm gap-5">
+                <label className="text-muted-foreground font-medium">
+                  {selection.parishName && selection.parishLocation
+                    ? "Parish: "
+                    : "Parish In: "}
+                </label>
+                <p className="mt-1 text-sm text-right">
+                  {formatParishInfo(
+                    selection.parishLocation,
+                    selection.parishName
+                  )}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
               <CardTitle>Liturgical Information</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
@@ -121,7 +145,11 @@ export default async function ViewPage(props: { params: Params }) {
                   Liturgical Year
                 </label>
                 <div className="mt-1 text-right">
-                  <Badge>Year {selection.liturgicalYear}</Badge>
+                  {selection.liturgicalYear ? (
+                    <Badge>Year {selection.liturgicalYear}</Badge>
+                  ) : (
+                    "-"
+                  )}
                 </div>
               </div>
 
@@ -196,36 +224,6 @@ export default async function ViewPage(props: { params: Params }) {
                   {selection.createdBy.name || selection.createdBy.email}
                 </p>
               </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Quick Actions</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <DownloadButton selectionId={selection.id} className="w-full" />
-              <CloneButton selectionId={selection.id} className="w-full" />
-              {session?.user?.id === selection.createdById && (
-                <>
-                  <Link
-                    href={`/mass-selections/${selection.id}/edit`}
-                    className="block"
-                  >
-                    <Button
-                      className="w-full gap-2 bg-transparent"
-                      variant="outline"
-                    >
-                      <Edit className="h-4 w-4" />
-                      Edit
-                    </Button>
-                  </Link>
-                  <DeleteButton
-                    selectionId={selection.id}
-                    className="w-full text-destructive"
-                  />
-                </>
-              )}
             </CardContent>
           </Card>
         </div>

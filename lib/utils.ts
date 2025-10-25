@@ -4,6 +4,7 @@ import { twMerge } from "tailwind-merge"
 import { Option } from "../components/common/multiple-selector"
 import { format } from "date-fns";
 import { enGB } from "date-fns/locale";
+import { Location } from "@/types/models";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -93,4 +94,26 @@ export function capitalize(sentence: string): string {
       return word.charAt(0).toUpperCase() + word.slice(1);
     })
     .join(" ");
+}
+
+export function formatParishInfo(location: Location | null | undefined, parishName: string | null | undefined): string {
+  const parts: string[] = []
+
+  if (parishName) {
+    parts.push(parishName)
+  }
+
+  if (location) {
+    if (location.city) {
+      parts.push(location.city)
+    }
+    if (location.state) {
+      parts.push(location.state)
+    }
+    if (location.country) {
+      parts.push(location.country)
+    }
+  }
+
+  return parts.length > 0 ? parts.join(", ") : "Unknown Parish"
 }

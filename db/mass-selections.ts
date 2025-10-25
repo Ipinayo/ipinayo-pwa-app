@@ -10,6 +10,7 @@ export async function findSelectionWithParts(id: string) {
         where: { id },
         include: {
             themes: true,
+            parishLocation: true,
             parts: true,
             createdBy: {
                 select: { name: true, email: true },
@@ -23,6 +24,7 @@ export async function findUserSelectionWithParts(id: string, userId: string) {
         where: { id, createdById: userId },
         include: {
             themes: true,
+            parishLocation: true,
             parts: true,
             createdBy: {
                 select: { name: true, email: true },
@@ -71,6 +73,16 @@ export async function findAllSelections({
                 { themes: { some: { name: { contains: query } } } },
                 { pastoralFocus: { contains: query, mode: "insensitive" } },
                 { liturgy: { contains: query, mode: "insensitive" } },
+                {
+                    parishLocation: {
+                        country: { contains: query, mode: "insensitive" },
+                        state: { contains: query, mode: "insensitive" },
+                        city: { contains: query, mode: "insensitive" },
+                        countryCode: { contains: query, mode: "insensitive" },
+                        stateCode: { contains: query, mode: "insensitive" },
+                        timezone: { contains: query, mode: "insensitive" }
+                    }
+                },
             ],
         })
     }
@@ -100,6 +112,7 @@ export async function findAllSelections({
         where: whereClause,
         include: {
             themes: true,
+            parishLocation: true,
             createdBy: {
                 select: { name: true, email: true },
             },
@@ -176,6 +189,7 @@ export async function findAllUserSelections({
         where: whereClause,
         include: {
             themes: true,
+            parishLocation: true,
             createdBy: {
                 select: { name: true, email: true },
             },

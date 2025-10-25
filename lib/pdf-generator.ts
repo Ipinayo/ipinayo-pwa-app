@@ -1,5 +1,5 @@
 import { PDFDocument, PDFPage, StandardFonts, rgb } from "pdf-lib"
-import { capitalize, formatDate, getLabelForValue } from "./utils"
+import { capitalize, formatDate, formatParishInfo, getLabelForValue } from "./utils"
 import { keySignatureItems, liturgicalSeasonItems } from "./constants"
 
 import { GenerateMassSelection } from "@/types/models"
@@ -68,7 +68,7 @@ function wrapText(text: string, maxCharsPerLine: number): string[] {
   return lines.length > 0 ? lines : [""]
 }
 
-export async function generateMassSelectionPDF(selection: GenerateMassSelection): Promise<Uint8Array> {
+export async function generateMassSelectionPDF(selection: GenerateMassSelection, showParishInfo = false,): Promise<Uint8Array> {
   const pdfDoc = await PDFDocument.create()
 
   // Constants
@@ -169,7 +169,32 @@ export async function generateMassSelectionPDF(selection: GenerateMassSelection)
     })
   })
 
-  yPosition -= titleHeight + 12
+  yPosition -= titleHeight + 1
+
+  const subtitles: string[] = []
+  if (showParishInfo && selection.parishLocation && selection.parishName) {
+    subtitles.push(formatParishInfo(selection.parishLocation, selection.parishName)!)
+  }
+  if (showParishInfo && selection.choirName) {
+    subtitles.push(selection.choirName)
+  }
+
+  if (subtitles.length > 0) {
+    subtitles.forEach((subtitle) => {
+      const subtitleWidth = bodyFont.widthOfTextAtSize(subtitle, 10)
+      const centeredX = margin + (contentWidth - subtitleWidth) / 2
+      currentPage.drawText(subtitle, {
+        x: centeredX,
+        y: yPosition,
+        size: 10,
+        font: bodyFont,
+        color: rgb(0.5, 0.5, 0.5),
+      })
+      yPosition -= 14
+    })
+  }
+
+  yPosition -= titleHeight + 10
 
   // Liturgical information section
   const liturgicalInfoItems = [

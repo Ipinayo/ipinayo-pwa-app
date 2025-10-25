@@ -59,4 +59,6 @@ export interface MassSelectionStats {
     thisWeek: number
 }
 
+export type Location = Prisma.LocationGetPayload<{}>;
+
 export { KeySignature, LiturgicalSeason, LiturgicalYear }

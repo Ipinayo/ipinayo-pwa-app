@@ -6,7 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { formatDate, getLabelForValue } from "@/lib/utils";
+import { formatDate, formatParishInfo, getLabelForValue } from "@/lib/utils";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -125,16 +125,25 @@ export default function MassSelectionCard({
           </div>
         )}
       </CardContent>
-      {publicView && (
-        <CardFooter className="border-t">
+      <CardFooter className="border-t flex flex-col gap-1">
+        {publicView && (
           <div className="flex items-center w-full justify-between text-xs text-muted-foreground">
             <span>
               by {selection.createdBy.name || selection.createdBy.email}
             </span>
             <span>Updated: {formatDate(selection.updatedAt)}</span>
           </div>
-        </CardFooter>
-      )}
+        )}
+        <div className="flex items-center w-full justify-between text-xs text-muted-foreground gap-5">
+          <span>for {selection.choirName || "Unnamed Choir"}</span>
+          <span className="capitalize text-right">
+            {selection.parishName && selection.parishLocation
+              ? "Parish: "
+              : "Parish In: "}
+            {formatParishInfo(selection.parishLocation, selection.parishName)}
+          </span>
+        </div>
+      </CardFooter>
     </Card>
   );
 }
