@@ -1,9 +1,10 @@
-import { Prisma } from "@/lib/generated/prisma";
+import { KeySignature, LiturgicalSeason, LiturgicalYear, Prisma } from "@/lib/generated/prisma";
 
 export type GenerateMassSelection = Prisma.MassSelectionGetPayload<{
     include: {
         themes: true
-        parts: true,
+        parts: true
+        parishLocation: true
         createdBy: {
             select: { name: true, email: true },
         },
@@ -16,21 +17,26 @@ export type MassSelectionWithParts = Prisma.MassSelectionGetPayload<{
     include: {
         themes: true
         parts: true
+        parishLocation: true
     }
 }>
 
 export type MassPart = Prisma.MassPartGetPayload<{}>;
 
-export type NewMassSelectionPart = Omit<MassPart, 'massSelectionId'>
+export type NewMassSelectionPart = Omit<Prisma.MassPartCreateInput, 'massSelection'>
 
-export type NewMassSelection = Omit<SingleMassSelection, 'id' | 'createdAt' | 'updatedAt' | 'createdById' | 'themes'> & {
+export type NewLocation = Omit<Prisma.LocationCreateInput, 'id' | 'massSelections' | 'userProfiles' | 'createdAt' | 'updatedAt'>;
+
+export type NewMassSelection = Omit<Prisma.MassSelectionCreateInput, 'id' | 'createdAt' | 'updatedAt' | 'createdById' | 'themes' | 'parishLocation'> & {
     themes: string[]
     parts: NewMassSelectionPart[]
-}
+    parishLocation?: NewLocation | null
+};
 
 export type MassSelection = Prisma.MassSelectionGetPayload<{
     include: {
         themes: true,
+        parishLocation: true,
         createdBy: {
             select: { name: true, email: true },
         },
@@ -48,4 +54,4 @@ export interface MassSelectionStats {
     thisWeek: number
 }
 
-export { KeySignature, LiturgicalSeason, LiturgicalYear } from "@/lib/generated/prisma"
+export { KeySignature, LiturgicalSeason, LiturgicalYear }
