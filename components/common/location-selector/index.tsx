@@ -16,7 +16,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { cn, transformStringsToOptions } from "@/lib/utils";
 
+import CreatableSelect from "../creatable-select";
 import { NewLocation } from "@/types/models";
 import { UseFormReturn } from "react-hook-form";
 import { useEffect } from "react";
@@ -102,7 +104,7 @@ export default function LocationSelector({
             >
               <FormControl>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select a country" />
+                  <SelectValue placeholder="Select country" />
                 </SelectTrigger>
               </FormControl>
               <SelectContent>
@@ -113,7 +115,6 @@ export default function LocationSelector({
                 ))}
               </SelectContent>
             </Select>
-            <FormDescription>Select your country first</FormDescription>
             <FormMessage />
           </FormItem>
         )}
@@ -145,7 +146,7 @@ export default function LocationSelector({
               >
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a state" />
+                    <SelectValue placeholder="Select state or province" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
@@ -162,7 +163,6 @@ export default function LocationSelector({
                   )}
                 </SelectContent>
               </Select>
-              <FormDescription>Select your state or province</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -174,46 +174,41 @@ export default function LocationSelector({
         <FormField
           control={form.control}
           name={`${fieldName}.city`}
-          render={({ field }) => (
+          render={({ field, fieldState }) => (
             <FormItem>
               <FormLabel>City</FormLabel>
-              <Select
-                onValueChange={(value) => {
-                  const cityData = cities.find((c) => c.name === value);
-                  if (cityData) {
-                    updateLocation({
-                      city: cityData.name,
-                      latitude: Number(cityData.latitude) || null,
-                      longitude: Number(cityData.longitude) || null,
-                    });
-                  }
-                }}
-                value={field.value || undefined}
-                disabled={cities.length === 0}
-              >
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a city" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {cities.length === 0 ? (
-                    <SelectItem value="none" disabled>
-                      No cities available
-                    </SelectItem>
-                  ) : (
-                    cities.map((city) => (
-                      <SelectItem
-                        key={`${city.name}-${city.stateCode}`}
-                        value={city.name}
-                      >
-                        {city.name}
-                      </SelectItem>
-                    ))
+              <FormControl>
+                <CreatableSelect
+                  value={field.value || undefined}
+                  onValueChange={(value) => {
+                    const cityData = cities.find((c) => c.name === value);
+                    if (cityData) {
+                      updateLocation({
+                        city: cityData.name,
+                        latitude: Number(cityData.latitude) || null,
+                        longitude: Number(cityData.longitude) || null,
+                      });
+                    }
+                    if (!cityData && value) {
+                      updateLocation({
+                        city: value,
+                        latitude: null,
+                        longitude: null,
+                      });
+                    }
+                  }}
+                  options={transformStringsToOptions(cities.map((c) => c.name))}
+                  placeholder="Select or type city name..."
+                  className={cn(
+                    "capitalize",
+                    fieldState.invalid
+                      ? "ring-destructive/20 dark:ring-destructive/40 border-destructive"
+                      : ""
                   )}
-                </SelectContent>
-              </Select>
-              <FormDescription>Select your city</FormDescription>
+                  dropdownClassName="capitalize"
+                  inputProps={{ className: "capitalize" }}
+                />
+              </FormControl>
               <FormMessage />
             </FormItem>
           )}

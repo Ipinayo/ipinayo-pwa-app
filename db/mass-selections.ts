@@ -2,6 +2,7 @@ import { MassSelectionFilter, SortBy, SortOrder } from "@/types/utils";
 import { MassSelectionStats, NewMassSelection } from "@/types/models";
 
 import { Prisma } from "@/lib/generated/prisma";
+import { capitalize } from "@/lib/utils";
 import prisma from "@/lib/prisma";
 
 export async function findSelectionWithParts(id: string) {
@@ -196,55 +197,57 @@ export async function findAllUserSelections({
 
 export async function saveSelection(selection: NewMassSelection, userId: string) {
 
-    return await prisma.massSelection.create({
-        data: {
-            title: selection.title,
-            date: new Date(selection.date),
-            liturgicalYear: selection.liturgicalYear,
-            liturgicalSeason: selection.liturgicalSeason,
-            liturgy: selection.liturgy,
-            themes: {
-                connectOrCreate: selection.themes.map(name => ({
-                    where: { name: name.toLowerCase() },
-                    create: { name: name.toLowerCase() }
-                }))
-            },
-            pastoralFocus: selection.pastoralFocus,
-            isPublic: selection.isPublic,
-            createdById: userId,
-            ...(selection.parishLocation && {
-                location: {
-                    connectOrCreate: {
-                        where: {
-                            country_state_city: {
-                                country: selection.parishLocation.country,
-                                state: selection.parishLocation.state || '',
-                                city: selection.parishLocation.city,
-                            }
-                        },
-                        create: {
-                            country: selection.parishLocation.country,
-                            countryCode: selection.parishLocation.countryCode,
-                            state: selection.parishLocation.state,
-                            stateCode: selection.parishLocation.stateCode,
-                            city: selection.parishLocation.city,
-                            latitude: selection.parishLocation.latitude,
-                            longitude: selection.parishLocation.longitude,
-                            timezone: selection.parishLocation.timezone,
-                        }
-                    }
-                }
-            }),
-            parts: {
-                create:
-                    selection.parts?.map((part) => ({
-                        partName: part.partName,
-                        keySignature: part.keySignature,
-                        notes: part.notes,
-                        songTitle: part.songTitle,
-                    })) || [],
-            },
+    const { parts, date, themes, parishLocation, ...rest } = selection
+
+    const data: Prisma.MassSelectionCreateInput = {
+        ...rest,
+        date: new Date(date),
+        themes: {
+            connectOrCreate: themes.map(name => ({
+                where: { name: name.toLowerCase() },
+                create: { name: name.toLowerCase() }
+            }))
         },
+        parts: {
+            create:
+                parts?.map((part) => ({
+                    partName: part.partName,
+                    keySignature: part.keySignature,
+                    notes: part.notes,
+                    songTitle: part.songTitle,
+                })) || [],
+        },
+        createdBy: {
+            connect: { id: userId }
+        },
+    }
+
+    if (parishLocation && parishLocation.country) {
+        data.parishLocation = {
+            connectOrCreate: {
+                where: {
+                    country_state_city: {
+                        country: parishLocation.country,
+                        state: parishLocation.state || '',
+                        city: capitalize(parishLocation.city || ''),
+                    }
+                },
+                create: {
+                    country: parishLocation.country,
+                    countryCode: parishLocation.countryCode,
+                    state: parishLocation.state,
+                    stateCode: parishLocation.stateCode,
+                    city: capitalize(parishLocation.city || ''),
+                    latitude: parishLocation.latitude,
+                    longitude: parishLocation.longitude,
+                    timezone: parishLocation.timezone,
+                }
+            }
+        }
+    }
+
+    return await prisma.massSelection.create({
+        data,
         // include: {
         //     parts: true,
         //     themes: true,
@@ -278,14 +281,14 @@ export async function updateSelection(
                 }
             }),
             // Handle location update
-            ...(parishLocation && {
+            ...(parishLocation && parishLocation.country && {
                 parishLocation: {
                     connectOrCreate: {
                         where: {
                             country_state_city: {
                                 country: parishLocation.country,
                                 state: parishLocation.state || '',
-                                city: parishLocation.city || '',
+                                city: capitalize(parishLocation.city || ''),
                             }
                         },
                         create: {
@@ -293,7 +296,7 @@ export async function updateSelection(
                             countryCode: parishLocation.countryCode,
                             state: parishLocation.state,
                             stateCode: parishLocation.stateCode,
-                            city: parishLocation.city,
+                            city: capitalize(parishLocation.city || ''),
                             latitude: parishLocation.latitude,
                             longitude: parishLocation.longitude,
                             timezone: parishLocation.timezone,

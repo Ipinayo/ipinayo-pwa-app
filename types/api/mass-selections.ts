@@ -14,11 +14,11 @@ export const massSelectionPartSchema = z.object({
 
 // Schema for location
 const locationSchema = z.object({
-    country: z.string().min(1, "Country is required"),
+    country: z.string().optional(),
     countryCode: z.string().optional().nullable(),
-    state: z.string().optional().nullable(),
+    state: z.string().optional(),
     stateCode: z.string().optional().nullable(),
-    city: z.string().min(1, "City is required"),
+    city: z.string().optional(),
     latitude: z.number().optional().nullable(),
     longitude: z.number().optional().nullable(),
     timezone: z.string().optional().nullable(),

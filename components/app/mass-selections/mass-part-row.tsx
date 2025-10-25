@@ -1,6 +1,5 @@
 "use client";
 
-import { Control, useController } from "react-hook-form";
 import {
   FormControl,
   FormField,
@@ -19,12 +18,12 @@ import {
 import { cn, getEnumByKey, transformStringsToOptions } from "@/lib/utils";
 
 import { Button } from "@/components/ui/button";
+import { Control } from "react-hook-form";
 import CreatableSelect from "@/components/common/creatable-select";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Trash2 } from "lucide-react";
 import { keySignatureItems } from "@/lib/constants";
-import { useState } from "react";
 
 interface MassPartRowProps {
   index: number;
@@ -60,18 +59,6 @@ export function MassPartRow({
   onRemove,
   canRemove,
 }: MassPartRowProps) {
-  const [partNameOpen, setPartNameOpen] = useState(false);
-
-  const { field: partNameField } = useController({
-    name: `parts.${index}.partName`,
-    control,
-  });
-
-  const handlePartNameSelect = (partName: string) => {
-    partNameField.onChange(partName);
-    setPartNameOpen(false);
-  };
-
   return (
     <div className="bg-card grid gap-4 rounded-lg border p-4">
       <div className="flex items-center justify-end">

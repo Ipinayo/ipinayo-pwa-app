@@ -42,6 +42,7 @@ import { useFieldArray, useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import DateSelect from "@/components/common/date-select";
 import { Input } from "@/components/ui/input";
+import LocationSelector from "@/components/common/location-selector";
 import { MassPartRow } from "./mass-part-row";
 import MultipleSelector from "@/components/common/multiple-selector";
 import { Switch } from "@/components/ui/switch";
@@ -135,6 +136,8 @@ export default function SaveForm(props: SaveFormProps) {
     });
   };
 
+  const location = form.watch("parishLocation");
+
   const handleSubmit = async (data: NewMassSelection) => {
     if (mode === "edit") {
       const { selection } = props;
@@ -223,6 +226,50 @@ export default function SaveForm(props: SaveFormProps) {
                 )}
               />
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Choir and Parish Information */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Choir and Parish Information</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <FormField
+              control={form.control}
+              name="choirName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Choir Name</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      placeholder="e.g., St. Joseph Choir"
+                      value={field.value || ""}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="parishName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Parish Name</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      placeholder="e.g., St. Joseph Parish"
+                      value={field.value || ""}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <LocationSelector form={form} />
           </CardContent>
         </Card>
 
