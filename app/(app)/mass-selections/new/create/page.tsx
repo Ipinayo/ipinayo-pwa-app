@@ -1,12 +1,18 @@
 import BackButton from "@/components/common/back-button";
 import SaveForm from "@/components/app/mass-selections/save-form";
 import { SearchParams } from "@/types/utils";
+import { auth } from "@/auth";
 import { getThemes } from "@/lib/actions/mass-selections";
 import { liturgyTemplates } from "@/lib/constants";
+import { redirect } from "next/navigation";
 
 export default async function CreateMassSelectionPage(props: {
   searchParams: SearchParams;
 }) {
+  const session = await auth();
+
+  if (!session?.user) redirect("/signin");
+
   const searchParams = await props.searchParams;
   const template = searchParams["template"] || "blank";
 

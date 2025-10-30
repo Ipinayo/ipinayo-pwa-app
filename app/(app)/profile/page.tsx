@@ -11,9 +11,15 @@ import { Edit, Heart, MapPin, Music } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { auth } from "@/auth";
 import { getUserProfile } from "@/lib/actions/user";
+import { redirect } from "next/navigation";
 
 export default async function ProfilePage() {
+  const session = await auth();
+
+  if (!session?.user) redirect("/signin");
+
   const userProfile = await getUserProfile();
 
   return (

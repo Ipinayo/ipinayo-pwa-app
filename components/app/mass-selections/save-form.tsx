@@ -136,8 +136,6 @@ export default function SaveForm(props: SaveFormProps) {
     });
   };
 
-  const location = form.watch("parishLocation");
-
   const handleSubmit = async (data: NewMassSelection) => {
     if (mode === "edit") {
       const { selection } = props;

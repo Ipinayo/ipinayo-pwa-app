@@ -15,12 +15,20 @@ import BackButton from "@/components/common/back-button";
 import { Badge } from "@/components/ui/badge";
 import Options from "@/components/app/mass-selections/options";
 import { Params } from "@/types/utils";
+import { auth } from "@/auth";
 import { getSelectionById } from "@/lib/actions/mass-selections";
 
 export default async function ViewPage(props: { params: Params }) {
   const params = await props.params;
+  const session = await auth();
 
   const selection = await getSelectionById(params.id);
+
+  if (!selection.isPublic) {
+    if (!session?.user?.id || selection.createdById !== session.user.id) {
+      throw new Error("Unauthorized");
+    }
+  }
 
   return (
     <div className="mx-auto max-w-6xl w-full">

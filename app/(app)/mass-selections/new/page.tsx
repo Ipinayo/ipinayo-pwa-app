@@ -9,9 +9,15 @@ import {
 import BackButton from "@/components/common/back-button";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { auth } from "@/auth";
 import { liturgyTemplates } from "@/lib/constants";
+import { redirect } from "next/navigation";
 
-export default function SelectLiturgyTemplatePage() {
+export default async function SelectLiturgyTemplatePage() {
+  const session = await auth();
+
+  if (!session?.user) redirect("/signin");
+
   return (
     <div className="w-full">
       <div className="mx-auto max-w-4xl">
