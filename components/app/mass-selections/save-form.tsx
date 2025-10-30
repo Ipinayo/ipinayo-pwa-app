@@ -46,7 +46,7 @@ import LocationSelector from "@/components/common/location-selector";
 import { MassPartRow } from "./mass-part-row";
 import MultipleSelector from "@/components/common/multiple-selector";
 import { Switch } from "@/components/ui/switch";
-import { createMassSelectionSchema } from "@/types/api/mass-selections";
+import { createMassSelectionSchema } from "@/types/schemas/mass-selections";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { withToast } from "@/lib/with-toast";

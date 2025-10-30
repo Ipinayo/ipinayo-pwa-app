@@ -1,7 +1,7 @@
 'use server'
 
 import { MassSelectionFilter, SortBy, SortOrder } from "@/types/utils";
-import { createMassSelectionSchema, updateMassSelectionSchema } from "@/types/api/mass-selections";
+import { createMassSelectionSchema, updateMassSelectionSchema } from "@/types/schemas/mass-selections";
 import {
     findAllSelections,
     findAllThemes,

@@ -1,4 +1,4 @@
-import { SelectionsResponse, ShareResponse } from "@/types/api/mass-selections";
+import { SelectionsResponse, ShareResponse } from "@/types/schemas/mass-selections";
 
 import { MassSelection } from "@/types/models";
 import { MassSelectionFilter } from "@/types/utils";

@@ -1,28 +1,9 @@
-import { KeySignature, LiturgicalSeason, LiturgicalYear } from "@/types/models";
+import { LiturgicalSeason, LiturgicalYear } from "@/types/models";
 
 import { MassSelection } from "../models";
+import { locationSchema } from "./location";
+import { massSelectionPartSchema } from "./mass-part";
 import { z } from "zod";
-
-// Schema for a mass selection part
-export const massSelectionPartSchema = z.object({
-    id: z.string(),
-    partName: z.string().min(1, "Part name is required"),
-    songTitle: z.string().min(1, "Song title is required"),
-    keySignature: z.enum(KeySignature).nullable().optional(),
-    notes: z.string().nullable().optional(),
-});
-
-// Schema for location
-const locationSchema = z.object({
-    country: z.string().optional(),
-    countryCode: z.string().optional().nullable(),
-    state: z.string().optional(),
-    stateCode: z.string().optional().nullable(),
-    city: z.string().optional(),
-    latitude: z.number().optional().nullable(),
-    longitude: z.number().optional().nullable(),
-    timezone: z.string().optional().nullable(),
-});
 
 // Schema for creating a new mass selection
 export const createMassSelectionSchema = z.object({
