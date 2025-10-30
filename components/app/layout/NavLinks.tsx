@@ -67,6 +67,12 @@ export default function NavLinks({
       active: pathname === "/dashboard",
     },
     {
+      href: "/profile",
+      label: "My Profile",
+      icon: User,
+      active: pathname === "/profile",
+    },
+    {
       href: "/settings",
       label: "Settings",
       icon: Settings,

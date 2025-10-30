@@ -1,11 +1,10 @@
 'use server'
 
 import { AppUser, UserProfile } from "@/types/models";
-import { findUser, findUserProfile } from "@/db/user";
+import { findUser, findUserProfile, updateUserProfile } from "@/db/user";
 
 import { UpdateUserProfile } from "@/types/utils";
 import { auth } from "@/auth";
-import { updateUserProfile } from '../simulated-data';
 import { updateUserProfileSchema } from "@/types/schemas/user";
 
 export async function getUserProfile(): Promise<UserProfile> {
