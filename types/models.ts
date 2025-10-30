@@ -61,4 +61,30 @@ export interface MassSelectionStats {
 
 export type Location = Prisma.LocationGetPayload<{}>;
 
+export type UserProfile = Prisma.UserProfileGetPayload<{
+    include: {
+        user: {
+            select: {
+                name: true;
+                email: true;
+                image: true;
+            }
+        },
+        parishLocation: true
+    }
+}>;
+
+export type AppUser = Prisma.UserGetPayload<{
+    select: {
+        name: true,
+        email: true,
+        image: true,
+        profile: {
+            select: {
+                headline: true
+            }
+        }
+    }
+}>
+
 export { KeySignature, LiturgicalSeason, LiturgicalYear }

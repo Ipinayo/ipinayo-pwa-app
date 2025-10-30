@@ -1,4 +1,4 @@
-import { LiturgicalSeason, LiturgicalYear } from "./models";
+import { LiturgicalSeason, LiturgicalYear, NewLocation } from "./models";
 
 export type SearchParams = Promise<{ [key: string]: string | undefined }>;
 
@@ -23,4 +23,16 @@ export interface MassSelectionFilter {
     year?: LiturgicalYear,
     sortBy?: SortBy,
     sortOrder?: SortOrder
+}
+
+export interface UpdateUserProfile {
+    name?: string
+    bio?: string;
+    headline?: string;
+    instruments?: string[];
+    vocalFach?: string;
+    favoriteGenres?: string[];
+    parishName?: string;
+    choirName?: string;
+    parishLocation?: NewLocation
 }
