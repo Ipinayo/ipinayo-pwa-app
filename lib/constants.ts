@@ -191,3 +191,40 @@ export const liturgicalYearItems = [
     { label: "Year B", value: LiturgicalYear.B },
     { label: "Year C", value: LiturgicalYear.C },
 ]
+
+export const vocalFachOptions = [
+    // General voice types
+    "Soprano",
+    "Mezzo-Soprano",
+    "Contralto",
+    "Tenor",
+    "Baritone",
+    "Bass",
+
+    // Common soprano fachs
+    "Lyric Soprano",
+    "Dramatic Soprano",
+    "Coloratura Soprano",
+    "Spinto Soprano",
+
+    // Mezzo-soprano and contralto
+    "Lyric Mezzo-Soprano",
+    "Dramatic Mezzo-Soprano",
+    "Coloratura Mezzo-Soprano",
+    "Lyric Contralto",
+    "Dramatic Contralto",
+
+    // Tenor
+    "Lyric Tenor",
+    "Dramatic Tenor",
+    "Heldentenor",
+
+    // Baritone
+    "Lyric Baritone",
+    "Dramatic Baritone",
+    "Verdi Baritone",
+
+    // Bass
+    "Basso Cantante",
+    "Basso Profundo",
+]
