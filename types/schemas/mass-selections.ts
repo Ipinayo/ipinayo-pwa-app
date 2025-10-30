@@ -1,6 +1,5 @@
 import { LiturgicalSeason, LiturgicalYear } from "@/types/models";
 
-import { MassSelection } from "../models";
 import { locationSchema } from "./location";
 import { massSelectionPartSchema } from "./mass-part";
 import { z } from "zod";
@@ -25,19 +24,3 @@ export const createMassSelectionSchema = z.object({
 export const updateMassSelectionSchema = createMassSelectionSchema.partial().extend({
     parts: z.array(massSelectionPartSchema).min(1, "At least one part is required").optional(),
 });
-
-export interface SelectionsResponse {
-    selections: MassSelection[];
-    pagination: {
-        page: number;
-        limit: number;
-        total: number;
-        pages: number;
-    };
-}
-
-export interface ShareResponse {
-    shareableLink: string;
-    pdfLink: string;
-    message: string;
-}
