@@ -72,6 +72,10 @@ model UserProfile {
   id               String    @id @default(cuid())
   userId           String    @unique
   bio              String?
+  headline         String?
+  instruments      String[]
+  vocalFach        String?
+  favoriteGenres   String[]
   parishName       String?
   choirName        String?
   parishLocationId String?
