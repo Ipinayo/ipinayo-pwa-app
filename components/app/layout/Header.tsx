@@ -1,5 +1,3 @@
-"use client";
-
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -9,53 +7,20 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Menu } from "lucide-react";
-import SideNav from "./SideNav";
+import MobileMenuTrigger from "./MobileMenuTrigger";
 import SignoutButton from "./SignoutButton";
-import { useSession } from "next-auth/react";
-import { useState } from "react";
+import { getUser } from "@/lib/actions/user";
 
-export default function Header() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  const { data: session } = useSession();
-
-  const user = session?.user;
+export default async function Header() {
+  const user = await getUser();
 
   return (
     <div className="bg-background sticky top-0 z-40 w-full border-b">
       <div className="flex h-16 items-center px-4 md:px-6">
-        {/* Mobile menu trigger */}
-        <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-          <SheetTrigger asChild>
-            <Button variant="ghost" size="icon" className="mr-2 md:hidden">
-              <Menu className="h-5 w-5" />
-              <span className="sr-only">Toggle menu</span>
-            </Button>
-          </SheetTrigger>
-          <SheetContent
-            side="left"
-            className="p-0"
-            aria-describedby="side navigation"
-          >
-            <SheetTitle className="sr-only">Side Navigation</SheetTitle>
-            <SheetDescription className="sr-only">
-              Side Navigation
-            </SheetDescription>
-            <SideNav isMobileMenuOpen={mobileMenuOpen} />
-          </SheetContent>
-        </Sheet>
+        <MobileMenuTrigger />
 
         <Link href="/" className="flex items-center">
           <img
@@ -83,11 +48,11 @@ export default function Header() {
                         alt={user?.name || ""}
                       />
                       <AvatarFallback>
-                        {user.name ||
-                          "A"
-                            .split(" ")
-                            .map((n) => n[0])
-                            .join("")}
+                        {(user.name || user.email)
+                          .split(" ")
+                          .map((n) => n[0])
+                          .join("")
+                          .toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
                   </Button>
@@ -101,9 +66,11 @@ export default function Header() {
                       <p className="text-muted-foreground text-xs leading-none">
                         {user.email}
                       </p>
-                      <Badge variant="secondary" className="w-fit text-xs mt-1">
-                        Composer
-                      </Badge>
+                      {user.profile?.headline && (
+                        <p className="text-sm text-muted-foreground italic mt-1">
+                          {user.profile.headline}
+                        </p>
+                      )}
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />

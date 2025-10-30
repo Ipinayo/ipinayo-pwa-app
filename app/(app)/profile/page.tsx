@@ -20,9 +20,7 @@ export default async function ProfilePage() {
     <div className="w-full">
       <div className="mx-auto max-w-4xl">
         <div className="flex items-center justify-between mb-8">
-          <h2 className="text-3xl font-display text-foreground mb-2">
-            My Profile
-          </h2>
+          <h2 className="text-3xl font-display text-foreground">My Profile</h2>
           <Button asChild variant="outline">
             <Link href="/settings/profile">
               <Edit className="mr-2 h-4 w-4" />
@@ -35,19 +33,18 @@ export default async function ProfilePage() {
           {/* Profile Header */}
           <Card>
             <CardHeader>
-              <div className="flex items-center gap-6">
+              <div className="flex flex-col sm:flex-row items-center gap-6">
                 <Avatar className="h-24 w-24">
                   <AvatarImage
-                    src={userProfile.user.name || undefined}
-                    alt={userProfile.user.name || userProfile.user.email}
+                    src={userProfile.user.image || undefined}
+                    alt="User Avatar"
                   />
                   <AvatarFallback>
-                    {userProfile.user.name ||
-                      userProfile.user.email
-                        .split(" ")
-                        .map((n) => n[0])
-                        .join("")
-                        .toUpperCase()}
+                    {(userProfile.user.name || userProfile.user.email)
+                      .split(" ")
+                      .map((n) => n[0])
+                      .join("")
+                      .toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1">

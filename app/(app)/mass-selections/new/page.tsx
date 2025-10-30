@@ -18,7 +18,9 @@ export default function SelectLiturgyTemplatePage() {
         <div className="flex items-center gap-4 mb-8">
           <BackButton fallback="/mass-selections" />
           <div>
-            <h1 className="text-3xl font-bold">Create Mass Selection</h1>
+            <h2 className="text-3xl font-display text-foreground">
+              Create Mass Selection
+            </h2>
             <p className="text-muted-foreground mt-1">
               Choose a liturgy template to get started
             </p>

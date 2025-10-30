@@ -22,7 +22,9 @@ export default async function CreateMassSelectionPage(props: {
         <div className="mb-8 flex items-center gap-4">
           <BackButton to="/mass-selections/new" backText="Back to Templates" />
           <div>
-            <h1 className="text-3xl font-bold">Create Mass Selection</h1>
+            <h2 className="text-3xl font-display text-foreground">
+              Create Mass Selection
+            </h2>
             <p className="text-muted-foreground mt-1">
               Using template:{" "}
               <span className="font-medium">{templateName}</span>

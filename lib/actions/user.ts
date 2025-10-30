@@ -34,7 +34,7 @@ export async function updateUserProfileAction(updates: UpdateUserProfile) {
 export async function getUser(): Promise<AppUser | null> {
     const session = await auth();
     if (!session?.user?.id) {
-        throw new Error("Unauthorized");
+        return null;
     }
 
     return findUser(session.user.id);

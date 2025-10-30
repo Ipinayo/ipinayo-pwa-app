@@ -18,7 +18,9 @@ export default async function EditPage(props: { params: Params }) {
           backText="Back to View"
         />
         <div>
-          <h1 className="text-3xl font-bold">Edit: {selection.title}</h1>
+          <h2 className="text-3xl font-display text-foreground">
+            Edit: {selection.title}
+          </h2>
           <p className="text-muted-foreground mt-1">
             Make changes to your Mass selection
           </p>
