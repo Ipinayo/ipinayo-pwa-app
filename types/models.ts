@@ -13,6 +13,10 @@ export type GenerateMassSelection = Prisma.MassSelectionGetPayload<{
 
 export type SingleMassSelection = Prisma.MassSelectionGetPayload<{}>
 
+export type SingleMassSelectionWithParts = Prisma.MassSelectionGetPayload<{
+    include: { themes: { select: { id: true } }, parts: true }
+}>
+
 export type MassSelectionWithParts = Prisma.MassSelectionGetPayload<{
     include: {
         themes: true

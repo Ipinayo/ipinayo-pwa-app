@@ -7,15 +7,18 @@ import {
     findAllThemes,
     findAllUserSelections,
     findMassSelectionStats,
+    findSelection,
     findSelectionWithParts,
     findUserSelection,
     removeSelection,
     saveSelection,
+    saveSelectionBySelection,
     updateSelection as updateSelectionDb
 } from "@/db/mass-selections";
 
 import { NewMassSelection } from "@/types/models";
 import { auth } from "@/auth";
+import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import z from "zod";
 
@@ -332,10 +335,10 @@ export async function cloneSelection(id: string) {
     try {
         const session = await auth();
         if (!session?.user?.id) {
-            throw new Error("Unauthorized");
+            redirect("/signin");
         }
 
-        const originalSelection = await findSelectionWithParts(id);
+        const originalSelection = await findSelection(id);
         if (!originalSelection) {
             throw new Error("Mass selection not found");
         }
@@ -345,12 +348,10 @@ export async function cloneSelection(id: string) {
             throw new Error("Access denied");
         }
 
-        const { createdBy, createdById, themes, ...rest } = originalSelection;
-        const result = await saveSelection({
-            ...rest,
+        const result = await saveSelectionBySelection({
+            ...originalSelection,
             title: `${originalSelection.title} (Copy)`,
-            isPublic: true,
-            themes: themes.map(theme => theme.name)
+            isPublic: true
         }, session.user.id);
 
         revalidatePath('/liturgical-selections');

@@ -1,5 +1,5 @@
 import { MassSelectionFilter, SortBy, SortOrder } from "@/types/utils";
-import { MassSelectionStats, NewMassSelection } from "@/types/models";
+import { MassSelectionStats, NewMassSelection, SingleMassSelectionWithParts } from "@/types/models";
 
 import { Prisma } from "@/lib/generated/prisma";
 import { capitalize } from "@/lib/utils";
@@ -35,7 +35,8 @@ export async function findUserSelectionWithParts(id: string, userId: string) {
 
 export async function findSelection(id: string) {
     return await prisma.massSelection.findUnique({
-        where: { id }
+        where: { id },
+        include: { themes: { select: { id: true } }, parts: true }
     })
 }
 
@@ -369,4 +370,27 @@ export async function findMassSelectionStats(
 
     // $queryRaw returns an array of rows, so we take the first one
     return stats[0]
+}
+
+export async function saveSelectionBySelection(selection: SingleMassSelectionWithParts, userId: string) {
+    const { themes, parts, createdById, id, createdAt, updatedAt, ...rest } = selection;
+
+
+    return await prisma.massSelection.create({
+        data: {
+            ...rest,
+            themes: themes.length > 0
+                ? { connect: themes.map((t) => ({ id: t.id })) }
+                : undefined,
+            parts: {
+                create: parts.map((part) => ({
+                    partName: part.partName,
+                    keySignature: part.keySignature,
+                    notes: part.notes,
+                    songTitle: part.songTitle,
+                })),
+            },
+            createdById: userId,
+        },
+    })
 }
