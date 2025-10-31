@@ -2,6 +2,7 @@ import { MassSelectionFilter, SortBy, SortOrder } from "@/types/utils";
 import { MassSelectionStats, NewMassSelection, SingleMassSelectionWithParts } from "@/types/models";
 
 import { Prisma } from "@/lib/generated/prisma";
+import { addLocationToUserProfile } from "./user";
 import { capitalize } from "@/lib/utils";
 import prisma from "@/lib/prisma";
 
@@ -261,7 +262,7 @@ export async function saveSelection(selection: NewMassSelection, userId: string)
         }
     }
 
-    return await prisma.massSelection.create({
+    const createdSelection = await prisma.massSelection.create({
         data,
         // include: {
         //     parts: true,
@@ -273,6 +274,9 @@ export async function saveSelection(selection: NewMassSelection, userId: string)
         // },
     })
 
+    addLocationToUserProfile(userId, createdSelection.parishLocationId!);
+
+    return createdSelection;
 }
 
 export async function updateSelection(
@@ -281,7 +285,7 @@ export async function updateSelection(
 ) {
     const { parts, date, themes, parishLocation, ...rest } = selection
 
-    return await prisma.massSelection.update({
+    const updatedSelection = await prisma.massSelection.update({
         where: { id },
         data: {
             ...rest,
@@ -340,6 +344,9 @@ export async function updateSelection(
         //     },
         // },
     })
+
+    addLocationToUserProfile(updatedSelection.createdById, updatedSelection.parishLocationId!);
+
 }
 
 export async function removeSelection(id: string) {

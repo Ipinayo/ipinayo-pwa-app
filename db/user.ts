@@ -93,3 +93,17 @@ export async function findUser(userId: string) {
         }
     });
 }
+
+export async function addLocationToUserProfile(userId: string, locationId: string) {
+    if (!locationId) return;
+
+    await prisma.userProfile.updateMany({
+        where: {
+            userId,
+            parishLocationId: null
+        },
+        data: {
+            parishLocationId: locationId
+        }
+    });
+}
