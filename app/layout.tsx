@@ -1,7 +1,7 @@
-import "../ui/globals.css";
+import "./ui/globals.css";
 
 import type { Metadata, Viewport } from "next";
-import { geistMono, pattaya, playfairDisplay, sourceSans } from "../ui/fonts";
+import { geistMono, pattaya, playfairDisplay, sourceSans } from "./ui/fonts";
 
 import { Analytics } from "@vercel/analytics/next";
 import { AppNavigationProvider } from "@/contexts/AppNavigationContext";
