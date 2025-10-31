@@ -25,10 +25,10 @@ export default async function SelectLiturgyTemplatePage() {
           <BackButton fallback="/mass-selections" />
           <div>
             <h2 className="text-3xl font-display text-foreground">
-              Create Mass Selection
+              Create Liturgical Selection
             </h2>
             <p className="text-muted-foreground mt-1">
-              Choose a liturgy template to get started
+              Choose a template to get started
             </p>
           </div>
         </div>
@@ -68,7 +68,7 @@ export default async function SelectLiturgyTemplatePage() {
                         {template.parts.length > 4 && (
                           <div className="flex items-center text-muted-foreground/70">
                             <span className="w-2 h-2 bg-primary/20 rounded-full mr-2"></span>
-                            +{template.parts.length - 4} more parts
+                            +{template.parts.length - 4} more sections
                           </div>
                         )}
                       </div>

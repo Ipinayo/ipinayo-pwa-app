@@ -16,8 +16,7 @@ export default function Loading() {
       <div className="mb-8">
         <Skeleton className="h-10" />
         <p className="text-muted-foreground">
-          Manage your Catholic Mass selections and create beautiful liturgical
-          music plans
+          Manage and create beautiful liturgical music plans
         </p>
       </div>
 
@@ -84,7 +83,7 @@ export default function Loading() {
           {/* Actions */}
           <div className="flex items-center justify-between">
             <h3 className="text-2xl font-display text-foreground">
-              My Mass Selections
+              My Liturgical Selections
             </h3>
             <Skeleton className="h-10" />
           </div>

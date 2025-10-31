@@ -29,7 +29,7 @@ export default async function CreateMassSelectionPage(props: {
           <BackButton to="/mass-selections/new" backText="Back to Templates" />
           <div>
             <h2 className="text-3xl font-display text-foreground">
-              Create Mass Selection
+              Create Liturgical Selection
             </h2>
             <p className="text-muted-foreground mt-1">
               Using template:{" "}

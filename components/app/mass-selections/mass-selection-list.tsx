@@ -41,12 +41,12 @@ export default async function MassSelectionList({
         <Music className="text-muted-foreground mx-auto mb-4 h-16 w-16" />
         <h3 className="mb-2 text-xl font-semibold">
           {isDefaultFilter
-            ? "No Mass Selections Yet"
+            ? "No Liturgical Selections Yet"
             : "No matching selections found"}
         </h3>
         <p className="text-muted-foreground mb-6">
           {isDefaultFilter
-            ? "Create your first Mass selection to get started with liturgical planning."
+            ? "Create your first selection to get started with liturgical planning."
             : "Try adjusting your search or filters to find what you're looking for."}
         </p>
 

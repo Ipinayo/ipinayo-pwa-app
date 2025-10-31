@@ -417,10 +417,10 @@ export default function SaveForm(props: SaveFormProps) {
           </CardContent>
         </Card>
 
-        {/* Mass Parts */}
+        {/* Liturgy Parts */}
         <Card>
           <CardHeader>
-            <CardTitle>Mass Parts</CardTitle>
+            <CardTitle>Liturgy Parts</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {fields.map((field, index) => (

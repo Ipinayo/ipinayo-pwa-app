@@ -5,9 +5,9 @@ export default function Loading() {
     <div className="max-w-full w-full">
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Mass Selections</h1>
+          <h1 className="text-3xl font-bold">Liturgical Selections</h1>
           <p className="text-muted-foreground mt-2">
-            Manage your liturgical Mass plans
+            Plan your liturgical music
           </p>
         </div>
       </div>

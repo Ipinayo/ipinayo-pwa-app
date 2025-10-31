@@ -73,13 +73,13 @@ export default async function ViewPage(props: { params: Params }) {
         <div className="lg:col-span-2 overflow-x-hidden">
           <Card>
             <CardHeader>
-              <CardTitle>Mass Parts</CardTitle>
+              <CardTitle>Liturgy Parts</CardTitle>
             </CardHeader>
             <CardContent className="overflow-auto">
               <Table className="w-full overflow-auto">
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-[200px]">Part</TableHead>
+                    <TableHead className="w-[200px]">Name</TableHead>
                     <TableHead>Song Title</TableHead>
                     <TableHead className="w-[120px]">Key</TableHead>
                     <TableHead>Notes</TableHead>

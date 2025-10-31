@@ -34,8 +34,8 @@ export default async function SignInPage(props: {
               Welcome Back
             </CardTitle>
             <CardDescription>
-              Sign in to access your Mass selections and continue sharing joy
-              through music.
+              Sign in to access your Liturgical selections and continue sharing
+              joy through music.
             </CardDescription>
           </CardHeader>
           <CardContent>

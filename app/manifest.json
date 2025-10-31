@@ -45,9 +45,9 @@
   "prefer_related_applications": false,
   "shortcuts": [
     {
-      "name": "Create Mass Selection",
+      "name": "Create Liturgical Selection",
       "short_name": "Create",
-      "description": "Create a new Mass selection",
+      "description": "Create a new Liturgical selection",
       "url": "/mass-selections/new",
       "icons": [
         {
@@ -59,7 +59,7 @@
     {
       "name": "Dashboard",
       "short_name": "Dashboard",
-      "description": "View your Mass selections",
+      "description": "View your Liturgical selections",
       "url": "/dashboard",
       "icons": [
         {

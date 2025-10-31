@@ -20,13 +20,15 @@ export default function HomePage() {
               Sharing Joy Through Music
             </h1>
             <p className="mb-3 text-sm md:text-base">
-              Create, manage, and share liturgical plans with ease. From Sunday
-              Mass to special celebrations, organize your musical selections
+              Create and share liturgical selections with ease. From Sunday Mass
+              to special liturgies, organize your musical selections
               beautifully.
             </p>
             <div>
               <Button size="sm" variant="secondary" asChild>
-                <Link href="/mass-selections">Browse Mass Selections</Link>
+                <Link href="/mass-selections">
+                  Browse Liturgical Selections
+                </Link>
               </Button>
             </div>
           </div>
@@ -40,7 +42,7 @@ export default function HomePage() {
             <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mx-auto">
               <Music className="w-6 h-6 text-primary" />
             </div>
-            <h3 className="font-display text-lg">Mass Templates</h3>
+            <h3 className="font-display text-lg">Liturgical Templates</h3>
             <p className="text-sm text-muted-foreground">
               Choose from Sunday Mass, Wedding, Funeral, and more pre-configured
               templates.
@@ -69,7 +71,7 @@ export default function HomePage() {
             <h3 className="font-display text-lg">Organized Planning</h3>
             <p className="text-sm text-muted-foreground">
               Track liturgical year, seasons, themes, and pastoral focus for
-              each Mass.
+              each Liturgy.
             </p>
           </CardContent>
         </Card>
@@ -81,8 +83,8 @@ export default function HomePage() {
             </div>
             <h3 className="font-display text-lg">PDF Export</h3>
             <p className="text-sm text-muted-foreground">
-              Generate professional PDFs of your Mass selections for printing
-              and sharing.
+              Generate professional PDFs of your selections for printing and
+              sharing.
             </p>
           </CardContent>
         </Card>
@@ -90,11 +92,10 @@ export default function HomePage() {
 
       <section className="mb-8 py-8 text-center">
         <h2 className="font-pattaya mb-4 text-2xl">
-          Ready to create and share your Mass Selection?
+          Ready to create and share your Liturgical selections?
         </h2>
         <p className="text-muted-foreground mx-auto mb-6 max-w-md">
-          Join our community and share your Liturgical selections with the
-          world.
+          Join our community and share your selections with the world.
         </p>
         <Button asChild>
           <Link href="/mass-selections/new">Create Selection</Link>

@@ -33,7 +33,7 @@ export default async function EditPage(props: { params: Params }) {
             Edit: {selection.title}
           </h2>
           <p className="text-muted-foreground mt-1">
-            Make changes to your Mass selection
+            Make changes to your Liturgical selection
           </p>
         </div>
       </div>

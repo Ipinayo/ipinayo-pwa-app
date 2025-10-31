@@ -54,7 +54,7 @@ export default function NavLinks({
     },
     {
       href: "/mass-selections",
-      label: "Mass Selections",
+      label: "Liturgical Selections",
       icon: BookOpen,
       active:
         pathname === "/mass-selections" ||

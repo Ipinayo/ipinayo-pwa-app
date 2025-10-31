@@ -41,10 +41,10 @@ export default async function MassSelectionsPage(props: {
       <div className="mb-8 flex items-center justify-between">
         <div>
           <h2 className="text-3xl font-display text-foreground">
-            Mass Selections
+            Liturgical Selections
           </h2>
           <p className="text-muted-foreground mt-2">
-            Manage your liturgical Mass plans
+            Plan and organize liturgical music with ease
           </p>
         </div>
         <Link href="/mass-selections/new">

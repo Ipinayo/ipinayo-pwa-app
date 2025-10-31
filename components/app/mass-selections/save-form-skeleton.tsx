@@ -73,7 +73,7 @@ export function SaveFormSkeleton() {
         </CardContent>
       </Card>
 
-      {/* Mass Parts Card */}
+      {/* Liturgy Section Card */}
       <Card>
         <CardHeader>
           <Skeleton className="h-6 w-24" />

@@ -83,7 +83,7 @@ export function MassPartRow({
           render={({ field, fieldState }) => (
             <FormItem>
               <FormLabel>
-                Part Name <span className="text-destructive">*</span>
+                Name <span className="text-destructive">*</span>
               </FormLabel>
               <FormControl>
                 <CreatableSelect

@@ -14,7 +14,7 @@ import { Toaster } from "@/components/ui/sonner";
 export const metadata: Metadata = {
   title: "Ìpínayò",
   description:
-    "Create and manage Catholic Mass selections with ease. Sharing joy through music.",
+    "Plan and organize liturgical music with ease. Sharing joy through music.",
   generator: "Ìpínayò",
   manifest: "/manifest.json",
   appleWebApp: {
@@ -439,13 +439,13 @@ export const metadata: Metadata = {
     siteName: "Ìpínayò",
     title: "Ìpínayò",
     description:
-      "Create and manage Catholic Mass selections with ease. Sharing joy through music.",
+      "Plan and organize liturgical music with ease. Sharing joy through music.",
   },
   twitter: {
     card: "summary",
     title: "Ìpínayò",
     description:
-      "Create and manage Catholic Mass selections with ease. Sharing joy through music.",
+      "Plan and organize liturgical music with ease. Sharing joy through music.",
   },
 };
 
