@@ -87,6 +87,7 @@ export async function findUser(userId: string) {
             image: true,
             profile: {
                 select: {
+                    id: true,
                     headline: true
                 }
             }
@@ -106,4 +107,15 @@ export async function addLocationToUserProfile(userId: string, locationId: strin
             parishLocationId: locationId
         }
     });
+}
+
+export async function findUserParishLocation(userId: string) {
+    const userProfile = await prisma.userProfile.findUnique({
+        where: { userId },
+        select: {
+            parishLocation: true
+        }
+    });
+
+    return userProfile?.parishLocation || null;
 }
