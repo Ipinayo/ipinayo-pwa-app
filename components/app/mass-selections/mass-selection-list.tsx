@@ -51,7 +51,7 @@ export default async function MassSelectionList({
         </p>
 
         <Button asChild size="lg" className="gap-2">
-          <Link href="/mass-selections/new">
+          <Link href="/liturgical-selections/new">
             <Plus className="h-5 w-5" />
             Create Selection
           </Link>

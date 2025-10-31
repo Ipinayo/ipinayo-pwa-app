@@ -105,7 +105,10 @@ export default function MassSelectionCard({
               selectionId={selection.id}
             />
 
-            <Link href={`/mass-selections/${selection.id}`} className="flex-1">
+            <Link
+              href={`/liturgical-selections/${selection.id}`}
+              className="flex-1"
+            >
               <Button
                 variant="outline"
                 size="sm"

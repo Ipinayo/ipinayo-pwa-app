@@ -172,7 +172,7 @@ export async function createSelection(data: NewMassSelection) {
 
         const result = await saveSelection(validationResult.data, session.user.id);
 
-        revalidatePath('/mass-selections');
+        revalidatePath('/liturgical-selections');
         revalidatePath('/dashboard');
 
         return result;
@@ -207,7 +207,7 @@ export async function createSelectionFromForm(formData: FormData) {
 
         const result = await saveSelection(validationResult.data, session.user.id);
 
-        revalidatePath('/mass-selections');
+        revalidatePath('/liturgical-selections');
         revalidatePath('/dashboard');
 
         return { success: true, data: result };
@@ -242,8 +242,8 @@ export async function updateSelection(id: string, data: Partial<NewMassSelection
 
         const result = await updateSelectionDb(validationResult.data, id);
 
-        revalidatePath('/mass-selections');
-        revalidatePath(`/mass-selections/${id}`);
+        revalidatePath('/liturgical-selections');
+        revalidatePath(`/liturgical-selections/${id}`);
         revalidatePath('/dashboard');
 
         return result;
@@ -287,8 +287,8 @@ export async function updateSelectionFromForm(id: string, formData: FormData) {
 
         const result = await updateSelectionDb(validationResult.data, id);
 
-        revalidatePath('/mass-selections');
-        revalidatePath(`/mass-selections/${id}`);
+        revalidatePath('/liturgical-selections');
+        revalidatePath(`/liturgical-selections/${id}`);
         revalidatePath('/dashboard');
 
         return { success: true, data: result };
@@ -317,7 +317,7 @@ export async function deleteSelection(id: string) {
 
         await removeSelection(id);
 
-        revalidatePath('/mass-selections');
+        revalidatePath('/liturgical-selections');
         revalidatePath('/dashboard');
 
         return { message: "Mass selection deleted successfully" };
@@ -353,7 +353,7 @@ export async function cloneSelection(id: string) {
             themes: themes.map(theme => theme.name)
         }, session.user.id);
 
-        revalidatePath('/mass-selections');
+        revalidatePath('/liturgical-selections');
         revalidatePath('/dashboard');
 
         return result;

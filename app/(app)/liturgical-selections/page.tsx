@@ -47,7 +47,7 @@ export default async function MassSelectionsPage(props: {
             Plan and organize liturgical music with ease
           </p>
         </div>
-        <Link href="/mass-selections/new">
+        <Link href="/liturgical-selections/new">
           <Button size="lg" className="gap-2">
             <Plus className="h-5 w-5" />
             Create Selection

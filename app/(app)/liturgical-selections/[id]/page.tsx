@@ -33,7 +33,7 @@ export default async function ViewPage(props: { params: Params }) {
   return (
     <div className="mx-auto max-w-6xl w-full">
       <div className="mb-8 flex items-center gap-4">
-        <BackButton fallback="/mass-selections" />
+        <BackButton fallback="/liturgical-selections" />
         <div className="flex-1">
           <div className="flex items-center gap-3 mb-2">
             <h2 className="text-3xl font-display text-foreground">

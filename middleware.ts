@@ -8,6 +8,6 @@ export const config = {
     matcher: [
         '/dashboard/:path*',
         '/settings/:path*',
-        '/mass-selections/:path*',
+        '/liturgical-selections/:path*',
     ],
 }

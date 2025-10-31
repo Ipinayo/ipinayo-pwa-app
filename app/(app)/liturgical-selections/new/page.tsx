@@ -22,7 +22,7 @@ export default async function SelectLiturgyTemplatePage() {
     <div className="w-full">
       <div className="mx-auto max-w-4xl">
         <div className="flex items-center gap-4 mb-8">
-          <BackButton fallback="/mass-selections" />
+          <BackButton fallback="/liturgical-selections" />
           <div>
             <h2 className="text-3xl font-display text-foreground">
               Create Liturgical Selection
@@ -80,7 +80,7 @@ export default async function SelectLiturgyTemplatePage() {
                     asChild
                   >
                     <Link
-                      href={`/mass-selections/new/create?template=${template.id}`}
+                      href={`/liturgical-selections/new/create?template=${template.id}`}
                     >
                       Select Template
                     </Link>

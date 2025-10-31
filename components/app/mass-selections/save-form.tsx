@@ -141,14 +141,14 @@ export default function SaveForm(props: SaveFormProps) {
       const { selection } = props;
       await withToast(() => updateSelection(selection.id, data), {
         success: () => {
-          router.push(`/mass-selections/${selection.id}`);
+          router.push(`/liturgical-selections/${selection.id}`);
           return "Successfully updated selection!";
         },
       });
     } else {
       await withToast(() => createSelection(data), {
         success: (newSelection) => {
-          router.push(`/mass-selections/${newSelection.id}`);
+          router.push(`/liturgical-selections/${newSelection.id}`);
           return "Successfully created selection!";
         },
       });
@@ -452,7 +452,7 @@ export default function SaveForm(props: SaveFormProps) {
           <Button
             type="button"
             variant="outline"
-            onClick={() => router.push("/mass-selections")}
+            onClick={() => router.push("/liturgical-selections")}
           >
             Cancel
           </Button>

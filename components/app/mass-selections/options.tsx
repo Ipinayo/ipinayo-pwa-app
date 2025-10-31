@@ -33,14 +33,14 @@ export default function Options({
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem asChild>
-          <Link href={`/mass-selections/${selection.id}`}>
+          <Link href={`/liturgical-selections/${selection.id}`}>
             <Eye className="mr-2 h-4 w-4" />
             View
           </Link>
         </DropdownMenuItem>
         {isOwner && (
           <DropdownMenuItem asChild>
-            <Link href={`/mass-selections/${selection.id}/edit`}>
+            <Link href={`/liturgical-selections/${selection.id}/edit`}>
               <Edit className="mr-2 h-4 w-4" />
               Edit
             </Link>

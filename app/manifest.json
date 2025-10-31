@@ -48,7 +48,7 @@
       "name": "Create Liturgical Selection",
       "short_name": "Create",
       "description": "Create a new Liturgical selection",
-      "url": "/mass-selections/new",
+      "url": "/liturgical-selections/new",
       "icons": [
         {
           "src": "/icons/pwa-192x192.png",

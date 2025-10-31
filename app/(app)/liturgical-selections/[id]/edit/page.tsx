@@ -25,7 +25,7 @@ export default async function EditPage(props: { params: Params }) {
     <div className="container mx-auto max-w-4xl px-4 py-8">
       <div className="mb-8 flex items-center gap-4">
         <BackButton
-          to={`/mass-selections/${params.id}`}
+          to={`/liturgical-selections/${params.id}`}
           backText="Back to View"
         />
         <div>

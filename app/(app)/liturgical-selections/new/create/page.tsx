@@ -26,7 +26,10 @@ export default async function CreateMassSelectionPage(props: {
     <div className="w-full">
       <div className="mx-auto max-w-4xl">
         <div className="mb-8 flex items-center gap-4">
-          <BackButton to="/mass-selections/new" backText="Back to Templates" />
+          <BackButton
+            to="/liturgical-selections/new"
+            backText="Back to Templates"
+          />
           <div>
             <h2 className="text-3xl font-display text-foreground">
               Create Liturgical Selection

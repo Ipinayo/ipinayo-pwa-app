@@ -53,12 +53,12 @@ export default function NavLinks({
       active: pathname === "/" || pathname === "",
     },
     {
-      href: "/mass-selections",
+      href: "/liturgical-selections",
       label: "Liturgical Selections",
       icon: BookOpen,
       active:
-        pathname === "/mass-selections" ||
-        pathname.startsWith("/mass-selections/"),
+        pathname === "/liturgical-selections" ||
+        pathname.startsWith("/liturgical-selections/"),
     },
     {
       href: "/dashboard",

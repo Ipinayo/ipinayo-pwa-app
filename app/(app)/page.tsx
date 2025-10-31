@@ -26,7 +26,7 @@ export default function HomePage() {
             </p>
             <div>
               <Button size="sm" variant="secondary" asChild>
-                <Link href="/mass-selections">
+                <Link href="/liturgical-selections">
                   Browse Liturgical Selections
                 </Link>
               </Button>
@@ -98,7 +98,7 @@ export default function HomePage() {
           Join our community and share your selections with the world.
         </p>
         <Button asChild>
-          <Link href="/mass-selections/new">Create Selection</Link>
+          <Link href="/liturgical-selections/new">Create Selection</Link>
         </Button>
       </section>
     </div>

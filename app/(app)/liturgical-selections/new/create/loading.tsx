@@ -7,7 +7,10 @@ export default function Loading() {
     <div className="w-full">
       <div className="mx-auto max-w-4xl">
         <div className="mb-8 flex items-center gap-4">
-          <BackButton to="/mass-selections/new" backText="Back to Templates" />
+          <BackButton
+            to="/liturgical-selections/new"
+            backText="Back to Templates"
+          />
           <div>
             <h1 className="text-3xl font-bold">Create Liturgical Selection</h1>
             <Skeleton className="h-4 w-28 mt-1" />
