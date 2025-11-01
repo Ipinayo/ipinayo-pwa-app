@@ -434,18 +434,23 @@ export const metadata: Metadata = {
   formatDetection: {
     telephone: false,
   },
+  icons: {
+    icon: "/favicon.ico",
+  },
   openGraph: {
     type: "website",
     siteName: "Ìpínayò",
     title: "Ìpínayò",
     description:
       "Plan and organize liturgical music with ease. Sharing joy through music.",
+    images: ["/icons/logo.png"],
   },
   twitter: {
     card: "summary",
     title: "Ìpínayò",
     description:
       "Plan and organize liturgical music with ease. Sharing joy through music.",
+    images: ["/icons/logo.png"],
   },
 };
 

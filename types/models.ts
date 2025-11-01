@@ -89,6 +89,6 @@ export type AppUser = Prisma.UserGetPayload<{
             }
         }
     }
-}>
+}>;
 
 export { KeySignature, LiturgicalSeason, LiturgicalYear }
