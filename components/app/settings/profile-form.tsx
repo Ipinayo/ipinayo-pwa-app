@@ -1,4 +1,5 @@
-import { Badge, Heart, MapPin, Music, Plus, Save, X } from "lucide-react";
+"use client";
+
 import {
   Card,
   CardContent,
@@ -7,257 +8,334 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { MapPin, Music, Save } from "lucide-react";
+import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  genreOptions,
+  instrumentOptions,
+  vocalFachOptions,
+} from "@/lib/constants";
+import {
+  getValuesFromOptions,
+  transformStringsToOptions,
+  transformToGroupedOptions,
+} from "@/lib/utils";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import LocationSelector from "@/components/common/location-selector";
+import MultipleSelector from "@/components/common/multiple-selector";
 import { Textarea } from "@/components/ui/textarea";
-import { vocalFachOptions } from "@/lib/constants";
+import { UpdateUserProfile } from "@/types/utils";
+import { UserProfile } from "@/types/models";
+import { updateUserProfileAction } from "@/lib/actions/user";
+import { updateUserProfileSchema } from "@/types/schemas/user";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
+import { withToast } from "@/lib/with-toast";
+import { zodResolver } from "@hookform/resolvers/zod";
 
-export default function ProfileForm() {
+export default function ProfileForm({ user }: { user: UserProfile }) {
+  const router = useRouter();
+
+  const form = useForm<UpdateUserProfile>({
+    resolver: zodResolver(updateUserProfileSchema),
+    defaultValues: {
+      name: user.user.name,
+      bio: user.bio,
+      headline: user.headline,
+      instruments: user.instruments || [],
+      vocalFach: user.vocalFach,
+      favoriteGenres: user.favoriteGenres || [],
+      parishName: user.parishName,
+      choirName: user.choirName,
+      parishLocation: user.parishLocation,
+    },
+  });
+
+  const handleSubmit = async (data: UpdateUserProfile) => {
+    await withToast(() => updateUserProfileAction(data), {
+      success: () => {
+        router.push("/profile");
+        return "Profile updated successfully!";
+      },
+    });
+  };
+
+  // Reset form when user changes
+  useEffect(() => {
+    form.reset({
+      name: user.user.name,
+      bio: user.bio,
+      headline: user.headline,
+      instruments: user.instruments || [],
+      vocalFach: user.vocalFach,
+      favoriteGenres: user.favoriteGenres || [],
+      parishName: user.parishName,
+      choirName: user.choirName,
+      parishLocation: user.parishLocation,
+    });
+  }, [user]);
+
   return (
-    <form>
-      {/* Basic Information */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Basic Information</CardTitle>
-          <CardDescription>
-            Your personal details and contact information
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="space-y-2">
-              <Label htmlFor="name">Full Name</Label>
-              <Input
-                id="name"
-                value={userData.name}
-                onChange={(e) =>
-                  setUserData({ ...userData, name: e.target.value })
-                }
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
+        {/* Basic Information */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Basic Information</CardTitle>
+            <CardDescription>
+              Your personal details and contact information
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid gap-4 md:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Full Name</FormLabel>
+                    <FormControl>
+                      <Input {...field} value={field.value || ""} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={userData.email}
-                onChange={(e) =>
-                  setUserData({ ...userData, email: e.target.value })
-                }
-              />
-            </div>
-          </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="headline">Your Headline</Label>
-            <Input
-              id="headline"
-              value={userData.headline || ""}
-              onChange={(e) =>
-                setUserData({ ...userData, headline: e.target.value })
-              }
-              placeholder="e.g. Music Director | Organist | Composer | Soprano"
-              maxLength={150}
+            <FormField
+              control={form.control}
+              name="headline"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Your Headline</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      value={field.value || ""}
+                      placeholder="e.g. Music Director | Organist | Composer | Soprano"
+                      maxLength={150}
+                    />
+                  </FormControl>
+                  <p className="text-xs text-muted-foreground">
+                    {field.value?.length || 0}/150 characters
+                  </p>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-            <p className="text-xs text-muted-foreground">
-              {userData.headline?.length || 0}/150 characters
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
 
-      {/* Bio */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Bio</CardTitle>
-          <CardDescription>
-            Tell us about yourself and your ministry
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Textarea
-            value={userData.bio}
-            onChange={(e) => setUserData({ ...userData, bio: e.target.value })}
-            rows={5}
-            placeholder="Share your story, experience, and passion for liturgical music..."
-          />
-        </CardContent>
-      </Card>
+        {/* Bio */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Bio</CardTitle>
+            <CardDescription>Tell us about yourself</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <FormField
+              control={form.control}
+              name="bio"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Textarea
+                      {...field}
+                      value={field.value || ""}
+                      rows={5}
+                      placeholder="Share your story, experience, and passion for liturgical music..."
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </CardContent>
+        </Card>
 
-      {/* Musical Profile */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Music className="h-5 w-5" />
-            Musical Profile
-          </CardTitle>
-          <CardDescription>Your musical skills and preferences</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {/* Instruments */}
-          <div className="space-y-2">
-            <Label>Instruments</Label>
-            <div className="flex flex-wrap gap-2 mb-2">
-              {userData.instruments.map((instrument) => (
-                <Badge key={instrument} variant="secondary" className="gap-1">
-                  {instrument}
-                  <button
-                    onClick={() => removeInstrument(instrument)}
-                    className="ml-1 hover:text-destructive"
+        {/* Choir & Parish Information */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <MapPin className="h-5 w-5" />
+              Choir & Parish Information
+            </CardTitle>
+            <CardDescription>
+              Your parish and choir details. If set, will be used to prefill
+              your selections
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid gap-4 md:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="parishName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Parish Name</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        value={field.value || ""}
+                        placeholder="Your parish name"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="choirName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Choir Name</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        value={field.value || ""}
+                        placeholder="Your choir name"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <LocationSelector form={form} />
+          </CardContent>
+        </Card>
+
+        {/* Musical Profile */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Music className="h-5 w-5" />
+              Musical Profile
+            </CardTitle>
+            <CardDescription>
+              Your musical skills and preferences
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {/* Instruments */}
+            <FormField
+              control={form.control}
+              name="instruments"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Instruments</FormLabel>
+                  <FormControl>
+                    <MultipleSelector
+                      value={transformStringsToOptions(field.value || [])}
+                      defaultOptions={transformToGroupedOptions(
+                        instrumentOptions,
+                        "name",
+                        "name",
+                        "children"
+                      )}
+                      onChange={(selected) =>
+                        field.onChange(getValuesFromOptions(selected))
+                      }
+                      placeholder="Add instruments"
+                      creatable={false}
+                      className="capitalize"
+                      dropdownClassName="capitalize"
+                      groupBy="group"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="vocalFach"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Vocal Fach</FormLabel>
+                  <Select
+                    value={field.value || ""}
+                    onValueChange={field.onChange}
                   >
-                    <X className="h-3 w-3" />
-                  </button>
-                </Badge>
-              ))}
-            </div>
-            <div className="flex gap-2">
-              <Input
-                placeholder="Add instrument"
-                value={newInstrument}
-                onChange={(e) => setNewInstrument(e.target.value)}
-                onKeyPress={(e) => e.key === "Enter" && addInstrument()}
-              />
-              <Button onClick={addInstrument} size="sm">
-                <Plus className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue
+                          placeholder="Select vocal fach"
+                          className="capitalize"
+                        />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {vocalFachOptions.map((fach) => (
+                        <SelectItem key={fach} value={fach}>
+                          {fach}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          <div className="space-y-2">
-            <Label htmlFor="vocalFach">Vocal Fach</Label>
-            <Select
-              value={userData.vocalFach || ""}
-              onValueChange={(value) =>
-                setUserData({ ...userData, vocalFach: value })
-              }
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select vocal fach" />
-              </SelectTrigger>
-              <SelectContent>
-                {vocalFachOptions.map((fach) => (
-                  <SelectItem key={fach} value={fach}>
-                    {fach}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+            {/* Favorite Genres */}
+            <FormField
+              control={form.control}
+              name="favoriteGenres"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Favorite Genres</FormLabel>
+                  <FormControl>
+                    <MultipleSelector
+                      value={transformStringsToOptions(field.value || [])}
+                      defaultOptions={transformStringsToOptions(genreOptions)}
+                      onChange={(selected) =>
+                        field.onChange(getValuesFromOptions(selected))
+                      }
+                      placeholder="Select or type to add genres"
+                      creatable
+                      className="capitalize"
+                      dropdownClassName="capitalize"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </CardContent>
+        </Card>
 
-          {/* Favorite Genres */}
-          <div className="space-y-2">
-            <Label>Favorite Genres</Label>
-            <div className="flex flex-wrap gap-2 mb-2">
-              {userData.favoriteGenres.map((genre) => (
-                <Badge key={genre} variant="outline" className="gap-1">
-                  <Heart className="h-3 w-3" />
-                  {genre}
-                  <button
-                    onClick={() => removeGenre(genre)}
-                    className="ml-1 hover:text-destructive"
-                  >
-                    <X className="h-3 w-3" />
-                  </button>
-                </Badge>
-              ))}
-            </div>
-            <div className="flex gap-2">
-              <Input
-                placeholder="Add genre"
-                value={newGenre}
-                onChange={(e) => setNewGenre(e.target.value)}
-                onKeyPress={(e) => e.key === "Enter" && addGenre()}
-              />
-              <Button onClick={addGenre} size="sm">
-                <Plus className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Location & Parish */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <MapPin className="h-5 w-5" />
-            Location & Parish
-          </CardTitle>
-          <CardDescription>
-            Your geographical information and parish details
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="space-y-2">
-              <Label htmlFor="country">Country</Label>
-              <Input
-                id="country"
-                value={profileData.country || ""}
-                onChange={(e) =>
-                  setProfileData({ ...profileData, country: e.target.value })
-                }
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="region">Region</Label>
-              <Input
-                id="region"
-                value={profileData.region || ""}
-                onChange={(e) =>
-                  setProfileData({ ...profileData, region: e.target.value })
-                }
-              />
-            </div>
-          </div>
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="space-y-2">
-              <Label htmlFor="locality">Locality</Label>
-              <Input
-                id="locality"
-                value={profileData.locality || ""}
-                onChange={(e) =>
-                  setProfileData({ ...profileData, locality: e.target.value })
-                }
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="parishName">Parish Name</Label>
-              <Input
-                id="parishName"
-                value={profileData.parishName || ""}
-                onChange={(e) =>
-                  setProfileData({
-                    ...profileData,
-                    parishName: e.target.value,
-                  })
-                }
-                placeholder="Your parish name"
-              />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Save Button */}
-      <div className="flex justify-end">
-        <Button
-          onClick={handleSave}
-          disabled={saving}
-          className="bg-primary hover:bg-primary/90"
-        >
-          <Save className="mr-2 h-4 w-4" />
-          {saving ? "Saving..." : "Save Changes"}
-        </Button>
-      </div>
-    </form>
+        {/* Save Button */}
+        <div className="flex justify-end">
+          <Button
+            type="submit"
+            disabled={form.formState.isSubmitting}
+            className="bg-primary hover:bg-primary/90"
+          >
+            <Save className="mr-2 h-4 w-4" />
+            {form.formState.isSubmitting ? "Saving..." : "Save Changes"}
+          </Button>
+        </div>
+      </form>
+    </Form>
   );
 }

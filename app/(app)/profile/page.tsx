@@ -118,70 +118,6 @@ export default async function ProfilePage() {
             </CardContent>
           </Card>
 
-          {/* Musical Profile */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Music className="h-5 w-5" />
-                Musical Profile
-              </CardTitle>
-              <CardDescription>
-                Your musical skills and preferences
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              {/* Instruments */}
-              <div className="space-y-2">
-                <p className="text-sm font-medium text-muted-foreground">
-                  Instruments
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {userProfile.instruments.length > 0 ? (
-                    userProfile.instruments.map((instrument) => (
-                      <Badge key={instrument} variant="secondary">
-                        {instrument}
-                      </Badge>
-                    ))
-                  ) : (
-                    <p className="text-sm text-muted-foreground">
-                      No instruments added
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <p className="text-sm font-medium text-muted-foreground">
-                  Vocal Fach
-                </p>
-                <p className="text-base">
-                  {userProfile.vocalFach || "Not specified"}
-                </p>
-              </div>
-
-              {/* Favorite Genres */}
-              <div className="space-y-2">
-                <p className="text-sm font-medium text-muted-foreground">
-                  Favorite Genres
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {userProfile.favoriteGenres.length > 0 ? (
-                    userProfile.favoriteGenres.map((genre) => (
-                      <Badge key={genre} variant="outline">
-                        <Heart className="h-3 w-3 mr-1" />
-                        {genre}
-                      </Badge>
-                    ))
-                  ) : (
-                    <p className="text-sm text-muted-foreground">
-                      No genres added
-                    </p>
-                  )}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
           {/* Location & Parish */}
           <Card>
             <CardHeader>
@@ -236,6 +172,78 @@ export default async function ProfilePage() {
                   <p className="text-base">
                     {userProfile.parishLocation?.city || "Not specified"}
                   </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Musical Profile */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Music className="h-5 w-5" />
+                Musical Profile
+              </CardTitle>
+              <CardDescription>
+                Your musical skills and preferences
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Instruments */}
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-muted-foreground">
+                  Instruments
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {userProfile.instruments.length > 0 ? (
+                    userProfile.instruments.map((instrument) => (
+                      <Badge
+                        key={instrument}
+                        variant="secondary"
+                        className="capitalize"
+                      >
+                        {instrument}
+                      </Badge>
+                    ))
+                  ) : (
+                    <p className="text-sm text-muted-foreground">
+                      No instruments added
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-muted-foreground">
+                  Vocal Fach
+                </p>
+                <p className="text-base capitalize">
+                  {userProfile.vocalFach || "Not specified"}
+                </p>
+              </div>
+
+              {/* Favorite Genres */}
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-muted-foreground">
+                  Favorite Genres
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {userProfile.favoriteGenres.length > 0 ? (
+                    userProfile.favoriteGenres.map((genre) => (
+                      <Badge
+                        key={genre}
+                        variant="outline"
+                        className="capitalize"
+                      >
+                        <Heart className="h-3 w-3 mr-1" />
+                        {genre}
+                      </Badge>
+                    ))
+                  ) : (
+                    <p className="text-sm text-muted-foreground">
+                      No genres added
+                    </p>
+                  )}
                 </div>
               </div>
             </CardContent>
