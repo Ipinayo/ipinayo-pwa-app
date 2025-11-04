@@ -1,13 +1,10 @@
 import BackButton from "@/components/common/back-button";
 import ProfileForm from "@/components/app/settings/profile-form";
-import { SearchParams } from "@/types/utils";
 import { auth } from "@/auth";
 import { getUserProfile } from "@/lib/actions/user";
 import { redirect } from "next/navigation";
 
-export default async function EditProfilePage(props: {
-  searchParams: SearchParams;
-}) {
+export default async function EditProfilePage() {
   const session = await auth();
 
   if (!session?.user) redirect("/signin");
