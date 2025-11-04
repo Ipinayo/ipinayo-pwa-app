@@ -59,6 +59,8 @@ type SaveFormProps =
       template: string;
       themes: string[];
       parishLocation: Location | null;
+      choirName: string | null;
+      parishName: string | null;
       selection?: never;
     }
   | {
@@ -110,6 +112,8 @@ const getDefaultValues = (props: SaveFormProps): NewMassSelection => {
     liturgy: liturgy?.liturgy || "",
     isPublic: true,
     parishLocation: props.parishLocation,
+    choirName: props.choirName,
+    parishName: props.parishName,
     parts: initialParts,
   };
 };

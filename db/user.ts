@@ -98,27 +98,31 @@ export async function findUser(userId: string) {
     });
 }
 
-export async function addLocationToUserProfile(userId: string, locationId: string) {
-    if (!locationId) return;
+export async function addParishAndChoirInfoToUserProfile(
+    userId: string,
+    locationId?: string | null,
+    choirName?: string | null,
+    parishName?: string | null
+) {
+    if (!locationId && !choirName && !parishName) return;
 
-    await prisma.userProfile.updateMany({
-        where: {
-            userId,
-            parishLocationId: null
-        },
-        data: {
-            parishLocationId: locationId
-        }
-    });
+    await prisma.$executeRaw`
+        UPDATE "UserProfile"
+        SET 
+            "parishLocationId" = COALESCE("parishLocationId", ${locationId}),
+            "choirName" = COALESCE("choirName", ${choirName}),
+            "parishName" = COALESCE("parishName", ${parishName})
+        WHERE "userId" = ${userId}
+    `;
 }
 
-export async function findUserParishLocation(userId: string) {
-    const userProfile = await prisma.userProfile.findUnique({
+export async function findUserParishAndChoirInfo(userId: string) {
+    return await prisma.userProfile.findUnique({
         where: { userId },
         select: {
+            choirName: true,
+            parishName: true,
             parishLocation: true
         }
     });
-
-    return userProfile?.parishLocation || null;
 }

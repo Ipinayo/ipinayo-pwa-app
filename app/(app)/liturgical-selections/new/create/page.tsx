@@ -3,7 +3,7 @@ import SaveForm from "@/components/app/mass-selections/save-form";
 import { SearchParams } from "@/types/utils";
 import { auth } from "@/auth";
 import { getThemes } from "@/lib/actions/mass-selections";
-import { getUserParishLocation } from "@/lib/actions/user";
+import { getUserParishAndChoirInfo } from "@/lib/actions/user";
 import { liturgyTemplates } from "@/lib/constants";
 import { redirect } from "next/navigation";
 
@@ -19,7 +19,7 @@ export default async function CreateMassSelectionPage(props: {
 
   const [themes, parishLocation] = await Promise.all([
     getThemes(),
-    getUserParishLocation(),
+    getUserParishAndChoirInfo(),
   ]);
 
   const templateName =
@@ -49,7 +49,9 @@ export default async function CreateMassSelectionPage(props: {
           mode="create"
           template={template}
           themes={themes}
-          parishLocation={parishLocation}
+          parishLocation={parishLocation?.parishLocation || null}
+          choirName={parishLocation?.choirName || null}
+          parishName={parishLocation?.parishName || null}
         />
       </div>
     </div>

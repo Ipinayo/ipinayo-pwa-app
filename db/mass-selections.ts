@@ -2,7 +2,7 @@ import { MassSelectionFilter, SortBy, SortOrder } from "@/types/utils";
 import { MassSelectionStats, NewMassSelection, SingleMassSelectionWithParts } from "@/types/models";
 
 import { Prisma } from "@/lib/generated/prisma";
-import { addLocationToUserProfile } from "./user";
+import { addParishAndChoirInfoToUserProfile } from "./user";
 import { capitalize } from "@/lib/utils";
 import prisma from "@/lib/prisma";
 
@@ -274,7 +274,7 @@ export async function saveSelection(selection: NewMassSelection, userId: string)
         // },
     })
 
-    addLocationToUserProfile(userId, createdSelection.parishLocationId!);
+    addParishAndChoirInfoToUserProfile(userId, createdSelection.parishLocationId, createdSelection.choirName, createdSelection.parishName);
 
     return createdSelection;
 }
@@ -345,7 +345,7 @@ export async function updateSelection(
         // },
     })
 
-    addLocationToUserProfile(updatedSelection.createdById, updatedSelection.parishLocationId!);
+    addParishAndChoirInfoToUserProfile(updatedSelection.createdById, updatedSelection.parishLocationId, updatedSelection.choirName, updatedSelection.parishName);
 
 }
 

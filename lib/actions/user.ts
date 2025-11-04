@@ -1,7 +1,7 @@
 'use server'
 
 import { AppUser, UserProfile } from "@/types/models";
-import { findUser, findUserParishLocation, findUserProfile, updateUserProfile } from "@/db/user";
+import { findUser, findUserParishAndChoirInfo, findUserProfile, updateUserProfile } from "@/db/user";
 
 import { UpdateUserProfile } from "@/types/utils";
 import { auth } from "@/auth";
@@ -40,11 +40,11 @@ export async function getUser(): Promise<AppUser | null> {
     return findUser(session.user.id);
 }
 
-export async function getUserParishLocation() {
+export async function getUserParishAndChoirInfo() {
     const session = await auth();
     if (!session?.user?.id) {
         throw new Error("Unauthorized");
     }
 
-    return await findUserParishLocation(session.user.id);
+    return await findUserParishAndChoirInfo(session.user.id);
 }
