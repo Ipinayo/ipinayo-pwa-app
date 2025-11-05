@@ -347,6 +347,7 @@ export async function updateSelection(
 
     addParishAndChoirInfoToUserProfile(updatedSelection.createdById, updatedSelection.parishLocationId, updatedSelection.choirName, updatedSelection.parishName);
 
+    return updatedSelection;
 }
 
 export async function removeSelection(id: string) {
