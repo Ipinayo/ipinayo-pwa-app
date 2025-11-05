@@ -69,6 +69,45 @@ export function getLabelForValue(
   return items.find((item) => item.value === value)?.label ?? fallback;
 }
 
+/**
+ * Flattens a recursive category structure into flat Option[] with group info.
+ *
+ * @param data - List of top-level data
+ * @param valueKey - Key to use as the option value (e.g. "id")
+ * @param labelKey - Key to use as the option label (e.g. "name")
+ * @param childrenKey - Key holding nested children (e.g. "children")
+ * @returns Option[] flattened with group name
+ */
+export function transformToGroupedOptions<T extends Record<string, any>>(
+  data: T[],
+  valueKey: keyof T,
+  labelKey: keyof T,
+  childrenKey: keyof T
+): Option[] {
+  const result: Option[] = [];
+
+  const recurse = (parent: T) => {
+    const children = parent[childrenKey] as Set<T> | T[] | undefined;
+    if (!children) return;
+
+    for (const child of Array.from(children)) {
+      result.push({
+        label: String(child[labelKey]),
+        value: child[valueKey],
+        group: String(parent[labelKey]), // group by parent name
+      });
+
+      recurse(child); // go deeper if the child has its own children
+    }
+  };
+
+  for (const parent of data) {
+    recurse(parent);
+  }
+
+  return result;
+}
+
 export function transformStringsToOptions(strings: string[]): Option[] {
   return strings.map((str) => ({
     label: str,
@@ -116,4 +155,8 @@ export function formatParishInfo(location: Location | null | undefined, parishNa
   }
 
   return parts.length > 0 ? parts.join(", ") : "Unknown Parish"
+}
+
+export function convertToLowerCase(str: string[]): string[] {
+  return str.map(s => s.toLowerCase());
 }

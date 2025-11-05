@@ -85,6 +85,7 @@ export type AppUser = Prisma.UserGetPayload<{
         image: true,
         profile: {
             select: {
+                id: true,
                 headline: true
             }
         }

@@ -228,3 +228,168 @@ export const vocalFachOptions = [
     "Basso Cantante",
     "Basso Profundo",
 ]
+
+export const instrumentOptions = [
+    {
+        "name": "woodwind",
+        "children": [
+            {
+                "name": "clarinet",
+                "children": []
+            },
+            {
+                "name": "saxophone",
+                "children": []
+            },
+            {
+                "name": "oboe",
+                "children": []
+            },
+            {
+                "name": "bassoon",
+                "children": []
+            },
+            {
+                "name": "flute",
+                "children": []
+            }
+        ]
+    },
+    {
+        "name": "percussion",
+        "children": [
+            {
+                "name": "tambourine",
+                "children": []
+            },
+            {
+                "name": "xylophone",
+                "children": []
+            },
+            {
+                "name": "cymbals",
+                "children": []
+            },
+            {
+                "name": "drum",
+                "children": []
+            },
+            {
+                "name": "triangle",
+                "children": []
+            }
+        ]
+    },
+    {
+        "name": "voice",
+        "children": [
+            {
+                "name": "alto",
+                "children": []
+            },
+            {
+                "name": "bass",
+                "children": []
+            },
+            {
+                "name": "soprano",
+                "children": []
+            },
+            {
+                "name": "tenor",
+                "children": []
+            }
+        ]
+    },
+    {
+        "name": "strings",
+        "children": [
+            {
+                "name": "double bass",
+                "children": []
+            },
+            {
+                "name": "guitar",
+                "children": []
+            },
+            {
+                "name": "violin",
+                "children": []
+            },
+            {
+                "name": "cello",
+                "children": []
+            },
+            {
+                "name": "viola",
+                "children": []
+            },
+            {
+                "name": "harp",
+                "children": []
+            }
+        ]
+    },
+    {
+        "name": "brass",
+        "children": [
+            {
+                "name": "french horn",
+                "children": []
+            },
+            {
+                "name": "tuba",
+                "children": []
+            },
+            {
+                "name": "trumpet",
+                "children": []
+            },
+            {
+                "name": "trombone",
+                "children": []
+            },
+            {
+                "name": "euphonium",
+                "children": []
+            }
+        ]
+    },
+    {
+        "name": "keyboards",
+        "children": [
+            {
+                "name": "harpsichord",
+                "children": []
+            },
+            {
+                "name": "piano",
+                "children": []
+            },
+            {
+                "name": "organ",
+                "children": []
+            },
+            {
+                "name": "accordion",
+                "children": []
+            }
+        ]
+    }
+]
+
+export const genreOptions = [
+    "contemporary liturgical",
+    "liturgical canticle",
+    "gospel",
+    "antiphon",
+    "oratorios",
+    "chant",
+    "polyphony",
+    "contemporary classical",
+    "hymn",
+    "children",
+    "motet",
+    "gregorian chant",
+    "classical"
+]
