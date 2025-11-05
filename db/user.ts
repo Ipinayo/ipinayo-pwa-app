@@ -47,8 +47,8 @@ export async function updateUserProfile(userId: string, updates: UpdateUserProfi
         where: { userId },
         data: {
             ...data,
-            instruments: convertToLowerCase(instruments || []),
-            favoriteGenres: convertToLowerCase(favoriteGenres || []),
+            instruments: convertToLowerCase(instruments ?? []),
+            favoriteGenres: convertToLowerCase(favoriteGenres ?? []),
 
             // Handle location update
             ...(parishLocation && parishLocation.country && {
