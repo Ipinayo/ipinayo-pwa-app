@@ -48,3 +48,6 @@ next-env.d.ts
 # Serwist
 public/sw*
 public/swe-worker*
+
+# Production seed file
+/prisma/seed-prod.ts
