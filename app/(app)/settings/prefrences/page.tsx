@@ -1,5 +1,5 @@
 import BackButton from "@/components/common/back-button";
-import { PreferencesPage } from "@/components/app/settings/prefrences-form";
+import { PreferencesForm } from "@/components/app/settings/preferences-form";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 
@@ -22,7 +22,7 @@ export default async function EditPreferences() {
           </div>
         </div>
 
-        <PreferencesPage />
+        <PreferencesForm />
       </div>
     </div>
   );

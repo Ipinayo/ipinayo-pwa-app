@@ -53,7 +53,7 @@ interface UserPreferences {
   soundEnabled: boolean;
 }
 
-export function PreferencesPage() {
+export function PreferencesForm() {
   const [preferences, setPreferences] = useState<UserPreferences>({
     defaultLiturgicalSeason: "ordinary-time",
     notificationsEnabled: true,
