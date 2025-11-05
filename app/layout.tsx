@@ -443,14 +443,14 @@ export const metadata: Metadata = {
     title: "Ìpínayò",
     description:
       "Plan and organize liturgical music with ease. Sharing joy through music.",
-    images: ["/icons/logo.png"],
+    images: ["https://ipinayo.com/icons/logo.png"],
   },
   twitter: {
     card: "summary",
     title: "Ìpínayò",
     description:
       "Plan and organize liturgical music with ease. Sharing joy through music.",
-    images: ["/icons/logo.png"],
+    images: ["https://ipinayo.com/icons/logo.png"],
   },
 };
 

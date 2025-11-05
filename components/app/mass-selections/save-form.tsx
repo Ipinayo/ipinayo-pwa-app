@@ -12,6 +12,7 @@ import {
 import {
   LiturgicalSeason,
   LiturgicalYear,
+  Location,
   MassSelectionWithParts,
   NewMassSelection,
 } from "@/types/models";
@@ -57,6 +58,9 @@ type SaveFormProps =
       mode: "create";
       template: string;
       themes: string[];
+      parishLocation: Location | null;
+      choirName: string | null;
+      parishName: string | null;
       selection?: never;
     }
   | {
@@ -107,6 +111,9 @@ const getDefaultValues = (props: SaveFormProps): NewMassSelection => {
     pastoralFocus: "",
     liturgy: liturgy?.liturgy || "",
     isPublic: true,
+    parishLocation: props.parishLocation,
+    choirName: props.choirName,
+    parishName: props.parishName,
     parts: initialParts,
   };
 };

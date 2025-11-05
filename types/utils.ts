@@ -26,13 +26,13 @@ export interface MassSelectionFilter {
 }
 
 export interface UpdateUserProfile {
-    name?: string
-    bio?: string;
-    headline?: string;
-    instruments?: string[];
-    vocalFach?: string;
-    favoriteGenres?: string[];
-    parishName?: string;
-    choirName?: string;
-    parishLocation?: NewLocation
+    name?: string | null;
+    bio?: string | null;
+    headline?: string | null;
+    instruments?: string[] | null;
+    vocalFach?: string | null;
+    favoriteGenres?: string[] | null;
+    parishName?: string | null;
+    choirName?: string | null;
+    parishLocation?: NewLocation | null;
 }

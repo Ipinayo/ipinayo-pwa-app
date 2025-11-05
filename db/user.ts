@@ -1,5 +1,6 @@
+import { capitalize, convertToLowerCase } from "@/lib/utils";
+
 import { UpdateUserProfile } from "@/types/utils";
-import { capitalize } from "@/lib/utils";
 import prisma from "@/lib/prisma";
 
 export async function createUserProfile(userId: string) {
@@ -40,12 +41,14 @@ export async function findUserProfile(userId: string) {
 
 export async function updateUserProfile(userId: string, updates: UpdateUserProfile) {
 
-    const { parishLocation, name, ...data } = updates;
+    const { parishLocation, name, instruments, favoriteGenres, ...data } = updates;
 
     return await prisma.userProfile.update({
         where: { userId },
         data: {
             ...data,
+            instruments: convertToLowerCase(instruments || []),
+            favoriteGenres: convertToLowerCase(favoriteGenres || []),
 
             // Handle location update
             ...(parishLocation && parishLocation.country && {
@@ -87,9 +90,39 @@ export async function findUser(userId: string) {
             image: true,
             profile: {
                 select: {
+                    id: true,
                     headline: true
                 }
             }
+        }
+    });
+}
+
+export async function addParishAndChoirInfoToUserProfile(
+    userId: string,
+    locationId?: string | null,
+    choirName?: string | null,
+    parishName?: string | null
+) {
+    if (!locationId && !choirName && !parishName) return;
+
+    await prisma.$executeRaw`
+        UPDATE "UserProfile"
+        SET 
+            "parishLocationId" = COALESCE("parishLocationId", ${locationId}),
+            "choirName" = COALESCE("choirName", ${choirName}),
+            "parishName" = COALESCE("parishName", ${parishName})
+        WHERE "userId" = ${userId}
+    `;
+}
+
+export async function findUserParishAndChoirInfo(userId: string) {
+    return await prisma.userProfile.findUnique({
+        where: { userId },
+        select: {
+            choirName: true,
+            parishName: true,
+            parishLocation: true
         }
     });
 }
