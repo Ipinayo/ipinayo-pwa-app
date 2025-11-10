@@ -75,7 +75,7 @@ export async function getSelections({
     query = '',
     season,
     year,
-    sortBy = SortBy.UPDATED_AT,
+    sortBy = SortBy.DATE,
     sortOrder = SortOrder.DESC
 }: MassSelectionFilter) {
     try {
@@ -111,7 +111,7 @@ export async function getUserSelections({
     query = '',
     season,
     year,
-    sortBy = SortBy.UPDATED_AT,
+    sortBy = SortBy.DATE,
     sortOrder = SortOrder.DESC
 }: MassSelectionFilter) {
     try {

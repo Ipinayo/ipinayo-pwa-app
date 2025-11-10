@@ -185,7 +185,7 @@ export default async function DashboardPage(props: {
                 queryName={"year"}
                 items={years}
               />
-              <SortFilter sortBy={sort_by} order={order} />
+              <SortFilter sortBy={sort_by || SortBy.UPDATED_AT} order={order} />
             </div>
           </div>
 
