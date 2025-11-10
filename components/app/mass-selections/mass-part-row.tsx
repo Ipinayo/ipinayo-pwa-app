@@ -28,36 +28,17 @@ import { keySignatureItems } from "@/lib/constants";
 interface MassPartRowProps {
   index: number;
   control: Control<NewMassSelection>;
-  onRemove: () => void;
   canRemove: boolean;
+  partNames: string[];
+  onRemove: () => void;
 }
-
-const commonPartNames = [
-  "Entrance Hymn",
-  "Kyrie",
-  "Gloria",
-  "Responsorial Psalm",
-  "Gospel Acclamation",
-  "Offertory Hymn",
-  "Sanctus",
-  "Memorial Acclamation",
-  "Great Amen",
-  "Lamb of God",
-  "Communion Hymn",
-  "Recessional Hymn",
-  "Prelude",
-  "Processional",
-  "Opening Hymn",
-  "Litany of Saints",
-  "Te Deum",
-  "Song of Farewell",
-];
 
 export function MassPartRow({
   index,
   control,
-  onRemove,
   canRemove,
+  partNames,
+  onRemove,
 }: MassPartRowProps) {
   return (
     <div className="bg-card grid gap-4 rounded-lg border p-4">
@@ -89,7 +70,7 @@ export function MassPartRow({
                 <AppSelect
                   value={field.value || undefined}
                   onValueChange={field.onChange}
-                  options={transformStringsToOptions(commonPartNames)}
+                  options={transformStringsToOptions(partNames)}
                   placeholder="Select or type part name..."
                   className={cn(
                     "capitalize",

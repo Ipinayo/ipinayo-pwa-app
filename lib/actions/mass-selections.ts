@@ -3,6 +3,7 @@
 import { MassSelectionFilter, SortBy, SortOrder } from "@/types/utils";
 import { createMassSelectionSchema, updateMassSelectionSchema } from "@/types/schemas/mass-selections";
 import {
+    findAllPartNames,
     findAllSelections,
     findAllThemes,
     findAllUserSelections,
@@ -384,4 +385,10 @@ export async function getMassSelectionStats() {
     }
 
     return findMassSelectionStats(session.user.id)
+}
+
+export async function getAllPartNames() {
+    const parts = await findAllPartNames();
+
+    return parts.map(part => part.partName);
 }

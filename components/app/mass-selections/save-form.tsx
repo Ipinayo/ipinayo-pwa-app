@@ -58,6 +58,7 @@ type SaveFormProps =
       mode: "create";
       template: string;
       themes: string[];
+      partNames: string[];
       parishLocation: Location | null;
       choirName: string | null;
       parishName: string | null;
@@ -67,6 +68,10 @@ type SaveFormProps =
       mode: "edit";
       selection: MassSelectionWithParts;
       themes: string[];
+      partNames: string[];
+      parishLocation?: never;
+      choirName?: never;
+      parishName?: never;
       template?: never;
     };
 
@@ -435,8 +440,9 @@ export default function SaveForm(props: SaveFormProps) {
                 key={field.id}
                 index={index}
                 control={form.control}
-                onRemove={() => remove(index)}
                 canRemove={fields.length > 1}
+                partNames={props.partNames}
+                onRemove={() => remove(index)}
               />
             ))}
 
