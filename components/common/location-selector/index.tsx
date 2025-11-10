@@ -15,7 +15,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { cn, transformStringsToOptions } from "@/lib/utils";
+import {
+  cn,
+  transformObjectToOptions,
+  transformStringsToOptions,
+} from "@/lib/utils";
 
 import AppSelect from "../app-select";
 import { NewLocation } from "@/types/models";
@@ -80,40 +84,42 @@ export default function LocationSelector({
       <FormField
         control={form.control}
         name={`${fieldName}.countryCode`}
-        render={({ field }) => (
+        render={({ field, fieldState }) => (
           <FormItem>
             <FormLabel>Country</FormLabel>
-            <Select
-              onValueChange={(value) => {
-                const countryData = countries.find((c) => c.isoCode === value);
-                if (countryData) {
-                  updateLocation({
-                    country: countryData.name,
-                    countryCode: countryData.isoCode,
-                    stateCode: null,
-                    state: "",
-                    city: "",
-                    latitude: Number(countryData.latitude) || null,
-                    longitude: Number(countryData.longitude) || null,
-                    timezone: countryData.timezones?.[0]?.zoneName || null,
-                  });
-                }
-              }}
-              value={field.value || undefined}
-            >
-              <FormControl>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select country" />
-                </SelectTrigger>
-              </FormControl>
-              <SelectContent>
-                {countries.map((country) => (
-                  <SelectItem key={country.isoCode} value={country.isoCode}>
-                    {country.flag} {country.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <FormControl>
+              <AppSelect
+                value={field.value || undefined}
+                onValueChange={(value) => {
+                  const countryData = countries.find(
+                    (c) => c.isoCode === value
+                  );
+                  if (countryData) {
+                    updateLocation({
+                      country: countryData.name,
+                      countryCode: countryData.isoCode,
+                      stateCode: null,
+                      state: "",
+                      city: "",
+                      latitude: Number(countryData.latitude) || null,
+                      longitude: Number(countryData.longitude) || null,
+                      timezone: countryData.timezones?.[0]?.zoneName || null,
+                    });
+                  }
+                }}
+                options={countries.map((country) => ({
+                  label: `${country.flag} ${country.name}`,
+                  value: country.isoCode,
+                }))}
+                placeholder="Select country"
+                className={cn(
+                  "capitalize",
+                  fieldState.invalid
+                    ? "ring-destructive/20 dark:ring-destructive/40 border-destructive"
+                    : ""
+                )}
+              />
+            </FormControl>
             <FormMessage />
           </FormItem>
         )}
@@ -124,44 +130,34 @@ export default function LocationSelector({
         <FormField
           control={form.control}
           name={`${fieldName}.stateCode`}
-          render={({ field }) => (
+          render={({ field, fieldState }) => (
             <FormItem>
               <FormLabel>State/Province</FormLabel>
-              <Select
-                onValueChange={(value) => {
-                  const stateData = states.find((s) => s.isoCode === value);
-                  if (stateData) {
-                    updateLocation({
-                      state: stateData.name,
-                      stateCode: stateData.isoCode,
-                      city: "",
-                      latitude: Number(stateData.latitude) || null,
-                      longitude: Number(stateData.longitude) || null,
-                    });
-                  }
-                }}
-                value={field.value || undefined}
-                disabled={states.length === 0}
-              >
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select state or province" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {states.length === 0 ? (
-                    <SelectItem value="none" disabled>
-                      No states available
-                    </SelectItem>
-                  ) : (
-                    states.map((state) => (
-                      <SelectItem key={state.isoCode} value={state.isoCode}>
-                        {state.name}
-                      </SelectItem>
-                    ))
+              <FormControl>
+                <AppSelect
+                  value={field.value || undefined}
+                  onValueChange={(value) => {
+                    const stateData = states.find((s) => s.isoCode === value);
+                    if (stateData) {
+                      updateLocation({
+                        state: stateData.name,
+                        stateCode: stateData.isoCode,
+                        city: "",
+                        latitude: Number(stateData.latitude) || null,
+                        longitude: Number(stateData.longitude) || null,
+                      });
+                    }
+                  }}
+                  options={transformObjectToOptions(states, "isoCode", "name")}
+                  placeholder="Select state or province"
+                  className={cn(
+                    "capitalize",
+                    fieldState.invalid
+                      ? "ring-destructive/20 dark:ring-destructive/40 border-destructive"
+                      : ""
                   )}
-                </SelectContent>
-              </Select>
+                />
+              </FormControl>
               <FormMessage />
             </FormItem>
           )}
@@ -206,6 +202,7 @@ export default function LocationSelector({
                   )}
                   dropdownClassName="capitalize"
                   inputProps={{ className: "capitalize" }}
+                  creatable
                 />
               </FormControl>
               <FormMessage />

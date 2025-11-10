@@ -99,6 +99,7 @@ export function MassPartRow({
                   )}
                   dropdownClassName="capitalize"
                   inputProps={{ className: "capitalize" }}
+                  creatable
                 />
               </FormControl>
               <FormMessage />

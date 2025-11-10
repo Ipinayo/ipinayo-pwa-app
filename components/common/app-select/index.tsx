@@ -95,7 +95,7 @@ export default function AppSelect({
   groupBy,
   className,
   dropdownClassName,
-  creatable = true,
+  creatable = false,
   commandProps,
   inputProps,
 }: AppSelectProps) {
@@ -185,8 +185,7 @@ export default function AppSelect({
   });
 
   const hasFilteredOptions = Object.keys(filteredOptions).length > 0;
-  const showCreateButton =
-    creatable && inputValue.trim() && !isExactMatch && value !== inputValue;
+  const showCreateButton = creatable && inputValue.trim() && !isExactMatch;
 
   return (
     <Command
@@ -298,9 +297,18 @@ export default function AppSelect({
                     e.stopPropagation();
                   }}
                   onSelect={handleCreateCustom}
-                  className="cursor-pointer text-primary"
+                  className={cn(
+                    "cursor-pointer text-popover-foreground",
+                    dropdownClassName
+                  )}
                 >
-                  Use "{inputValue}"
+                  <Check
+                    className={cn(
+                      "mr-2 h-4 w-4",
+                      value === inputValue ? "opacity-100" : "opacity-0"
+                    )}
+                  />
+                  {inputValue}
                 </CommandItem>
               </CommandGroup>
             )}
