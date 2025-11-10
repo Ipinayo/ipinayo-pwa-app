@@ -15,49 +15,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { cn, getEnumByKey, transformStringsToOptions } from "@/lib/utils";
+import { cn, getEnumByKey } from "@/lib/utils";
 
 import AppSelect from "@/components/common/app-select";
-import { Button } from "@/components/ui/button";
 import { Control } from "react-hook-form";
 import { Input } from "@/components/ui/input";
-import { Option } from "@/components/common/multiple-selector";
+import { SelectOption } from "@/types/components/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Trash2 } from "lucide-react";
 import { keySignatureItems } from "@/lib/constants";
 
 interface MassPartRowProps {
   index: number;
   control: Control<NewMassSelection>;
-  canRemove: boolean;
-  partNames: Option[];
-  onRemove: () => void;
+  partNames: SelectOption[];
 }
 
-export function MassPartRow({
-  index,
-  control,
-  canRemove,
-  partNames,
-  onRemove,
-}: MassPartRowProps) {
+export function MassPartRow({ index, control, partNames }: MassPartRowProps) {
   return (
-    <div className="bg-card grid gap-4 rounded-lg border p-4">
-      <div className="flex items-center justify-end">
-        {/* <h4 className="font-medium">Part {index + 1}</h4> */}
-        {canRemove && (
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={onRemove}
-            className="text-destructive hover:text-destructive"
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
-        )}
-      </div>
-
+    <div className="bg-card grid gap-4 rounded-lg border p-3 sm:p-4 transition-colors">
       <div className="grid gap-4 md:grid-cols-2">
         <FormField
           control={control}
