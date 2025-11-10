@@ -1,4 +1,8 @@
-import { getSelectionById, getThemes } from "@/lib/actions/mass-selections";
+import {
+  getAllPartNames,
+  getSelectionById,
+  getThemes,
+} from "@/lib/actions/mass-selections";
 
 import BackButton from "@/components/common/back-button";
 import { Params } from "@/types/utils";
@@ -19,7 +23,10 @@ export default async function EditPage(props: { params: Params }) {
     throw new Error("Unauthorized");
   }
 
-  const themes = await getThemes();
+  const [themes, partNames] = await Promise.all([
+    getThemes(),
+    getAllPartNames(),
+  ]);
 
   return (
     <div className="container mx-auto max-w-4xl px-4 py-8">
@@ -38,7 +45,12 @@ export default async function EditPage(props: { params: Params }) {
         </div>
       </div>
 
-      <SaveForm mode="edit" selection={selection} themes={themes} />
+      <SaveForm
+        mode="edit"
+        selection={selection}
+        themes={themes}
+        partNames={partNames}
+      />
     </div>
   );
 }

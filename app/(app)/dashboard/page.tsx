@@ -110,7 +110,7 @@ export default async function DashboardPage(props: {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3 mb-8">
-        <Card className="lg:col-span-1 border-2 border-dashed border-primary/20 bg-gradient-to-br from-primary/5 to-transparent h-fit">
+        <Card className="lg:col-span-1 border-2 border-dashed border-primary/20 bg-linear-to-br from-primary/5 to-transparent h-fit">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-primary" />
@@ -185,7 +185,7 @@ export default async function DashboardPage(props: {
                 queryName={"year"}
                 items={years}
               />
-              <SortFilter sortBy={sort_by} order={order} />
+              <SortFilter sortBy={sort_by || SortBy.UPDATED_AT} order={order} />
             </div>
           </div>
 

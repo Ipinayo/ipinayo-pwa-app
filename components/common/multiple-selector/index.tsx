@@ -370,7 +370,7 @@ const MultipleSelector = React.forwardRef<
       const Item = (
         <CommandItem
           value={inputValue}
-          className="cursor-pointer"
+          className={cn("cursor-pointer ml-1 mb-1", dropdownClassName)}
           onMouseDown={(e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -386,7 +386,7 @@ const MultipleSelector = React.forwardRef<
             onChange?.(newOptions);
           }}
         >
-          {`Create "${inputValue}"`}
+          {inputValue}
         </CommandItem>
       );
 

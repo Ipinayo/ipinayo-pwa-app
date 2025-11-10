@@ -1,8 +1,9 @@
+import { getAllPartNames, getThemes } from "@/lib/actions/mass-selections";
+
 import BackButton from "@/components/common/back-button";
 import SaveForm from "@/components/app/mass-selections/save-form";
 import { SearchParams } from "@/types/utils";
 import { auth } from "@/auth";
-import { getThemes } from "@/lib/actions/mass-selections";
 import { getUserParishAndChoirInfo } from "@/lib/actions/user";
 import { liturgyTemplates } from "@/lib/constants";
 import { redirect } from "next/navigation";
@@ -17,9 +18,10 @@ export default async function CreateMassSelectionPage(props: {
   const searchParams = await props.searchParams;
   const template = searchParams["template"] || "blank";
 
-  const [themes, parishLocation] = await Promise.all([
+  const [themes, parishLocation, partNames] = await Promise.all([
     getThemes(),
     getUserParishAndChoirInfo(),
+    getAllPartNames(),
   ]);
 
   const templateName =
@@ -52,6 +54,7 @@ export default async function CreateMassSelectionPage(props: {
           parishLocation={parishLocation?.parishLocation || null}
           choirName={parishLocation?.choirName || null}
           parishName={parishLocation?.parishName || null}
+          partNames={partNames}
         />
       </div>
     </div>

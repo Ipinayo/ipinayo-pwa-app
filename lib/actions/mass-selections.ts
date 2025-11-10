@@ -3,6 +3,7 @@
 import { MassSelectionFilter, SortBy, SortOrder } from "@/types/utils";
 import { createMassSelectionSchema, updateMassSelectionSchema } from "@/types/schemas/mass-selections";
 import {
+    findAllPartNames,
     findAllSelections,
     findAllThemes,
     findAllUserSelections,
@@ -18,6 +19,7 @@ import {
 
 import { NewMassSelection } from "@/types/models";
 import { auth } from "@/auth";
+import { findUserParishAndChoirInfo } from "@/db/user";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import z from "zod";
@@ -75,7 +77,7 @@ export async function getSelections({
     query = '',
     season,
     year,
-    sortBy = SortBy.UPDATED_AT,
+    sortBy = SortBy.DATE,
     sortOrder = SortOrder.DESC
 }: MassSelectionFilter) {
     try {
@@ -111,7 +113,7 @@ export async function getUserSelections({
     query = '',
     season,
     year,
-    sortBy = SortBy.UPDATED_AT,
+    sortBy = SortBy.DATE,
     sortOrder = SortOrder.DESC
 }: MassSelectionFilter) {
     try {
@@ -348,10 +350,15 @@ export async function cloneSelection(id: string) {
             throw new Error("Access denied");
         }
 
+        const parishAndChoirInfo = await findUserParishAndChoirInfo(session.user.id);
+
         const result = await saveSelectionBySelection({
             ...originalSelection,
             title: `${originalSelection.title} (Copy)`,
-            isPublic: true
+            isPublic: true,
+            parishLocationId: parishAndChoirInfo?.parishLocation?.id || null,
+            choirName: parishAndChoirInfo?.choirName || null,
+            parishName: parishAndChoirInfo?.parishName || null,
         }, session.user.id);
 
         revalidatePath('/liturgical-selections');
@@ -378,4 +385,10 @@ export async function getMassSelectionStats() {
     }
 
     return findMassSelectionStats(session.user.id)
+}
+
+export async function getAllPartNames() {
+    const parts = await findAllPartNames();
+
+    return parts.map(part => part.partName);
 }

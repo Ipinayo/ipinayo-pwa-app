@@ -17,10 +17,11 @@ import {
 } from "@/components/ui/select";
 import { cn, getEnumByKey, transformStringsToOptions } from "@/lib/utils";
 
+import AppSelect from "@/components/common/app-select";
 import { Button } from "@/components/ui/button";
 import { Control } from "react-hook-form";
-import CreatableSelect from "@/components/common/creatable-select";
 import { Input } from "@/components/ui/input";
+import { Option } from "@/components/common/multiple-selector";
 import { Textarea } from "@/components/ui/textarea";
 import { Trash2 } from "lucide-react";
 import { keySignatureItems } from "@/lib/constants";
@@ -28,36 +29,17 @@ import { keySignatureItems } from "@/lib/constants";
 interface MassPartRowProps {
   index: number;
   control: Control<NewMassSelection>;
-  onRemove: () => void;
   canRemove: boolean;
+  partNames: Option[];
+  onRemove: () => void;
 }
-
-const commonPartNames = [
-  "Entrance Hymn",
-  "Kyrie",
-  "Gloria",
-  "Responsorial Psalm",
-  "Gospel Acclamation",
-  "Offertory Hymn",
-  "Sanctus",
-  "Memorial Acclamation",
-  "Great Amen",
-  "Lamb of God",
-  "Communion Hymn",
-  "Recessional Hymn",
-  "Prelude",
-  "Processional",
-  "Opening Hymn",
-  "Litany of Saints",
-  "Te Deum",
-  "Song of Farewell",
-];
 
 export function MassPartRow({
   index,
   control,
-  onRemove,
   canRemove,
+  partNames,
+  onRemove,
 }: MassPartRowProps) {
   return (
     <div className="bg-card grid gap-4 rounded-lg border p-4">
@@ -86,10 +68,10 @@ export function MassPartRow({
                 Name <span className="text-destructive">*</span>
               </FormLabel>
               <FormControl>
-                <CreatableSelect
+                <AppSelect
                   value={field.value || undefined}
                   onValueChange={field.onChange}
-                  options={transformStringsToOptions(commonPartNames)}
+                  options={partNames}
                   placeholder="Select or type part name..."
                   className={cn(
                     "capitalize",
@@ -99,6 +81,7 @@ export function MassPartRow({
                   )}
                   dropdownClassName="capitalize"
                   inputProps={{ className: "capitalize" }}
+                  creatable
                 />
               </FormControl>
               <FormMessage />
