@@ -119,6 +119,7 @@ model MassPart {
   keySignature    KeySignature?
   notes           String?
   massSelectionId String
+  order           Int           @default(0)
   massSelection   MassSelection @relation(fields: [massSelectionId], references: [id], onDelete: Cascade)
 
   @@index([massSelectionId])
