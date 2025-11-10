@@ -22,7 +22,7 @@ interface GroupOption {
   [key: string]: SelectOption[];
 }
 
-interface CreatableSelectProps {
+interface AppSelectProps {
   value?: string;
   onValueChange: (value: string) => void;
   options?: SelectOption[];
@@ -85,7 +85,7 @@ function transToGroupOption(options: SelectOption[], groupBy?: string) {
   return groupOption;
 }
 
-export default function CreatableSelect({
+export default function AppSelect({
   value,
   onValueChange,
   options = [],
@@ -95,10 +95,10 @@ export default function CreatableSelect({
   groupBy,
   className,
   dropdownClassName,
-  creatable = true,
+  creatable = false,
   commandProps,
   inputProps,
-}: CreatableSelectProps) {
+}: AppSelectProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
@@ -185,8 +185,7 @@ export default function CreatableSelect({
   });
 
   const hasFilteredOptions = Object.keys(filteredOptions).length > 0;
-  const showCreateButton =
-    creatable && inputValue.trim() && !isExactMatch && value !== inputValue;
+  const showCreateButton = creatable && inputValue.trim() && !isExactMatch;
 
   return (
     <Command
@@ -298,9 +297,18 @@ export default function CreatableSelect({
                     e.stopPropagation();
                   }}
                   onSelect={handleCreateCustom}
-                  className="cursor-pointer text-primary"
+                  className={cn(
+                    "cursor-pointer text-popover-foreground",
+                    dropdownClassName
+                  )}
                 >
-                  Use "{inputValue}"
+                  <Check
+                    className={cn(
+                      "mr-2 h-4 w-4",
+                      value === inputValue ? "opacity-100" : "opacity-0"
+                    )}
+                  />
+                  {inputValue}
                 </CommandItem>
               </CommandGroup>
             )}

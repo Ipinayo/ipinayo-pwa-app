@@ -36,6 +36,7 @@ export default function DateSelect({
           selected={value}
           onSelect={onChange}
           endMonth={undefined}
+          defaultMonth={value}
           required
         />
       </PopoverContent>

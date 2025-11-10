@@ -8,16 +8,16 @@ import { createQueryString } from "@/lib/utils";
 import { useCallback } from "react";
 
 const items = [
-  { label: "Latest First", value: `${SortBy.UPDATED_AT}-${SortOrder.DESC}` },
-  { label: "Oldest First", value: `${SortBy.UPDATED_AT}-${SortOrder.ASC}` },
-  { label: "Title A-Z", value: `${SortBy.TITLE}-${SortOrder.ASC}` },
-  { label: "Title Z-A", value: `${SortBy.TITLE}-${SortOrder.DESC}` },
   { label: "Date (Newest)", value: `${SortBy.DATE}-${SortOrder.DESC}` },
   { label: "Date (Oldest)", value: `${SortBy.DATE}-${SortOrder.ASC}` },
+  { label: "Title A-Z", value: `${SortBy.TITLE}-${SortOrder.ASC}` },
+  { label: "Title Z-A", value: `${SortBy.TITLE}-${SortOrder.DESC}` },
+  { label: "Latest First", value: `${SortBy.UPDATED_AT}-${SortOrder.DESC}` },
+  { label: "Oldest First", value: `${SortBy.UPDATED_AT}-${SortOrder.ASC}` },
 ];
 
 export default function SortFilter({
-  sortBy = SortBy.UPDATED_AT,
+  sortBy = SortBy.DATE,
   order = SortOrder.DESC,
 }: {
   sortBy?: SortBy;

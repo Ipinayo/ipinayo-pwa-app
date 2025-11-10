@@ -115,6 +115,17 @@ export function transformStringsToOptions(strings: string[]): Option[] {
   }));
 }
 
+export function transformObjectToOptions<T extends Record<string, any>>(
+  data: T[],
+  valueKey: keyof T,
+  labelKey: keyof T
+): Option[] {
+  return data.map((item) => ({
+    label: String(item[labelKey]),
+    value: item[valueKey],
+  }));
+}
+
 export function getValuesFromOptions(options: Option[]) {
   return options.map((opt) => opt.value)
 }

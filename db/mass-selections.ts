@@ -227,7 +227,7 @@ export async function saveSelection(selection: NewMassSelection, userId: string)
         parts: {
             create:
                 parts?.map((part) => ({
-                    partName: part.partName,
+                    partName: part.partName.toLowerCase(),
                     keySignature: part.keySignature,
                     notes: part.notes,
                     songTitle: part.songTitle,
@@ -327,7 +327,7 @@ export async function updateSelection(
                 parts: {
                     deleteMany: {},
                     create: parts.map((part) => ({
-                        partName: part.partName,
+                        partName: part.partName.toLowerCase(),
                         keySignature: part.keySignature,
                         notes: part.notes,
                         songTitle: part.songTitle,
@@ -392,7 +392,7 @@ export async function saveSelectionBySelection(selection: SingleMassSelectionWit
                 : undefined,
             parts: {
                 create: parts.map((part) => ({
-                    partName: part.partName,
+                    partName: part.partName.toLowerCase(),
                     keySignature: part.keySignature,
                     notes: part.notes,
                     songTitle: part.songTitle,
@@ -401,4 +401,13 @@ export async function saveSelectionBySelection(selection: SingleMassSelectionWit
             createdById: userId,
         },
     })
+}
+
+export async function findAllPartNames() {
+    return await prisma.massPart.findMany({
+        distinct: ['partName'],
+        select: { partName: true },
+        orderBy: { partName: 'asc' }
+    });
+
 }
