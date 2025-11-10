@@ -22,7 +22,7 @@ interface GroupOption {
   [key: string]: SelectOption[];
 }
 
-interface CreatableSelectProps {
+interface AppSelectProps {
   value?: string;
   onValueChange: (value: string) => void;
   options?: SelectOption[];
@@ -85,7 +85,7 @@ function transToGroupOption(options: SelectOption[], groupBy?: string) {
   return groupOption;
 }
 
-export default function CreatableSelect({
+export default function AppSelect({
   value,
   onValueChange,
   options = [],
@@ -98,7 +98,7 @@ export default function CreatableSelect({
   creatable = true,
   commandProps,
   inputProps,
-}: CreatableSelectProps) {
+}: AppSelectProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);

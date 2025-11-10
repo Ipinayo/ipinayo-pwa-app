@@ -17,9 +17,9 @@ import {
 } from "@/components/ui/select";
 import { cn, getEnumByKey, transformStringsToOptions } from "@/lib/utils";
 
+import AppSelect from "@/components/common/app-select";
 import { Button } from "@/components/ui/button";
 import { Control } from "react-hook-form";
-import CreatableSelect from "@/components/common/creatable-select";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Trash2 } from "lucide-react";
@@ -86,7 +86,7 @@ export function MassPartRow({
                 Name <span className="text-destructive">*</span>
               </FormLabel>
               <FormControl>
-                <CreatableSelect
+                <AppSelect
                   value={field.value || undefined}
                   onValueChange={field.onChange}
                   options={transformStringsToOptions(commonPartNames)}

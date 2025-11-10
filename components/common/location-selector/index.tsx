@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/select";
 import { cn, transformStringsToOptions } from "@/lib/utils";
 
-import CreatableSelect from "../creatable-select";
+import AppSelect from "../app-select";
 import { NewLocation } from "@/types/models";
 import { UseFormReturn } from "react-hook-form";
 import { useEffect } from "react";
@@ -177,7 +177,7 @@ export default function LocationSelector({
             <FormItem>
               <FormLabel>City</FormLabel>
               <FormControl>
-                <CreatableSelect
+                <AppSelect
                   value={field.value || undefined}
                   onValueChange={(value) => {
                     const cityData = cities.find((c) => c.name === value);
