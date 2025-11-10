@@ -167,6 +167,8 @@ export default function SaveForm(props: SaveFormProps) {
     }
   };
 
+  const partNames = transformStringsToOptions(props.partNames);
+
   // Reset form when template changes
   useEffect(() => {
     form.reset(getDefaultValues(props));
@@ -441,7 +443,7 @@ export default function SaveForm(props: SaveFormProps) {
                 index={index}
                 control={form.control}
                 canRemove={fields.length > 1}
-                partNames={props.partNames}
+                partNames={partNames}
                 onRemove={() => remove(index)}
               />
             ))}

@@ -21,6 +21,7 @@ import AppSelect from "@/components/common/app-select";
 import { Button } from "@/components/ui/button";
 import { Control } from "react-hook-form";
 import { Input } from "@/components/ui/input";
+import { Option } from "@/components/common/multiple-selector";
 import { Textarea } from "@/components/ui/textarea";
 import { Trash2 } from "lucide-react";
 import { keySignatureItems } from "@/lib/constants";
@@ -29,7 +30,7 @@ interface MassPartRowProps {
   index: number;
   control: Control<NewMassSelection>;
   canRemove: boolean;
-  partNames: string[];
+  partNames: Option[];
   onRemove: () => void;
 }
 
@@ -70,7 +71,7 @@ export function MassPartRow({
                 <AppSelect
                   value={field.value || undefined}
                   onValueChange={field.onChange}
-                  options={transformStringsToOptions(partNames)}
+                  options={partNames}
                   placeholder="Select or type part name..."
                   className={cn(
                     "capitalize",
