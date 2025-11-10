@@ -18,6 +18,7 @@ import {
 
 import { NewMassSelection } from "@/types/models";
 import { auth } from "@/auth";
+import { findUserParishAndChoirInfo } from "@/db/user";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import z from "zod";
@@ -348,10 +349,15 @@ export async function cloneSelection(id: string) {
             throw new Error("Access denied");
         }
 
+        const parishAndChoirInfo = await findUserParishAndChoirInfo(session.user.id);
+
         const result = await saveSelectionBySelection({
             ...originalSelection,
             title: `${originalSelection.title} (Copy)`,
-            isPublic: true
+            isPublic: true,
+            parishLocationId: parishAndChoirInfo?.parishLocation?.id || null,
+            choirName: parishAndChoirInfo?.choirName || null,
+            parishName: parishAndChoirInfo?.parishName || null,
         }, session.user.id);
 
         revalidatePath('/liturgical-selections');
