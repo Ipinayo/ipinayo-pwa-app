@@ -5,12 +5,12 @@ import { Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CSS } from "@dnd-kit/utilities";
 import { Control } from "react-hook-form";
-import { MassPartRow } from "./mass-part-row";
+import { MassPartForm } from "./mass-part-form";
 import { NewMassSelection } from "@/types/models";
 import { SelectOption } from "@/types/components/select";
 import { useSortable } from "@dnd-kit/sortable";
 
-interface DraggableMassPartRowProps {
+interface MassPartRowProps {
   partId: string;
   control: Control<NewMassSelection>;
   index: number;
@@ -20,7 +20,7 @@ interface DraggableMassPartRowProps {
   onInsertPart: () => void;
 }
 
-export default function DraggableMassPartRow({
+export default function MassPartRow({
   partId,
   control,
   index,
@@ -28,7 +28,7 @@ export default function DraggableMassPartRow({
   partNames,
   onRemove,
   onInsertPart,
-}: DraggableMassPartRowProps) {
+}: MassPartRowProps) {
   const {
     attributes,
     listeners,
@@ -54,7 +54,7 @@ export default function DraggableMassPartRow({
           {...listeners}
           title="Drag to reorder"
         >
-          <MassPartRow control={control} index={index} partNames={partNames} />
+          <MassPartForm control={control} index={index} partNames={partNames} />
         </div>
 
         {/* Delete Button  */}

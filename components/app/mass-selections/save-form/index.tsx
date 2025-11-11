@@ -71,7 +71,7 @@ import { useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { withToast } from "@/lib/with-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
-import DraggableMassPartRow from "./draggable-mass-part-row";
+import MassPartRow from "../mass-part-row";
 
 type SaveFormProps =
   | {
@@ -549,7 +549,7 @@ export default function SaveForm(props: SaveFormProps) {
                 strategy={verticalListSortingStrategy}
               >
                 {fields.map((field, index) => (
-                  <DraggableMassPartRow
+                  <MassPartRow
                     key={field.id}
                     partId={field.id}
                     partNames={partNames}

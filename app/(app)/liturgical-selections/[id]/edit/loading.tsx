@@ -1,4 +1,4 @@
-import { SaveFormSkeleton } from "@/components/app/mass-selections/save-form-skeleton";
+import { SaveFormSkeleton } from "@/components/app/mass-selections/save-form/index-skeleton";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Loading() {

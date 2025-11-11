@@ -13,7 +13,7 @@ import { liturgicalSeasonItems, liturgicalYearItems } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import MassSelectionList from "@/components/app/mass-selections/mass-selection-list";
-import MassSelectionListSkeleton from "@/components/app/mass-selections/mass-selection-list-skeleton";
+import MassSelectionListSkeleton from "@/components/app/mass-selections/mass-selection-list/index-skeleton";
 import QueryFilter from "@/components/common/query-filter";
 import SearchBar from "@/components/common/search-bar";
 import SortFilter from "@/components/app/mass-selections/sort-filter";

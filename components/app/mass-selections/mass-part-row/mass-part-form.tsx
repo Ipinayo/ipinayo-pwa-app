@@ -24,13 +24,13 @@ import { SelectOption } from "@/types/components/select";
 import { Textarea } from "@/components/ui/textarea";
 import { keySignatureItems } from "@/lib/constants";
 
-interface MassPartRowProps {
+interface MassPartFormProps {
   index: number;
   control: Control<NewMassSelection>;
   partNames: SelectOption[];
 }
 
-export function MassPartRow({ index, control, partNames }: MassPartRowProps) {
+export function MassPartForm({ index, control, partNames }: MassPartFormProps) {
   return (
     <div className="bg-card grid gap-4 rounded-lg border p-3 sm:p-4 transition-colors">
       <div className="grid gap-4 md:grid-cols-2">
