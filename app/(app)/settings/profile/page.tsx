@@ -14,7 +14,7 @@ export default async function EditProfilePage() {
   return (
     <div className="w-full">
       <div className="mx-auto max-w-4xl">
-        <div className="mb-8 flex items-center gap-4">
+        <div className="mb-8 flex flex-col sm:flex-row items-start sm:items-center gap-4">
           <BackButton fallback="/profile" />
           <div>
             <h2 className="text-3xl font-display text-foreground">
