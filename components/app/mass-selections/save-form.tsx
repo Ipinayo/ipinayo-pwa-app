@@ -72,6 +72,7 @@ import { useRouter } from "next/navigation";
 import { withToast } from "@/lib/with-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import DraggableMassPartRow from "./draggable-mass-part-row";
+import { useAppNavigation } from "@/contexts/AppNavigationContext";
 
 type SaveFormProps =
   | {
@@ -147,6 +148,16 @@ const getDefaultValues = (props: SaveFormProps): NewMassSelection => {
 
 export default function SaveForm(props: SaveFormProps) {
   const router = useRouter();
+
+  const { canGoBack, handleBack, navigateTo } = useAppNavigation();
+
+  const onBack = () => {
+    if (canGoBack) {
+      handleBack();
+    } else {
+      navigateTo("/dashboard");
+    }
+  };
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -567,11 +578,7 @@ export default function SaveForm(props: SaveFormProps) {
 
         {/* Actions */}
         <div className="flex items-center justify-between">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => router.push("/liturgical-selections")}
-          >
+          <Button type="button" variant="outline" onClick={() => onBack()}>
             Cancel
           </Button>
 
