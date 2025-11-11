@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
+import MassPartRowSkeleton from "./mass-part-row-skeleton";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export function SaveFormSkeleton() {
@@ -81,50 +82,13 @@ export function SaveFormSkeleton() {
         <CardContent className="space-y-4">
           {/* Render 3 skeleton parts */}
           {[1, 2, 3].map((i) => (
-            <div key={i} className="bg-card grid gap-4 rounded-lg border p-4">
-              <div className="flex items-center justify-between">
-                <Skeleton className="h-5 w-16" />
-                <Skeleton className="h-8 w-8" />
-              </div>
-
-              <div className="grid gap-4 md:grid-cols-2">
-                {/* Part Name */}
-                <div className="space-y-2">
-                  <Skeleton className="h-4 w-20" />
-                  <Skeleton className="h-10 w-full" />
-                </div>
-
-                {/* Key Signature */}
-                <div className="space-y-2">
-                  <Skeleton className="h-4 w-24" />
-                  <Skeleton className="h-10 w-full" />
-                </div>
-              </div>
-
-              {/* Song Title */}
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-20" />
-                <Skeleton className="h-10 w-full" />
-              </div>
-
-              {/* Notes */}
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-28" />
-                <Skeleton className="h-20 w-full" />
-              </div>
-            </div>
+            <MassPartRowSkeleton key={i} />
           ))}
-
-          {/* Add Part Button */}
-          <div className="flex justify-center pt-4">
-            <Skeleton className="h-10 w-32" />
-          </div>
         </CardContent>
       </Card>
 
       {/* Actions */}
-      <div className="flex items-center justify-between">
-        <Skeleton className="h-10 w-24" />
+      <div className="flex justify-end">
         <Skeleton className="h-10 w-40" />
       </div>
     </div>
