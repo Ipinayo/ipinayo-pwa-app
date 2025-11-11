@@ -1,5 +1,5 @@
 import { MassSelectionFilter, SortBy, SortOrder } from "@/types/utils";
-import { MassSelectionStats, NewMassSelection, SingleMassSelectionWithParts } from "@/types/models";
+import { MassSelectionStats, NewMassSelection, NewMassSelectionPart, SingleMassSelectionWithParts } from "@/types/models";
 
 import { Prisma } from "@/lib/generated/prisma";
 import { addParishAndChoirInfoToUserProfile } from "./user";
@@ -12,7 +12,7 @@ export async function findSelectionWithParts(id: string) {
         include: {
             themes: true,
             parishLocation: true,
-            parts: true,
+            parts: { orderBy: { order: "asc" } },
             createdBy: {
                 select: { name: true, email: true },
             },
@@ -26,7 +26,7 @@ export async function findUserSelectionWithParts(id: string, userId: string) {
         include: {
             themes: true,
             parishLocation: true,
-            parts: true,
+            parts: { orderBy: { order: "asc" } },
             createdBy: {
                 select: { name: true, email: true },
             },
@@ -37,7 +37,10 @@ export async function findUserSelectionWithParts(id: string, userId: string) {
 export async function findSelection(id: string) {
     return await prisma.massSelection.findUnique({
         where: { id },
-        include: { themes: { select: { id: true } }, parts: true }
+        include: {
+            themes: { select: { id: true } },
+            parts: { orderBy: { order: "asc" } },
+        }
     })
 }
 
@@ -228,6 +231,7 @@ export async function saveSelection(selection: NewMassSelection, userId: string)
             create:
                 parts?.map((part) => ({
                     partName: part.partName.toLowerCase(),
+                    order: part.order,
                     keySignature: part.keySignature,
                     notes: part.notes,
                     songTitle: part.songTitle,
@@ -263,15 +267,7 @@ export async function saveSelection(selection: NewMassSelection, userId: string)
     }
 
     const createdSelection = await prisma.massSelection.create({
-        data,
-        // include: {
-        //     parts: true,
-        //     themes: true,
-        //     parishLocation: true,
-        //     createdBy: {
-        //         select: { name: true, email: true },
-        //     },
-        // },
+        data
     })
 
     addParishAndChoirInfoToUserProfile(userId, createdSelection.parishLocationId, createdSelection.choirName, createdSelection.parishName);
@@ -285,69 +281,102 @@ export async function updateSelection(
 ) {
     const { parts, date, themes, parishLocation, ...rest } = selection
 
-    const updatedSelection = await prisma.massSelection.update({
-        where: { id },
-        data: {
-            ...rest,
-            ...(date && { date: new Date(date) }),
-            ...(themes && {
-                themes: {
-                    set: [], // Disconnect all existing
-                    connectOrCreate: themes.map(name => ({
-                        where: { name: name.toLowerCase() },
-                        create: { name: name.toLowerCase() }
-                    }))
-                }
-            }),
-            // Handle location update
-            ...(parishLocation && parishLocation.country && {
-                parishLocation: {
-                    connectOrCreate: {
-                        where: {
-                            country_state_city: {
+    console.log("Updating selection with data: ", selection);
+
+    let partsToCreate: NewMassSelectionPart[] = [];
+    let partsToUpdate: NewMassSelectionPart[] = [];
+    let idsToDelete: string[] = [];
+
+    if (parts) {
+
+        // Get existing part IDs
+        const existingParts = await prisma.massPart.findMany({
+            where: { massSelectionId: id },
+            select: { id: true },
+        });
+
+        const existingIds = new Set(existingParts.map(p => p.id));
+        partsToUpdate = parts.filter(p => existingIds.has(p.id));
+        partsToCreate = parts.filter(p => !existingIds.has(p.id));
+        const updatedIds = new Set(partsToUpdate.map(p => p.id));
+        idsToDelete = [...existingIds].filter(id => !updatedIds.has(id));
+
+    }
+
+    // Do updates outside the nested write
+    await prisma.$transaction([
+        // 1. Delete removed parts
+        ...(idsToDelete.length > 0 ? [
+            prisma.massPart.deleteMany({
+                where: { id: { in: idsToDelete } },
+            })
+        ] : []),
+
+        // 2. Update existing parts
+        ...partsToUpdate.map((part) =>
+            prisma.massPart.update({
+                where: { id: part.id },
+                data: {
+                    partName: part.partName,
+                    songTitle: part.songTitle,
+                    keySignature: part.keySignature,
+                    notes: part.notes,
+                    order: part.order,
+                },
+            })
+        ),
+
+        // 3. Update mass selection with new parts
+        prisma.massSelection.update({
+            where: { id },
+            data: {
+                ...rest,
+                ...(date && { date: new Date(date) }),
+                ...(themes && {
+                    themes: {
+                        set: [], // Disconnect all existing
+                        connectOrCreate: themes.map(name => ({
+                            where: { name: name.toLowerCase() },
+                            create: { name: name.toLowerCase() }
+                        }))
+                    }
+                }),
+                // Handle location update
+                ...(parishLocation && parishLocation.country && {
+                    parishLocation: {
+                        connectOrCreate: {
+                            where: {
+                                country_state_city: {
+                                    country: parishLocation.country,
+                                    state: parishLocation.state || '',
+                                    city: capitalize(parishLocation.city || ''),
+                                }
+                            },
+                            create: {
                                 country: parishLocation.country,
-                                state: parishLocation.state || '',
+                                countryCode: parishLocation.countryCode,
+                                state: parishLocation.state,
+                                stateCode: parishLocation.stateCode,
                                 city: capitalize(parishLocation.city || ''),
+                                latitude: parishLocation.latitude,
+                                longitude: parishLocation.longitude,
+                                timezone: parishLocation.timezone,
                             }
-                        },
-                        create: {
-                            country: parishLocation.country,
-                            countryCode: parishLocation.countryCode,
-                            state: parishLocation.state,
-                            stateCode: parishLocation.stateCode,
-                            city: capitalize(parishLocation.city || ''),
-                            latitude: parishLocation.latitude,
-                            longitude: parishLocation.longitude,
-                            timezone: parishLocation.timezone,
                         }
                     }
-                }
-            }),
-            ...(parts && {
+                }),
                 parts: {
-                    deleteMany: {},
-                    create: parts.map((part) => ({
-                        partName: part.partName.toLowerCase(),
+                    create: partsToCreate.map((part) => ({
+                        partName: part.partName,
+                        songTitle: part.songTitle,
                         keySignature: part.keySignature,
                         notes: part.notes,
-                        songTitle: part.songTitle,
+                        order: part.order,
                     })),
                 },
-            }),
-        },
-        // include: {
-        //     parts: true,
-        //     themes: true,
-        //     parishLocation: true,
-        //     createdBy: {
-        //         select: { name: true, email: true },
-        //     },
-        // },
-    })
-
-    addParishAndChoirInfoToUserProfile(updatedSelection.createdById, updatedSelection.parishLocationId, updatedSelection.choirName, updatedSelection.parishName);
-
-    return updatedSelection;
+            },
+        }),
+    ]);
 }
 
 export async function removeSelection(id: string) {
@@ -393,6 +422,7 @@ export async function saveSelectionBySelection(selection: SingleMassSelectionWit
             parts: {
                 create: parts.map((part) => ({
                     partName: part.partName.toLowerCase(),
+                    order: part.order,
                     keySignature: part.keySignature,
                     notes: part.notes,
                     songTitle: part.songTitle,
