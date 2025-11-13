@@ -16,7 +16,7 @@ export default function AppLayout({
       </Suspense>
       <SideNav />
       <div className="flex flex-1 flex-col md:ml-16 md:transition-all md:duration-300 md:ease-in-out">
-        <main className="container flex flex-1 py-10">{children}</main>
+        <main className="container flex flex-1 py-8 sm:py-10">{children}</main>
         <Footer />
       </div>
     </div>

@@ -33,7 +33,7 @@ const serwist = new Serwist({
   }
 });
 
-const urlsToCache = ["/", "/~offline"] as const
+const urlsToCache = ["/", "/liturgical-selections", "/~offline"] as const
 
 // cache on install
 self.addEventListener("install", (event) => {

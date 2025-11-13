@@ -1,4 +1,4 @@
-import MassSelectionListSkeleton from "@/components/app/mass-selections/mass-selection-list-skeleton";
+import MassSelectionListSkeleton from "@/components/app/mass-selections/mass-selection-list/index-skeleton";
 
 export default function Loading() {
   return (

@@ -4,6 +4,7 @@ import { Copy, Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { cloneSelection } from "@/lib/actions/mass-selections";
+import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -31,6 +32,11 @@ export default function CloneButton({
       const clonedSelection = await cloneSelection(selectionId);
       router.push(`/liturgical-selections/${clonedSelection.id}/edit`);
     } catch (error) {
+      // Ignore redirect errors
+      if (isRedirectError(error)) {
+        return;
+      }
+
       console.error("Error cloning selection:", error);
       toast.error("Error cloning selection, please try again");
     } finally {
