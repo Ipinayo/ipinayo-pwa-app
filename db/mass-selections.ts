@@ -316,7 +316,7 @@ export async function updateSelection(
             prisma.massPart.update({
                 where: { id: part.id },
                 data: {
-                    partName: part.partName,
+                    partName: part.partName.toLowerCase(),
                     songTitle: part.songTitle,
                     keySignature: part.keySignature,
                     notes: part.notes,
