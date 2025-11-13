@@ -366,7 +366,7 @@ export async function updateSelection(
                 }),
                 parts: {
                     create: partsToCreate.map((part) => ({
-                        partName: part.partName,
+                        partName: part.partName.toLowerCase(),
                         songTitle: part.songTitle,
                         keySignature: part.keySignature,
                         notes: part.notes,
