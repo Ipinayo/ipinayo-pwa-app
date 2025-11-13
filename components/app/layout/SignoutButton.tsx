@@ -18,6 +18,7 @@ export default function SignoutButton({
   return (
     <form action={logoutAction} className="flex w-full justify-start">
       <Button
+        type="submit"
         variant="outline"
         className={cn("flex w-full justify-start", className)}
         size="sm"

@@ -51,6 +51,7 @@ export default function DownloadButton({
 
   return (
     <Button
+      type="button"
       variant={variant}
       size={size}
       onClick={handleDownload}

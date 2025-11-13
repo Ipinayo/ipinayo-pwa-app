@@ -243,7 +243,7 @@ export function PreferencesForm() {
         {/* Save Button */}
         <div className="flex justify-end">
           <Button
-            onClick={handleSave}
+            type="submit"
             disabled={saving}
             className="bg-primary hover:bg-primary/90"
           >

@@ -40,6 +40,7 @@ export default function DeleteButton({
 
   return (
     <Button
+      type="button"
       variant={variant}
       size={size}
       onClick={handleDelete}

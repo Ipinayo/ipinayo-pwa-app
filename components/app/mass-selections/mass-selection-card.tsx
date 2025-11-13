@@ -105,19 +105,17 @@ export default function MassSelectionCard({
               selectionId={selection.id}
             />
 
-            <Link
-              href={`/liturgical-selections/${selection.id}`}
-              className="flex-1"
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full gap-2 bg-transparent flex-1"
+              asChild
             >
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full gap-2 bg-transparent"
-              >
+              <Link href={`/liturgical-selections/${selection.id}`}>
                 <Eye className="h-4 w-4" />
                 View
-              </Button>
-            </Link>
+              </Link>
+            </Button>
 
             <CloneButton
               variant="outline"

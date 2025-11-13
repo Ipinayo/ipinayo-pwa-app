@@ -43,13 +43,14 @@ export default function ErrorPage({
           <p className="text-muted-foreground">{error?.message}</p>
 
           <div className="flex flex-col gap-2">
-            <Button onClick={handleRetry} className="w-full">
+            <Button type="button" onClick={handleRetry} className="w-full">
               <RefreshCw className="mr-2 h-4 w-4" />
               Try Again
             </Button>
 
             {showHomeButton && (
               <Button
+                type="button"
                 variant="outline"
                 onClick={() => router.push("/")}
                 className="w-full"

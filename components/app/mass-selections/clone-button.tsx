@@ -46,6 +46,7 @@ export default function CloneButton({
 
   return (
     <Button
+      type="button"
       variant={variant}
       size={size}
       onClick={handleClone}
