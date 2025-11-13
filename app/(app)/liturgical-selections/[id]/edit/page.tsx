@@ -8,13 +8,14 @@ import BackButton from "@/components/common/back-button";
 import { Params } from "@/types/utils";
 import SaveForm from "@/components/app/mass-selections/save-form";
 import { auth } from "@/auth";
+import { redirect } from "next/navigation";
 
 export default async function EditPage(props: { params: Params }) {
   const params = await props.params;
   const session = await auth();
 
   if (!session?.user?.id) {
-    throw new Error("Unauthorized");
+    redirect("/signin");
   }
 
   const selection = await getSelectionById(params.id);
