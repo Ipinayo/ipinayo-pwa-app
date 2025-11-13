@@ -119,7 +119,7 @@ export function MassPartForm({ index, control, partNames }: MassPartFormProps) {
             <FormLabel>Notes (Optional)</FormLabel>
             <FormControl>
               <Textarea
-                placeholder="e.g., Verses 1, 2, and 4 only"
+                placeholder="e.g., Hymn 1 - Verses 1, 2, and 4 only"
                 {...field}
                 value={field.value || ""}
                 rows={2}

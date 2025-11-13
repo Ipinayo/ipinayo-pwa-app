@@ -538,7 +538,7 @@ export default function SaveForm(props: SaveFormProps) {
               specific positions.
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-3 sm:space-y-4">
+          <CardContent className="space-y-4">
             <DndContext
               sensors={sensors}
               collisionDetection={closestCenter}
