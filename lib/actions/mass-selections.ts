@@ -20,6 +20,7 @@ import {
 import { NewMassSelection } from "@/types/models";
 import { auth } from "@/auth";
 import { findUserParishAndChoirInfo } from "@/db/user";
+import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import z from "zod";
@@ -367,6 +368,13 @@ export async function cloneSelection(id: string) {
         return result;
 
     } catch (error: any) {
+
+        // Handle redirect errors properly
+        if (isRedirectError(error)) {
+            // Rethrow so Next.js handles the redirect natively
+            throw error;
+        }
+
         console.error("Error cloning mass selection:", error);
         throw new Error("Error cloning mass selection: " + error?.message);
     }

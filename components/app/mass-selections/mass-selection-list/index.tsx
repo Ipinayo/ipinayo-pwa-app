@@ -7,7 +7,7 @@ import {
 
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import MassSelectionCard from "./mass-selection-card";
+import MassSelectionCard from "../mass-selection-card";
 import { MassSelectionFilter } from "@/types/utils";
 import { UrlPagination } from "@/components/common/url-pagination";
 import { cn } from "@/lib/utils";

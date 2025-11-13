@@ -8,19 +8,10 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { Command as CommandPrimitive, useCommandState } from "cmdk";
+import { GroupOption, SelectOption } from "@/types/components/select";
 import { forwardRef, useEffect, useRef, useState } from "react";
 
 import { cn } from "@/lib/utils";
-
-export interface SelectOption {
-  value: string;
-  label: string;
-  disable?: boolean;
-}
-
-interface GroupOption {
-  [key: string]: SelectOption[];
-}
 
 interface AppSelectProps {
   value?: string;

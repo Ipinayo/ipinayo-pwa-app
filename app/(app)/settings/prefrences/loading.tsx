@@ -6,7 +6,7 @@ export default function PreferencesLoading() {
   return (
     <div className="w-full">
       <div className="mx-auto max-w-4xl">
-        <div className="mb-8 flex items-center gap-4">
+        <div className="mb-8 flex flex-col sm:flex-row items-start sm:items-center gap-4">
           <Skeleton className="h-10 w-10 rounded-md" />
           <div>
             <Skeleton className="h-8 w-48" />

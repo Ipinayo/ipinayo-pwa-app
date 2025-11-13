@@ -27,8 +27,9 @@ export type MassSelectionWithParts = Prisma.MassSelectionGetPayload<{
 
 export type MassPart = Prisma.MassPartGetPayload<{}>;
 
-export type NewMassSelectionPart = Omit<Prisma.MassPartCreateInput, 'id' | 'massSelection'> & {
+export type NewMassSelectionPart = Omit<Prisma.MassPartCreateInput, 'id' | 'massSelection' | 'order'> & {
     id: string
+    order: number
 };
 
 export type NewLocation = Omit<Prisma.LocationCreateInput, 'id' | 'massSelections' | 'userProfiles' | 'createdAt' | 'updatedAt' | 'country'> & {

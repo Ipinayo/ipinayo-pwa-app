@@ -1,6 +1,12 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -16,7 +22,7 @@ import {
   MassSelectionWithParts,
   NewMassSelection,
 } from "@/types/models";
-import { Plus, Save } from "lucide-react";
+import { Save } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -39,19 +45,33 @@ import {
   liturgyTemplates,
 } from "@/lib/constants";
 import { useFieldArray, useForm } from "react-hook-form";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
 
 import { Button } from "@/components/ui/button";
 import DateSelect from "@/components/common/date-select";
 import { Input } from "@/components/ui/input";
 import LocationSelector from "@/components/common/location-selector";
-import { MassPartRow } from "./mass-part-row";
 import MultipleSelector from "@/components/common/multiple-selector";
 import { Switch } from "@/components/ui/switch";
 import { createMassSelectionSchema } from "@/types/schemas/mass-selections";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { withToast } from "@/lib/with-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
+import MassPartRow from "../mass-part-row";
 
 type SaveFormProps =
   | {
@@ -91,7 +111,8 @@ const getDefaultValues = (props: SaveFormProps): NewMassSelection => {
   const initialParts =
     parts.length > 0
       ? parts.map((partName, index) => ({
-          id: (index + 1).toString(),
+          id: `temp-${(index + 1).toString()}`,
+          order: index,
           partName,
           keySignature: null,
           notes: "",
@@ -99,7 +120,8 @@ const getDefaultValues = (props: SaveFormProps): NewMassSelection => {
         }))
       : [
           {
-            id: "1",
+            id: "temp-1",
+            order: 0,
             partName: "",
             keySignature: null,
             notes: "",
@@ -126,27 +148,103 @@ const getDefaultValues = (props: SaveFormProps): NewMassSelection => {
 export default function SaveForm(props: SaveFormProps) {
   const router = useRouter();
 
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
   const form = useForm<NewMassSelection>({
     resolver: zodResolver(createMassSelectionSchema),
     defaultValues: getDefaultValues(props),
   });
 
-  const { fields, append, remove } = useFieldArray({
+  const { fields, append, remove, move, insert, update } = useFieldArray({
     control: form.control,
     name: "parts",
   });
 
-  const { mode } = props;
+  const itemIds = useMemo(() => fields.map((item) => item.id), [fields]);
 
-  const addPart = () => {
-    append({
-      id: Date.now().toString(),
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (!over || active.id === over.id) {
+      return;
+    }
+
+    const oldIndex = fields.findIndex((field) => field.id === active.id);
+    const newIndex = fields.findIndex((field) => field.id === over.id);
+
+    if (oldIndex === -1 || newIndex === -1) {
+      return;
+    }
+
+    // Use the move function from useFieldArray
+    move(oldIndex, newIndex);
+
+    // Update order field for all parts after the move
+    const currentParts = form.getValues("parts");
+    currentParts.forEach((part, idx) => {
+      update(idx, {
+        ...part,
+        order: idx,
+      });
+    });
+  };
+
+  const addPart = (afterIndex?: number) => {
+    const insertIndex =
+      afterIndex !== undefined ? afterIndex + 1 : fields.length;
+
+    const newPart = {
+      id: `temp-${Date.now()}`,
+      order: insertIndex,
       partName: "",
       keySignature: null,
       notes: "",
       songTitle: "",
+    };
+
+    // Use insert if adding at a specific position, append if adding at the end
+    if (afterIndex !== undefined) {
+      insert(insertIndex, newPart);
+    } else {
+      append(newPart);
+    }
+
+    // Update order field for all parts after the insertion
+    const currentParts = form.getValues("parts");
+    currentParts.forEach((part, idx) => {
+      update(idx, {
+        ...part,
+        order: idx,
+      });
     });
   };
+
+  const removePart = (index: number) => {
+    if (fields.length > 1) {
+      // Use remove from useFieldArray
+      remove(index);
+
+      // Update order field for remaining parts
+      const currentParts = form.getValues("parts");
+      currentParts.forEach((part, idx) => {
+        update(idx, {
+          ...part,
+          order: idx,
+        });
+      });
+    }
+  };
+
+  const { mode } = props;
 
   const handleSubmit = async (data: NewMassSelection) => {
     if (mode === "edit") {
@@ -435,43 +533,39 @@ export default function SaveForm(props: SaveFormProps) {
         <Card>
           <CardHeader>
             <CardTitle>Liturgy Parts</CardTitle>
+            <CardDescription>
+              Drag to reorder parts. Click "Insert Part" to add parts at
+              specific positions.
+            </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            {fields.map((field, index) => (
-              <MassPartRow
-                key={field.id}
-                index={index}
-                control={form.control}
-                canRemove={fields.length > 1}
-                partNames={partNames}
-                onRemove={() => remove(index)}
-              />
-            ))}
-
-            <div className="flex justify-center pt-4">
-              <Button
-                type="button"
-                onClick={addPart}
-                variant="outline"
-                className="gap-2 bg-transparent"
+          <CardContent className="space-y-3 sm:space-y-4">
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext
+                items={itemIds}
+                strategy={verticalListSortingStrategy}
               >
-                <Plus className="h-4 w-4" />
-                Add Part
-              </Button>
-            </div>
+                {fields.map((field, index) => (
+                  <MassPartRow
+                    key={field.id}
+                    partId={field.id}
+                    partNames={partNames}
+                    control={form.control}
+                    index={index}
+                    onRemove={() => removePart(index)}
+                    canRemove={fields.length > 1}
+                    onInsertPart={() => addPart(index)}
+                  />
+                ))}
+              </SortableContext>
+            </DndContext>
           </CardContent>
         </Card>
 
-        {/* Actions */}
-        <div className="flex items-center justify-between">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => router.push("/liturgical-selections")}
-          >
-            Cancel
-          </Button>
-
+        <div className="flex justify-end">
           <Button
             type="submit"
             disabled={form.formState.isSubmitting}

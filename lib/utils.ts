@@ -1,10 +1,10 @@
 import { clsx, type ClassValue } from "clsx"
 import { ReadonlyURLSearchParams } from "next/navigation";
 import { twMerge } from "tailwind-merge"
-import { Option } from "../components/common/multiple-selector"
 import { format } from "date-fns";
 import { enGB } from "date-fns/locale";
 import { Location } from "@/types/models";
+import { SelectOption } from "@/types/components/select";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -76,15 +76,15 @@ export function getLabelForValue(
  * @param valueKey - Key to use as the option value (e.g. "id")
  * @param labelKey - Key to use as the option label (e.g. "name")
  * @param childrenKey - Key holding nested children (e.g. "children")
- * @returns Option[] flattened with group name
+ * @returns SelectOption[] flattened with group name
  */
 export function transformToGroupedOptions<T extends Record<string, any>>(
   data: T[],
   valueKey: keyof T,
   labelKey: keyof T,
   childrenKey: keyof T
-): Option[] {
-  const result: Option[] = [];
+): SelectOption[] {
+  const result: SelectOption[] = [];
 
   const recurse = (parent: T) => {
     const children = parent[childrenKey] as Set<T> | T[] | undefined;
@@ -108,7 +108,7 @@ export function transformToGroupedOptions<T extends Record<string, any>>(
   return result;
 }
 
-export function transformStringsToOptions(strings: string[]): Option[] {
+export function transformStringsToOptions(strings: string[]): SelectOption[] {
   return strings.map((str) => ({
     label: str,
     value: str,
@@ -119,14 +119,14 @@ export function transformObjectToOptions<T extends Record<string, any>>(
   data: T[],
   valueKey: keyof T,
   labelKey: keyof T
-): Option[] {
+): SelectOption[] {
   return data.map((item) => ({
     label: String(item[labelKey]),
     value: item[valueKey],
   }));
 }
 
-export function getValuesFromOptions(options: Option[]) {
+export function getValuesFromOptions(options: SelectOption[]) {
   return options.map((opt) => opt.value)
 }
 

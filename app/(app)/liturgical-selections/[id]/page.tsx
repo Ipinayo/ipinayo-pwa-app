@@ -32,7 +32,7 @@ export default async function ViewPage(props: { params: Params }) {
 
   return (
     <div className="mx-auto max-w-6xl w-full">
-      <div className="mb-8 flex items-center gap-4">
+      <div className="mb-8 flex flex-col sm:flex-row items-start sm:items-center gap-4">
         <BackButton fallback="/liturgical-selections" />
         <div className="flex-1">
           <div className="flex items-center gap-3 mb-2">
@@ -52,7 +52,7 @@ export default async function ViewPage(props: { params: Params }) {
             )}
             <Options selection={selection} />
           </div>
-          <div className="flex flex-col w-full sm:flex-row items-start sm:items-center gap-1 sm:gap-4 text-muted-foreground">
+          <div className="flex flex-wrap w-full items-center gap-4 text-muted-foreground">
             <div className="flex items-center gap-1">
               <Calendar className="h-4 w-4" />
               {formatDate(selection.date)}
@@ -60,10 +60,6 @@ export default async function ViewPage(props: { params: Params }) {
             <div className="flex items-center gap-1">
               <Music className="h-4 w-4" />
               {selection.parts.length} part(s)
-            </div>
-            <div className="flex items-center gap-1">
-              <User className="h-4 w-4" />
-              {selection.createdBy.name || selection.createdBy.email}
             </div>
           </div>
         </div>

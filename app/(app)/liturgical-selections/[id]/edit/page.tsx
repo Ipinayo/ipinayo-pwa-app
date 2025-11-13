@@ -8,13 +8,14 @@ import BackButton from "@/components/common/back-button";
 import { Params } from "@/types/utils";
 import SaveForm from "@/components/app/mass-selections/save-form";
 import { auth } from "@/auth";
+import { redirect } from "next/navigation";
 
 export default async function EditPage(props: { params: Params }) {
   const params = await props.params;
   const session = await auth();
 
   if (!session?.user?.id) {
-    throw new Error("Unauthorized");
+    redirect("/signin");
   }
 
   const selection = await getSelectionById(params.id);
@@ -29,8 +30,8 @@ export default async function EditPage(props: { params: Params }) {
   ]);
 
   return (
-    <div className="container mx-auto max-w-4xl px-4 py-8">
-      <div className="mb-8 flex items-center gap-4">
+    <div className="mx-auto max-w-4xl w-full">
+      <div className="mb-8 flex flex-col sm:flex-row items-start sm:items-center gap-4">
         <BackButton
           to={`/liturgical-selections/${params.id}`}
           backText="Back to View"

@@ -21,7 +21,7 @@ export default async function SelectLiturgyTemplatePage() {
   return (
     <div className="w-full">
       <div className="mx-auto max-w-4xl">
-        <div className="flex items-center gap-4 mb-8">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-8">
           <BackButton fallback="/liturgical-selections" />
           <div>
             <h2 className="text-3xl font-display text-foreground">
