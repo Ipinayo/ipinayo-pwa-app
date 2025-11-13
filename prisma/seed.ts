@@ -25,11 +25,12 @@ export async function saveSelection(selection: NewMassSelection, userId: string)
         },
         parts: {
             create:
-                parts?.map((part) => ({
+                parts?.map((part, index) => ({
                     partName: part.partName.toLowerCase(),
                     keySignature: part.keySignature,
                     notes: part.notes,
                     songTitle: part.songTitle,
+                    order: index,
                 })) || [],
         },
         createdBy: {
