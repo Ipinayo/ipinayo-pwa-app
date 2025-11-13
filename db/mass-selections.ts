@@ -297,8 +297,8 @@ export async function updateSelection(
         const existingIds = new Set(existingParts.map(p => p.id));
         partsToUpdate = parts.filter(p => existingIds.has(p.id));
         partsToCreate = parts.filter(p => !existingIds.has(p.id));
-        const updatedIds = new Set(partsToUpdate.map(p => p.id));
-        idsToDelete = [...existingIds].filter(id => !updatedIds.has(id));
+        // Correct deletion logic: delete any existing part not present in incoming parts
+        idsToDelete = [...existingIds].filter(id => !parts.some(p => p.id === id));
 
     }
 
