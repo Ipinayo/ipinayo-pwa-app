@@ -67,7 +67,7 @@ export default async function Header() {
                         {user.email}
                       </p>
                       {user.profile?.headline && (
-                        <p className="text-sm text-muted-foreground italic mt-1">
+                        <p className="text-sm text-muted-foreground mt-1">
                           {user.profile.headline}
                         </p>
                       )}
