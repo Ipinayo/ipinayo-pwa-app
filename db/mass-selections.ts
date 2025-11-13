@@ -281,7 +281,6 @@ export async function updateSelection(
 ) {
     const { parts, date, themes, parishLocation, ...rest } = selection
 
-    console.log("Updating selection with data: ", selection);
 
     let partsToCreate: NewMassSelectionPart[] = [];
     let partsToUpdate: NewMassSelectionPart[] = [];
