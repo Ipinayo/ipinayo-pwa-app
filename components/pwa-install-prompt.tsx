@@ -119,6 +119,7 @@ export function PWAInstallPrompt() {
           <div className="flex items-center justify-between">
             <CardTitle className="text-lg">Install Ìpínayò</CardTitle>
             <Button
+              type="button"
               variant="ghost"
               size="sm"
               onClick={handleDismiss}
@@ -134,13 +135,14 @@ export function PWAInstallPrompt() {
         <CardContent className="pt-0">
           <div className="flex gap-2">
             <Button
+              type="button"
               onClick={handleInstallClick}
               className="flex-1 bg-primary hover:bg-primary/90"
             >
               <Download className="mr-2 h-4 w-4" />
               Install App
             </Button>
-            <Button variant="outline" onClick={handleDismiss}>
+            <Button type="button" variant="outline" onClick={handleDismiss}>
               Not Now
             </Button>
           </div>
