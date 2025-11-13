@@ -123,6 +123,7 @@ model MassPart {
   massSelection   MassSelection @relation(fields: [massSelectionId], references: [id], onDelete: Cascade)
 
   @@index([massSelectionId])
+  @@index([order])
 }
 
 model Theme {
