@@ -72,7 +72,7 @@ export default function MassPartRow({
               variant="ghost"
               size="sm"
               onClick={onRemove}
-              className="text-destructive hover:text-destructive hover:bg-destructive/10 text-xs h-7 px-2 transition-colors"
+              className="text-destructive hover:bg-destructive/10 dark:hover:bg-destructive/20 hover:text-destructive text-xs h-7 px-2 transition-colors"
             >
               <Trash2 className="h-3 w-3 mr-1" />
               Delete Part
