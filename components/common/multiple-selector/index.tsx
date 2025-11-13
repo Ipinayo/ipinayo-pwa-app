@@ -12,7 +12,6 @@ import { forwardRef, useEffect } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import React from "react";
-import { S } from "@vite-pwa/assets-generator/dist/shared/assets-generator.DnoqiTld.mjs";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
