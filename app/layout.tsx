@@ -479,7 +479,13 @@ export default function RootLayout({
           <SessionProvider>
             <AppNavigationProvider>
               {children}
-              <Toaster duration={5000} richColors closeButton expand />
+              <Toaster
+                duration={5000}
+                richColors
+                closeButton
+                expand
+                position="top-right"
+              />
               <PWAInstallPrompt />
               <OfflineIndicator />
             </AppNavigationProvider>

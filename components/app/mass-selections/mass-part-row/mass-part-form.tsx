@@ -104,7 +104,7 @@ export function MassPartForm({ index, control, partNames }: MassPartFormProps) {
               Song Title <span className="text-destructive">*</span>
             </FormLabel>
             <FormControl>
-              <Input placeholder="Or type custom title..." {...field} />
+              <Input placeholder="Enter song title..." {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>
