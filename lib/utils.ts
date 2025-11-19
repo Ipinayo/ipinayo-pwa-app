@@ -171,3 +171,9 @@ export function formatParishInfo(location: Location | null | undefined, parishNa
 export function convertToLowerCase(str: string[]): string[] {
   return str.map(s => s.toLowerCase());
 }
+
+export function getFieldError(err: any): string {
+  if (!Array.isArray(err)) return err?.message ?? '';
+  const first = err.find(item => item && item.message);
+  return first?.message ?? '';
+}

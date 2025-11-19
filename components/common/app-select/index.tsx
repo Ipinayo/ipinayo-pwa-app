@@ -24,6 +24,7 @@ interface AppSelectProps {
   className?: string;
   dropdownClassName?: string;
   creatable?: boolean;
+  invalid?: boolean;
   commandProps?: React.ComponentPropsWithoutRef<typeof Command>;
   inputProps?: Omit<
     React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input>,
@@ -87,6 +88,7 @@ export default function AppSelect({
   className,
   dropdownClassName,
   creatable = false,
+  invalid = false,
   commandProps,
   inputProps,
 }: AppSelectProps) {
@@ -193,7 +195,11 @@ export default function AppSelect({
       <div
         className={cn(
           "border-input ring-offset-background focus-within:ring-ring flex h-10 w-full rounded-md border bg-transparent px-3 py-2 text-sm focus-within:ring-2 focus-within:ring-offset-2",
-          disabled && "cursor-not-allowed opacity-50",
+          {
+            "cursor-not-allowed opacity-50": disabled,
+            "ring-destructive/20 dark:ring-destructive/40 border-destructive":
+              invalid,
+          },
           className
         )}
         onClick={() => {

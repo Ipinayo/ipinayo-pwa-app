@@ -162,6 +162,7 @@ export default function SaveForm(props: SaveFormProps) {
   const form = useForm<NewMassSelection>({
     resolver: zodResolver(createMassSelectionSchema),
     defaultValues: getDefaultValues(props),
+    mode: "onBlur",
   });
 
   const { fields, append, remove, move, insert, update } = useFieldArray({
@@ -468,7 +469,7 @@ export default function SaveForm(props: SaveFormProps) {
             <FormField
               control={form.control}
               name="themes"
-              render={({ field }) => (
+              render={({ field, fieldState }) => (
                 <FormItem>
                   <FormLabel>Themes</FormLabel>
                   <FormControl>
@@ -482,8 +483,14 @@ export default function SaveForm(props: SaveFormProps) {
                       creatable
                       className="capitalize"
                       dropdownClassName="capitalize"
+                      invalid={!!fieldState.error}
+                      inputProps={{ onBlur: field.onBlur }}
+                      maxSelected={10}
                     />
                   </FormControl>
+                  <p className="text-xs text-muted-foreground">
+                    {field.value?.length || 0}/10 themes
+                  </p>
                   <FormMessage />
                 </FormItem>
               )}

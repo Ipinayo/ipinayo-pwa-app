@@ -48,11 +48,8 @@ export function MassPartForm({ index, control, partNames }: MassPartFormProps) {
                   onValueChange={field.onChange}
                   options={partNames}
                   placeholder="Select or type part name..."
-                  className={cn(
-                    fieldState.invalid
-                      ? "ring-destructive/20 dark:ring-destructive/40 border-destructive"
-                      : ""
-                  )}
+                  invalid={!!fieldState.error}
+                  inputProps={{ onBlur: field.onBlur }}
                   creatable
                 />
               </FormControl>
