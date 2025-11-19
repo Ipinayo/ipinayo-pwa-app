@@ -112,12 +112,8 @@ export default function LocationSelector({
                   value: country.isoCode,
                 }))}
                 placeholder="Select country"
-                className={cn(
-                  "capitalize",
-                  fieldState.invalid
-                    ? "ring-destructive/20 dark:ring-destructive/40 border-destructive"
-                    : ""
-                )}
+                className="capitalize"
+                invalid={!!fieldState.error}
               />
             </FormControl>
             <FormMessage />
@@ -150,12 +146,8 @@ export default function LocationSelector({
                   }}
                   options={transformObjectToOptions(states, "isoCode", "name")}
                   placeholder="Select state or province"
-                  className={cn(
-                    "capitalize",
-                    fieldState.invalid
-                      ? "ring-destructive/20 dark:ring-destructive/40 border-destructive"
-                      : ""
-                  )}
+                  className="capitalize"
+                  invalid={!!fieldState.error}
                 />
               </FormControl>
               <FormMessage />
@@ -194,14 +186,10 @@ export default function LocationSelector({
                   }}
                   options={transformStringsToOptions(cities.map((c) => c.name))}
                   placeholder="Select or type city name..."
-                  className={cn(
-                    "capitalize",
-                    fieldState.invalid
-                      ? "ring-destructive/20 dark:ring-destructive/40 border-destructive"
-                      : ""
-                  )}
+                  className="capitalize"
                   dropdownClassName="capitalize"
                   inputProps={{ className: "capitalize" }}
+                  invalid={!!fieldState.error}
                   creatable
                 />
               </FormControl>
