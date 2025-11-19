@@ -183,7 +183,7 @@
   }
 
   body {
-    @apply bg-gradient-to-br from-background via-background to-muted text-foreground font-sans;
+    @apply bg-linear-to-br from-background via-background to-muted text-foreground font-sans;
   }
 
   h1,
@@ -198,15 +198,16 @@
 }
 
 @utility primary-gradient {
-  @apply from-primary-light to-primary text-primary-foreground bg-gradient-to-r;
+  @apply from-primary-light to-primary text-primary-foreground bg-linear-to-r;
 }
 
 @utility container {
   margin-inline: auto;
-  padding-inline: 2rem;
+  padding-inline: 1rem;
 
   @media (width >=--theme(--breakpoint-sm)) {
     max-width: none;
+    padding-inline: 2rem;
   }
 
   @media (width >=1400px) {
