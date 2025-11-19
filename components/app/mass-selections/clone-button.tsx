@@ -7,6 +7,7 @@ import { cloneSelection } from "@/lib/actions/mass-selections";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { useState } from "react";
 
 interface CloneButtonProps {
@@ -26,9 +27,16 @@ export default function CloneButton({
 
   const router = useRouter();
 
+  const { data: session } = useSession();
+
   const handleClone = async () => {
     setIsCloning(true);
     try {
+      if (!session?.user) {
+        toast.info("Please sign in to create your own selections");
+        router.push("/signin");
+        return;
+      }
       const clonedSelection = await cloneSelection(selectionId);
       router.push(`/liturgical-selections/${clonedSelection.id}/edit`);
     } catch (error) {
