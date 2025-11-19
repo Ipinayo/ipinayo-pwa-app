@@ -17,28 +17,42 @@ interface UrlPaginationProps {
   className?: string;
 }
 
-export default function AppPagination({ currentPage, totalPages, handlePageChange, className }: UrlPaginationProps) {
+export default function AppPagination({
+  currentPage,
+  totalPages,
+  handlePageChange,
+  className,
+}: UrlPaginationProps) {
   // Generate page numbers to show
   const getVisiblePages = () => {
-    const delta = 2;
+    const delta = 1;
     const range = [];
     const rangeWithDots = [];
 
-    for (let i = Math.max(2, currentPage - delta); i <= Math.min(totalPages - 1, currentPage + delta); i++) {
+    for (
+      let i = Math.max(2, currentPage - delta);
+      i <= Math.min(totalPages - 1, currentPage + delta);
+      i++
+    ) {
       range.push(i);
     }
 
-    if (currentPage - delta > 2) {
-      rangeWithDots.push(1, "...");
-    } else {
-      rangeWithDots.push(1);
+    // Show first page always
+    rangeWithDots.push(1);
+
+    // Only show "..." if the next page after 1 is more than 2
+    if (range.length > 0 && range[0] > 2) {
+      rangeWithDots.push("...");
     }
 
     rangeWithDots.push(...range);
 
-    if (currentPage + delta < totalPages - 1) {
-      rangeWithDots.push("...", totalPages);
-    } else if (totalPages > 1) {
+    // Only show "..." before last page if the last in range is not adjacent to totalPages
+    if (range.length > 0 && range[range.length - 1] < totalPages - 1) {
+      rangeWithDots.push("...");
+    }
+
+    if (totalPages > 1) {
       rangeWithDots.push(totalPages);
     }
 
@@ -92,7 +106,9 @@ export default function AppPagination({ currentPage, totalPages, handlePageChang
               e.preventDefault();
               handlePageChange(currentPage + 1);
             }}
-            className={currentPage >= totalPages ? "pointer-events-none opacity-50" : ""}
+            className={
+              currentPage >= totalPages ? "pointer-events-none opacity-50" : ""
+            }
           />
         </PaginationItem>
       </PaginationContent>

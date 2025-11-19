@@ -57,6 +57,7 @@ export default function DownloadButton({
       onClick={handleDownload}
       disabled={isGenerating}
       className={className}
+      title="Download PDF of this selection"
     >
       {isGenerating ? (
         <Loader2 className="mr-2 h-4 w-4 animate-spin" />

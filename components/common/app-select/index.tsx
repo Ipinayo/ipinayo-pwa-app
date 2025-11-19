@@ -160,9 +160,7 @@ export default function AppSelect({
   };
 
   // Check if the input value matches any existing option
-  const isExactMatch = options.some(
-    (opt) => opt.label.toLowerCase() === inputValue.toLowerCase()
-  );
+  const isExactMatch = options.some((opt) => opt.label === inputValue);
 
   // Filter options based on input
   const filteredOptions: GroupOption = {};

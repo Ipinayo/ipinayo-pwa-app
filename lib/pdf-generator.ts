@@ -285,7 +285,7 @@ export async function generateMassSelectionPDF(selection: GenerateMassSelection,
   yPosition -= 30
 
   // Table rows
-  selection.parts.forEach((part) => {
+  selection.parts.sort((a, b) => a.order - b.order).forEach((part) => {
     // Sanitize all text fields
     const sanitizedPartName = sanitizeForPdf(part.partName)
     const sanitizedSongTitle = sanitizeForPdf(part.songTitle)

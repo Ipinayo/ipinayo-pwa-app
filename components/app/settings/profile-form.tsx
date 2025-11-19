@@ -256,8 +256,6 @@ export default function ProfileForm({ user }: { user: UserProfile }) {
                       }
                       placeholder="Add instruments"
                       creatable={false}
-                      className="capitalize"
-                      dropdownClassName="capitalize"
                       groupBy="group"
                     />
                   </FormControl>
@@ -278,10 +276,7 @@ export default function ProfileForm({ user }: { user: UserProfile }) {
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue
-                          placeholder="Select vocal fach"
-                          className="capitalize"
-                        />
+                        <SelectValue placeholder="Select vocal fach" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -311,10 +306,7 @@ export default function ProfileForm({ user }: { user: UserProfile }) {
                       onChange={(selected) =>
                         field.onChange(getValuesFromOptions(selected))
                       }
-                      placeholder="Select or type to add genres"
-                      creatable
-                      className="capitalize"
-                      dropdownClassName="capitalize"
+                      placeholder="Select genres"
                     />
                   </FormControl>
                   <FormMessage />
