@@ -1,4 +1,13 @@
-import { Calendar, Eye, Globe, Lock } from "lucide-react";
+import {
+  Calendar,
+  Clock,
+  Eye,
+  Globe,
+  Lock,
+  MapPin,
+  User,
+  Users,
+} from "lucide-react";
 import {
   Card,
   CardContent,
@@ -126,23 +135,56 @@ export default function MassSelectionCard({
           </div>
         )}
       </CardContent>
-      <CardFooter className="border-t flex flex-col gap-1">
+      <CardFooter className="border-t border-border/50 flex flex-col gap-1">
         {publicView && (
-          <div className="flex items-center w-full justify-between text-xs text-muted-foreground">
-            <span>
-              by {selection.createdBy.name || selection.createdBy.email}
-            </span>
-            <span>Updated: {formatDate(selection.updatedAt)}</span>
+          <div className="grid grid-cols-2 gap-4 text-xs w-full">
+            <div className="flex items-start gap-2 min-w-0">
+              <User className="h-3.5 w-3.5 text-muted-foreground shrink-0 mt-0.5" />
+              <div className="min-w-0">
+                <p className="text-muted-foreground text-xs">Created by</p>
+                <p className="font-medium text-foreground truncate">
+                  {selection.createdBy.name || selection.createdBy.email}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-start gap-2 min-w-0">
+              <Clock className="h-3.5 w-3.5 text-muted-foreground shrink-0 mt-0.5" />
+              <div className="min-w-0">
+                <p className="text-muted-foreground text-xs">Last Updated</p>
+                <p className="font-medium text-foreground text-xs">
+                  {formatDate(selection.updatedAt)}
+                </p>
+              </div>
+            </div>
           </div>
         )}
-        <div className="flex items-center w-full justify-between text-xs text-muted-foreground gap-5">
-          <span>for {selection.choirName || "Unnamed Choir"}</span>
-          <span className="text-right">
-            {selection.parishName && selection.parishLocation
-              ? "Parish: "
-              : "Parish In: "}
-            {formatParishInfo(selection.parishLocation, selection.parishName)}
-          </span>
+
+        <div className="grid grid-cols-2 gap-4 text-xs">
+          <div className="flex items-start gap-2 min-w-0">
+            <Users className="h-3.5 w-3.5 text-muted-foreground shrink-0 mt-0.5" />
+            <div className="min-w-0">
+              <p className="text-muted-foreground text-xs">For</p>
+              <p className="font-medium text-foreground truncate">
+                {selection.choirName || "Unnamed Choir"}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-start gap-2 min-w-0">
+            <MapPin className="h-3.5 w-3.5 text-muted-foreground shrink-0 mt-0.5" />
+            <div className="min-w-0">
+              <p className="text-muted-foreground text-xs">
+                {selection.parishName && selection.parishLocation
+                  ? "Parish: "
+                  : "Parish In: "}
+              </p>
+              <p className="font-medium text-foreground truncate">
+                {formatParishInfo(
+                  selection.parishLocation,
+                  selection.parishName
+                )}
+              </p>
+            </div>
+          </div>
         </div>
       </CardFooter>
     </Card>
