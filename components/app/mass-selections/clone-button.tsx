@@ -52,6 +52,7 @@ export default function CloneButton({
       onClick={handleClone}
       disabled={isCloning}
       className={className}
+      title="Crete your own selection from this"
     >
       {isCloning ? (
         <Loader2 className="mr-2 h-4 w-4 animate-spin" />

@@ -39,7 +39,7 @@ export default function Options({
           </Link>
         </DropdownMenuItem>
         {isOwner && (
-          <DropdownMenuItem asChild>
+          <DropdownMenuItem title="Make changes to this selection" asChild>
             <Link href={`/liturgical-selections/${selection.id}/edit`}>
               <Edit className="mr-2 h-4 w-4" />
               Edit
