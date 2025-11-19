@@ -49,13 +49,10 @@ export function MassPartForm({ index, control, partNames }: MassPartFormProps) {
                   options={partNames}
                   placeholder="Select or type part name..."
                   className={cn(
-                    "capitalize",
                     fieldState.invalid
                       ? "ring-destructive/20 dark:ring-destructive/40 border-destructive"
                       : ""
                   )}
-                  dropdownClassName="capitalize"
-                  inputProps={{ className: "capitalize" }}
                   creatable
                 />
               </FormControl>

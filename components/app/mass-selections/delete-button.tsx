@@ -46,6 +46,7 @@ export default function DeleteButton({
       onClick={handleDelete}
       disabled={isDeleting}
       className={className}
+      title="Delete this selection"
     >
       {isDeleting ? (
         <Loader2 className="mr-2 h-4 w-4 animate-spin" />

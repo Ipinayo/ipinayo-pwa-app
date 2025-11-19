@@ -197,11 +197,7 @@ export default async function ProfilePage() {
                 <div className="flex flex-wrap gap-2">
                   {userProfile.instruments.length > 0 ? (
                     userProfile.instruments.map((instrument) => (
-                      <Badge
-                        key={instrument}
-                        variant="secondary"
-                        className="capitalize"
-                      >
+                      <Badge key={instrument} variant="secondary">
                         {instrument}
                       </Badge>
                     ))
@@ -217,7 +213,7 @@ export default async function ProfilePage() {
                 <p className="text-sm font-medium text-muted-foreground">
                   Vocal Fach
                 </p>
-                <p className="text-base capitalize">
+                <p className="text-base">
                   {userProfile.vocalFach || "Not specified"}
                 </p>
               </div>
@@ -230,11 +226,7 @@ export default async function ProfilePage() {
                 <div className="flex flex-wrap gap-2">
                   {userProfile.favoriteGenres.length > 0 ? (
                     userProfile.favoriteGenres.map((genre) => (
-                      <Badge
-                        key={genre}
-                        variant="outline"
-                        className="capitalize"
-                      >
+                      <Badge key={genre} variant="outline">
                         <Heart className="h-3 w-3 mr-1" />
                         {genre}
                       </Badge>

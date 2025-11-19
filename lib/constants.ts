@@ -237,147 +237,147 @@ export const vocalFachOptions = [
 
 export const instrumentOptions = [
     {
-        "name": "woodwind",
+        "name": "Woodwind",
         "children": [
             {
-                "name": "clarinet",
+                "name": "Clarinet",
                 "children": []
             },
             {
-                "name": "saxophone",
+                "name": "Saxophone",
                 "children": []
             },
             {
-                "name": "oboe",
+                "name": "Oboe",
                 "children": []
             },
             {
-                "name": "bassoon",
+                "name": "Bassoon",
                 "children": []
             },
             {
-                "name": "flute",
+                "name": "Flute",
                 "children": []
             }
         ]
     },
     {
-        "name": "percussion",
+        "name": "Percussion",
         "children": [
             {
-                "name": "tambourine",
+                "name": "Tambourine",
                 "children": []
             },
             {
-                "name": "xylophone",
+                "name": "Xylophone",
                 "children": []
             },
             {
-                "name": "cymbals",
+                "name": "Cymbals",
                 "children": []
             },
             {
-                "name": "drum",
+                "name": "Drum",
                 "children": []
             },
             {
-                "name": "triangle",
+                "name": "Triangle",
                 "children": []
             }
         ]
     },
     {
-        "name": "voice",
+        "name": "Voice",
         "children": [
             {
-                "name": "alto",
+                "name": "Alto",
                 "children": []
             },
             {
-                "name": "bass",
+                "name": "Bass",
                 "children": []
             },
             {
-                "name": "soprano",
+                "name": "Soprano",
                 "children": []
             },
             {
-                "name": "tenor",
+                "name": "Tenor",
                 "children": []
             }
         ]
     },
     {
-        "name": "strings",
+        "name": "Strings",
         "children": [
             {
-                "name": "double bass",
+                "name": "Double Bass",
                 "children": []
             },
             {
-                "name": "guitar",
+                "name": "Guitar",
                 "children": []
             },
             {
-                "name": "violin",
+                "name": "Violin",
                 "children": []
             },
             {
-                "name": "cello",
+                "name": "Cello",
                 "children": []
             },
             {
-                "name": "viola",
+                "name": "Viola",
                 "children": []
             },
             {
-                "name": "harp",
+                "name": "Harp",
                 "children": []
             }
         ]
     },
     {
-        "name": "brass",
+        "name": "Brass",
         "children": [
             {
-                "name": "french horn",
+                "name": "French Horn",
                 "children": []
             },
             {
-                "name": "tuba",
+                "name": "Tuba",
                 "children": []
             },
             {
-                "name": "trumpet",
+                "name": "Trumpet",
                 "children": []
             },
             {
-                "name": "trombone",
+                "name": "Trombone",
                 "children": []
             },
             {
-                "name": "euphonium",
+                "name": "Euphonium",
                 "children": []
             }
         ]
     },
     {
-        "name": "keyboards",
+        "name": "Keyboards",
         "children": [
             {
-                "name": "harpsichord",
+                "name": "Harpsichord",
                 "children": []
             },
             {
-                "name": "piano",
+                "name": "Piano",
                 "children": []
             },
             {
-                "name": "organ",
+                "name": "Organ",
                 "children": []
             },
             {
-                "name": "accordion",
+                "name": "Accordion",
                 "children": []
             }
         ]
@@ -385,17 +385,17 @@ export const instrumentOptions = [
 ]
 
 export const genreOptions = [
-    "contemporary liturgical",
-    "liturgical canticle",
-    "gospel",
-    "antiphon",
-    "oratorios",
-    "chant",
-    "polyphony",
-    "contemporary classical",
-    "hymn",
-    "children",
-    "motet",
-    "gregorian chant",
-    "classical"
+    "Contemporary Liturgical",
+    "Liturgical Canticle",
+    "Gospel",
+    "Antiphon",
+    "Oratorios",
+    "Chant",
+    "Polyphony",
+    "Contemporary Classical",
+    "Hymn",
+    "Children",
+    "Motet",
+    "Gregorian Chant",
+    "Classical"
 ]
