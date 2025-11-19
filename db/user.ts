@@ -1,6 +1,5 @@
-import { capitalize, convertToLowerCase } from "@/lib/utils";
-
 import { UpdateUserProfile } from "@/types/utils";
+import { capitalize } from "@/lib/utils";
 import prisma from "@/lib/prisma";
 
 export async function createUserProfile(userId: string) {
@@ -47,8 +46,6 @@ export async function updateUserProfile(userId: string, updates: UpdateUserProfi
         where: { userId },
         data: {
             ...data,
-            instruments: convertToLowerCase(instruments || []),
-            favoriteGenres: convertToLowerCase(favoriteGenres || []),
 
             // Handle location update
             ...(parishLocation && parishLocation.country && {

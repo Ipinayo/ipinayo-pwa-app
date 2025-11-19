@@ -137,7 +137,7 @@ export default function MassSelectionCard({
         )}
         <div className="flex items-center w-full justify-between text-xs text-muted-foreground gap-5">
           <span>for {selection.choirName || "Unnamed Choir"}</span>
-          <span className="capitalize text-right">
+          <span className="text-right">
             {selection.parishName && selection.parishLocation
               ? "Parish: "
               : "Parish In: "}
