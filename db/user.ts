@@ -46,6 +46,8 @@ export async function updateUserProfile(userId: string, updates: UpdateUserProfi
         where: { userId },
         data: {
             ...data,
+            instruments: instruments ? { set: instruments } : undefined,
+            favoriteGenres: favoriteGenres ? { set: favoriteGenres } : undefined,
 
             // Handle location update
             ...(parishLocation && parishLocation.country && {
@@ -95,6 +97,8 @@ export async function findUser(userId: string) {
     });
 }
 
+// Add parish and choir info only if they don't exist
+// Using COALESCE to avoid overwriting existing data
 export async function addParishAndChoirInfoToUserProfile(
     userId: string,
     locationId?: string | null,
