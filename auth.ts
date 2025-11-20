@@ -28,6 +28,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     events: {
         async createUser({ user }) {
             await createUserProfile(user.id);
-        },
-    },
+        }
+    }
 });
