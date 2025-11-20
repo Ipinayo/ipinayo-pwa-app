@@ -270,6 +270,7 @@ export async function saveSelection(selection: NewMassSelection, userId: string)
         data
     })
 
+    // Attempt update of user profile with parish and choir info if not already set
     addParishAndChoirInfoToUserProfile(userId, createdSelection.parishLocationId, createdSelection.choirName, createdSelection.parishName);
 
     return createdSelection;
