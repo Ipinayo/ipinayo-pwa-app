@@ -174,6 +174,11 @@ export function getFieldError(err: any): string {
 
 // Date formatting utilities
 
+/**
+ *  Formats timestamps in user's timezone (for createdAt/updatedAt)
+ * @param date 
+ * @returns date string in PPP format
+ */
 export const formatDate = (date: string | Date) => {
   if (!date) return '';
 
@@ -182,12 +187,22 @@ export const formatDate = (date: string | Date) => {
   return formatInTimeZone(date, userTimezone, 'PPP', { locale: enGB })
 };
 
+/** 
+ * Formats calendar dates in UTC (for liturgical selection dates)
+ * @param date 
+ * @returns date string in PPP format
+ */
 export const formatCalendarDate = (date: string | Date) => {
   if (!date) return '';
 
   return formatInTimeZone(date, 'UTC', 'PPP', { locale: enGB });
 };
 
-export function normalizeDate(d: Date) {
-  return new Date((Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())));
+/**
+ * Normalizes dates to UTC midnight before database storage
+ * @param date 
+ * @returns date at UTC midnight
+ */
+export function normalizeDate(date: Date) {
+  return new Date((Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())));
 }
