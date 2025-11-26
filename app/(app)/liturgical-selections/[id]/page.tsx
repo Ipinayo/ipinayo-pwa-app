@@ -1,4 +1,4 @@
-import { Calendar, Globe, Lock, Music, User } from "lucide-react";
+import { Calendar, Globe, Lock, Music } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
@@ -8,7 +8,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { formatDate, formatParishInfo, getLabelForValue } from "@/lib/utils";
+import {
+  formatCalendarDate,
+  formatDate,
+  formatParishInfo,
+  getLabelForValue,
+} from "@/lib/utils";
 import { keySignatureItems, liturgicalSeasonItems } from "@/lib/constants";
 
 import BackButton from "@/components/common/back-button";
@@ -55,7 +60,7 @@ export default async function ViewPage(props: { params: Params }) {
           <div className="flex flex-wrap w-full items-center gap-4 text-muted-foreground">
             <div className="flex items-center gap-1">
               <Calendar className="h-4 w-4" />
-              {formatDate(selection.date)}
+              {formatCalendarDate(selection.date)}
             </div>
             <div className="flex items-center gap-1">
               <Music className="h-4 w-4" />
