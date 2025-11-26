@@ -204,5 +204,5 @@ export const formatCalendarDate = (date: string | Date) => {
  * @returns date at UTC midnight
  */
 export function normalizeDate(date: Date) {
-  return new Date((Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())));
+  return new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
 }
