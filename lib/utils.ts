@@ -175,7 +175,7 @@ export function getFieldError(err: any): string {
 // Date formatting utilities
 
 /**
- *  Formats timestamps in user's timezone (for createdAt/updatedAt)
+ * Formats timestamps in user's timezone (for createdAt/updatedAt)
  * @param date 
  * @returns date string in PPP format
  */
