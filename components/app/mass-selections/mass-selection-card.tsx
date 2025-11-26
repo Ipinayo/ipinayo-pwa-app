@@ -15,7 +15,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { formatDate, formatParishInfo, getLabelForValue } from "@/lib/utils";
+import {
+  formatCalendarDate,
+  formatDate,
+  formatParishInfo,
+  getLabelForValue,
+} from "@/lib/utils";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -55,7 +60,7 @@ export default function MassSelectionCard({
         </div>
         <div className="text-muted-foreground flex items-center gap-2 text-sm">
           <Calendar className="h-4 w-4" />
-          {formatDate(selection.date)}
+          {formatCalendarDate(selection.date)}
         </div>
       </CardHeader>
 
@@ -159,7 +164,7 @@ export default function MassSelectionCard({
           </div>
         )}
 
-        <div className="grid grid-cols-2 gap-4 text-xs">
+        <div className="grid grid-cols-2 gap-4 text-xs w-full">
           <div className="flex items-start gap-2 min-w-0">
             <Users className="h-3.5 w-3.5 text-muted-foreground shrink-0 mt-0.5" />
             <div className="min-w-0">

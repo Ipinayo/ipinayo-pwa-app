@@ -1,5 +1,5 @@
 import { PDFDocument, PDFPage, StandardFonts, rgb } from "pdf-lib"
-import { capitalize, formatDate, formatParishInfo, getLabelForValue } from "./utils"
+import { capitalize, formatCalendarDate, formatDate, formatParishInfo, getLabelForValue } from "./utils"
 import { keySignatureItems, liturgicalSeasonItems } from "./constants"
 
 import { GenerateMassSelection } from "@/types/models"
@@ -198,7 +198,7 @@ export async function generateMassSelectionPDF(selection: GenerateMassSelection,
 
   // Liturgical information section
   const liturgicalInfoItems = [
-    { label: "Date", value: formatDate(selection.date) },
+    { label: "Date", value: formatCalendarDate(selection.date) },
     ...(selection.liturgicalYear
       ? [{ label: "Liturgical Year", value: `Year ${selection.liturgicalYear}` }]
       : []

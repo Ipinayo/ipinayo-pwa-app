@@ -89,7 +89,7 @@ model UserProfile {
 model MassSelection {
   id               String            @id @default(cuid())
   title            String
-  date             DateTime
+  date             DateTime          @db.Date
   liturgicalYear   LiturgicalYear?
   liturgicalSeason LiturgicalSeason?
   liturgy          String?

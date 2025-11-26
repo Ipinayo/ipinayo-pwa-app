@@ -37,6 +37,7 @@ import {
 import {
   getEnum,
   getValuesFromOptions,
+  normalizeDate,
   transformStringsToOptions,
 } from "@/lib/utils";
 import {
@@ -248,6 +249,8 @@ export default function SaveForm(props: SaveFormProps) {
   const { mode } = props;
 
   const handleSubmit = async (data: NewMassSelection) => {
+    data.date = normalizeDate(data.date);
+
     if (mode === "edit") {
       const { selection } = props;
       await withToast(() => updateSelection(selection.id, data), {

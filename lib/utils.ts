@@ -1,8 +1,8 @@
 import { clsx, type ClassValue } from "clsx"
 import { ReadonlyURLSearchParams } from "next/navigation";
 import { twMerge } from "tailwind-merge"
-import { format } from "date-fns";
 import { enGB } from "date-fns/locale";
+import { formatInTimeZone } from 'date-fns-tz';
 import { Location } from "@/types/models";
 import { SelectOption } from "@/types/components/select";
 
@@ -54,12 +54,6 @@ export function getEnum<T extends Record<string, string>>(
 
   return undefined;
 }
-
-export const formatDate = (date: string | Date) => {
-  if (!date) return '';
-
-  return format(date, 'PPP', { locale: enGB })
-};
 
 export function getLabelForValue(
   items: { label: string; value: string }[],
@@ -176,4 +170,24 @@ export function getFieldError(err: any): string {
   if (!Array.isArray(err)) return err?.message ?? '';
   const first = err.find(item => item && item.message);
   return first?.message ?? '';
+}
+
+// Date formatting utilities
+
+export const formatDate = (date: string | Date) => {
+  if (!date) return '';
+
+  const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone; // Browser timezone
+
+  return formatInTimeZone(date, userTimezone, 'PPP', { locale: enGB })
+};
+
+export const formatCalendarDate = (date: string | Date) => {
+  if (!date) return '';
+
+  return formatInTimeZone(date, 'UTC', 'PPP', { locale: enGB });
+};
+
+export function normalizeDate(d: Date) {
+  return new Date((Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())));
 }
