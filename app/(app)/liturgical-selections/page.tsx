@@ -15,7 +15,7 @@ import SearchBar from "@/components/common/search-bar";
 import SortFilter from "@/components/app/mass-selections/sort-filter";
 import { Suspense } from "react";
 import { getEnumByValue } from "@/lib/utils";
-import { getFilterPreferences } from "@/lib/actions/cookies";
+import { getFilterPreferences } from "@/lib/actions/filter";
 
 const seasons = [
   { label: "All Seasons", value: "all" },

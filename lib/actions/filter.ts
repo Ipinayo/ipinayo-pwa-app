@@ -18,7 +18,7 @@ const FILTER_CONFIGS: Record<string, FilterConfig> = {
     }
 };
 
-export async function saveFilterPreferences(
+export async function saveSortPreferences(
     filterType: keyof typeof FILTER_CONFIGS,
     sortBy: string,
     order: string

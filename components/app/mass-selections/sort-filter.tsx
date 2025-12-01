@@ -5,7 +5,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import AppFilter from "@/components/common/app-filter";
 import { createQueryString } from "@/lib/utils";
-import { saveFilterPreferences } from "@/lib/actions/cookies";
+import { saveSortPreferences } from "@/lib/actions/filter";
 import { useCallback } from "react";
 
 const items = [
@@ -35,7 +35,7 @@ export default function SortFilter({
       const [sort_by, order] = value.split("-");
 
       // Save to cookies via server action
-      await saveFilterPreferences(filterType, sort_by, order);
+      await saveSortPreferences(filterType, sort_by, order);
 
       router.push(
         `${pathname}?${createQueryString(
