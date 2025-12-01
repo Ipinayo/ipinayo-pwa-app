@@ -35,7 +35,7 @@ export default function Pagination({
       totalPages={totalPages}
       className={className}
       onPageChange={async (number) =>
-        await saveQueryFilterPreferences(filterType, "page", number?.toString())
+        await saveQueryFilterPreferences(filterType, "page", number.toString())
       }
     />
   );
