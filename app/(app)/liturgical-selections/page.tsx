@@ -11,7 +11,7 @@ import MassSelectionList from "@/components/app/mass-selections/mass-selection-l
 import MassSelectionListSkeleton from "@/components/app/mass-selections/mass-selection-list/index-skeleton";
 import { Plus } from "lucide-react";
 import QueryFilter from "@/components/common/query-filter";
-import SearchBar from "@/components/common/search-bar";
+import Search from "@/components/app/mass-selections/search";
 import SortFilter from "@/components/app/mass-selections/sort-filter";
 import { Suspense } from "react";
 import { getEnumByValue } from "@/lib/utils";
@@ -32,7 +32,7 @@ export default async function MassSelectionsPage(props: {
   const savedPreferences = await getFilterPreferences("selections");
 
   const page = Number(filters["page"]) || Number(savedPreferences.page) || 1;
-  const query = filters["query"] || "";
+  const query = filters["query"] || savedPreferences.query;
   const season =
     getEnumByValue(LiturgicalSeason, filters["season"] || "") ||
     getEnumByValue(LiturgicalSeason, savedPreferences.season || "");
@@ -71,7 +71,7 @@ export default async function MassSelectionsPage(props: {
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-4 mb-6">
-        <SearchBar placeholder="Search selections..." />
+        <Search query={query} placeholder="Search selections..." />
         <div className="flex gap-2">
           <QueryFilter
             filterType="selections"
