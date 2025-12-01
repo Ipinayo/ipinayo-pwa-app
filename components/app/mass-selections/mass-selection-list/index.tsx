@@ -9,15 +9,17 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import MassSelectionCard from "../mass-selection-card";
 import { MassSelectionFilter } from "@/types/utils";
-import { UrlPagination } from "@/components/common/url-pagination";
+import Pagination from "../pagination";
 import { cn } from "@/lib/utils";
 
 type MassSelectionListProps = MassSelectionFilter & {
+  filterType: "selections" | "dashboard";
   userOnly?: boolean;
   className?: string;
 };
 
 export default async function MassSelectionList({
+  filterType,
   userOnly = false,
   className,
   ...filter
@@ -76,7 +78,8 @@ export default async function MassSelectionList({
       </div>
 
       <div className="mt-8">
-        <UrlPagination
+        <Pagination
+          filterType={filterType}
           currentPage={selectionsPage.page}
           totalPages={selectionsPage.pages}
         />
