@@ -36,7 +36,7 @@ export function UrlPagination({
         )}`
       );
     },
-    [pathname, router, searchParams]
+    [pathname, router, searchParams, onPageChange]
   );
 
   return (
