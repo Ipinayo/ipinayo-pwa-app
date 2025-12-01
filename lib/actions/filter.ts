@@ -34,8 +34,8 @@ export async function saveSortPreferences(
     order: string
 ) {
     const config = FILTER_CONFIGS[filterType];
-    setCookie(`${config.storageKey}_sb`, sortBy, config.path);
-    setCookie(`${config.storageKey}_so`, order, config.path);
+    await setCookie(`${config.storageKey}_sb`, sortBy, config.path);
+    await setCookie(`${config.storageKey}_so`, order, config.path);
 }
 
 export async function saveQueryFilterPreferences(
