@@ -33,7 +33,7 @@ export default function QueryFilter({
         )}`
       );
     },
-    [pathname, router, searchParams]
+    [pathname, router, searchParams, filterType, queryName]
   );
 
   return (
