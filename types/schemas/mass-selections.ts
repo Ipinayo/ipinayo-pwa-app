@@ -46,3 +46,6 @@ export const createMassSelectionSchema = z.object({
 export const updateMassSelectionSchema = createMassSelectionSchema.partial().extend({
     parts: z.array(massSelectionPartSchema).min(1, "At least one part is required").optional(),
 });
+
+
+export type DraftMassSelection = z.infer<typeof draftMassSelectionSchema>;
