@@ -16,17 +16,18 @@ datasource db {
 }
 
 model User {
-  id            String          @id @default(cuid())
-  name          String?
-  email         String          @unique
-  emailVerified DateTime?
-  image         String?
-  accounts      Account[]
-  sessions      Session[]
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
-  profile       UserProfile?
-  selections    MassSelection[]
+  id                  String               @id @default(cuid())
+  name                String?
+  email               String               @unique
+  emailVerified       DateTime?
+  image               String?
+  accounts            Account[]
+  sessions            Session[]
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  profile             UserProfile?
+  selections          MassSelection[]
+  massSelectionDrafts MassSelectionDraft[]
 }
 
 model Account {
@@ -127,27 +128,53 @@ model MassPart {
 }
 
 model Theme {
-  id             String          @id @default(cuid())
-  name           String          @unique
-  massSelections MassSelection[]
+  id                   String              @id @default(cuid())
+  name                 String              @unique
+  massSelections       MassSelection[]
+  massSelectionDraft   MassSelectionDraft? @relation(fields: [massSelectionDraftId], references: [id])
+  massSelectionDraftId String?
 }
 
 model Location {
-  id             String          @id @default(cuid())
-  country        String
-  countryCode    String?
-  state          String          @default("")
-  stateCode      String?
-  city           String          @default("")
-  latitude       Float?
-  longitude      Float?
-  timezone       String?
-  massSelections MassSelection[]
-  userProfiles   UserProfile[]
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
+  id                  String               @id @default(cuid())
+  country             String
+  countryCode         String?
+  state               String               @default("")
+  stateCode           String?
+  city                String               @default("")
+  latitude            Float?
+  longitude           Float?
+  timezone            String?
+  massSelections      MassSelection[]
+  userProfiles        UserProfile[]
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  massSelectionDrafts MassSelectionDraft[]
 
   @@unique([country, state, city])
+}
+
+model MassSelectionDraft {
+  id               String            @id @default(cuid())
+  title            String
+  date             DateTime?         @db.Date
+  liturgicalYear   LiturgicalYear?
+  liturgicalSeason LiturgicalSeason?
+  liturgy          String?
+  themes           Theme[]
+  pastoralFocus    String?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  isPublic         Boolean           @default(false)
+  parishName       String?
+  choirName        String?
+  parishLocationId String?
+  createdById      String
+  createdBy        User              @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  parts            Json              @default("[]")
+  parishLocation   Location?         @relation(fields: [parishLocationId], references: [id], onDelete: SetNull)
+
+  @@index([createdById])
 }
 
 enum KeySignature {
