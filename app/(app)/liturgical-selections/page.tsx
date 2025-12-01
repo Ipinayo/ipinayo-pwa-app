@@ -71,7 +71,7 @@ export default async function MassSelectionsPage(props: {
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-4 mb-6">
-        <Search query={query} placeholder="Search selections..." />
+        <Search filterType="selections" query={query} placeholder="Search selections..." />
         <div className="flex gap-2">
           <QueryFilter
             filterType="selections"

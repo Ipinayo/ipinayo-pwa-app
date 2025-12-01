@@ -19,7 +19,14 @@ export default function Pagination({
 }: PaginationProps) {
   useEffect(() => {
     // Save current page to cookies on mount
-    saveQueryFilterPreferences(filterType, "page", currentPage.toString());
+    const saveSearchPagination = async () => {
+      await saveQueryFilterPreferences(
+        filterType,
+        "page",
+        currentPage.toString()
+      );
+    };
+    saveSearchPagination();
   }, []);
 
   return (

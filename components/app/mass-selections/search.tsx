@@ -5,16 +5,18 @@ import { saveQueryFilterPreferences } from "@/lib/actions/filter";
 import { useEffect } from "react";
 
 export default function Search({
+  filterType,
   query,
   placeholder,
 }: {
+  filterType: "selections" | "dashboard";
   query?: string;
   placeholder?: string;
 }) {
   useEffect(() => {
     // Save current search query to cookies on mount
     const saveSearchQuery = async () => {
-      if (query) await saveQueryFilterPreferences("selections", "query", query);
+      if (query) await saveQueryFilterPreferences(filterType, "query", query);
     };
     saveSearchQuery();
   }, []);
@@ -24,7 +26,7 @@ export default function Search({
       query={query}
       placeholder={placeholder}
       onSearch={async (term) =>
-        await saveQueryFilterPreferences("selections", "query", term)
+        await saveQueryFilterPreferences(filterType, "query", term)
       }
     />
   );
