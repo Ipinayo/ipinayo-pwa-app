@@ -1,0 +1,35 @@
+"use client";
+
+import { UrlPagination } from "@/components/common/url-pagination";
+import { saveQueryFilterPreferences } from "@/lib/actions/filter";
+import { useEffect } from "react";
+
+interface PaginationProps {
+  filterType: "selections" | "dashboard";
+  currentPage: number;
+  totalPages: number;
+  className?: string;
+}
+
+export default function Pagination({
+  filterType,
+  currentPage,
+  totalPages,
+  className,
+}: PaginationProps) {
+  useEffect(() => {
+    // Save current page to cookies on mount
+    saveQueryFilterPreferences(filterType, "page", currentPage.toString());
+  }, []);
+
+  return (
+    <UrlPagination
+      currentPage={currentPage}
+      totalPages={totalPages}
+      className={className}
+      onPageChange={async (number) =>
+        await saveQueryFilterPreferences(filterType, "page", number?.toString())
+      }
+    />
+  );
+}

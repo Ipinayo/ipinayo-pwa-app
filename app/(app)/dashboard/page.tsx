@@ -202,6 +202,7 @@ export default async function DashboardPage(props: {
             key={searchKey}
           >
             <MassSelectionList
+              filterType="dashboard"
               query={query}
               year={year}
               season={season}

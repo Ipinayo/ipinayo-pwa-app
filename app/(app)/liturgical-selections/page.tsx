@@ -31,7 +31,7 @@ export default async function MassSelectionsPage(props: {
   // Get saved preferences from cookies
   const savedPreferences = await getFilterPreferences("selections");
 
-  const page = Number(filters["page"]) || 1;
+  const page = Number(filters["page"]) || Number(savedPreferences.page) || 1;
   const query = filters["query"] || "";
   const season =
     getEnumByValue(LiturgicalSeason, filters["season"] || "") ||
@@ -91,6 +91,7 @@ export default async function MassSelectionsPage(props: {
 
       <Suspense fallback={<MassSelectionListSkeleton />} key={searchKey}>
         <MassSelectionList
+          filterType="selections"
           query={query}
           year={year}
           season={season}
