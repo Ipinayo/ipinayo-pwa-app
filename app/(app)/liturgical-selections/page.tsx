@@ -33,8 +33,12 @@ export default async function MassSelectionsPage(props: {
 
   const page = Number(filters["page"]) || 1;
   const query = filters["query"] || "";
-  const season = getEnumByValue(LiturgicalSeason, filters["season"] || "");
-  const year = getEnumByValue(LiturgicalYear, filters["year"] || "");
+  const season =
+    getEnumByValue(LiturgicalSeason, filters["season"] || "") ||
+    getEnumByValue(LiturgicalSeason, savedPreferences.season || "");
+  const year =
+    getEnumByValue(LiturgicalYear, filters["year"] || "") ||
+    getEnumByValue(LiturgicalYear, savedPreferences.year || "");
   const sort_by =
     getEnumByValue(SortBy, filters["sort_by"] || "") ||
     getEnumByValue(SortBy, savedPreferences.sortBy || "") ||
@@ -70,11 +74,13 @@ export default async function MassSelectionsPage(props: {
         <SearchBar placeholder="Search selections..." />
         <div className="flex gap-2">
           <QueryFilter
+            filterType="selections"
             selected={season ?? "all"}
             queryName={"season"}
             items={seasons}
           />
           <QueryFilter
+            filterType="selections"
             selected={year ?? "all"}
             queryName={"year"}
             items={years}

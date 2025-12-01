@@ -41,6 +41,30 @@ export async function saveSortPreferences(
     });
 }
 
+export async function saveQueryFilterPreferences(
+    filterType: keyof typeof FILTER_CONFIGS,
+    queryName: "season" | "year",
+    value: string
+) {
+    const config = FILTER_CONFIGS[filterType];
+    const cookieStore = await cookies();
+
+    if (queryName === "year")
+        cookieStore.set(`${config.storageKey}_yr`, value, {
+            path: config.path,
+            maxAge: 60 * 60 * 24 * 365,
+            sameSite: 'lax',
+            httpOnly: false,
+        });
+    else
+        cookieStore.set(`${config.storageKey}_ss`, value, {
+            path: config.path,
+            maxAge: 60 * 60 * 24 * 365,
+            sameSite: 'lax',
+            httpOnly: false,
+        });
+}
+
 export async function getFilterPreferences(filterType: keyof typeof FILTER_CONFIGS) {
     const config = FILTER_CONFIGS[filterType];
     const cookieStore = await cookies();
@@ -48,5 +72,7 @@ export async function getFilterPreferences(filterType: keyof typeof FILTER_CONFI
     return {
         sortBy: cookieStore.get(`${config.storageKey}_sb`)?.value,
         order: cookieStore.get(`${config.storageKey}_so`)?.value,
+        year: cookieStore.get(`${config.storageKey}_yr`)?.value,
+        season: cookieStore.get(`${config.storageKey}_ss`)?.value,
     };
 }

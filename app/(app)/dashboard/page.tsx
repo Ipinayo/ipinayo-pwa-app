@@ -176,11 +176,13 @@ export default async function DashboardPage(props: {
             <SearchBar placeholder="Search selections..." />
             <div className="flex flex-col xs:flex-row gap-2">
               <QueryFilter
+                filterType="dashboard"
                 selected={season ?? "all"}
                 queryName={"season"}
                 items={seasons}
               />
               <QueryFilter
+                filterType="dashboard"
                 selected={year ?? "all"}
                 queryName={"year"}
                 items={years}
