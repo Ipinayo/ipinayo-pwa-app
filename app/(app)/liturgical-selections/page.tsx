@@ -15,6 +15,7 @@ import SearchBar from "@/components/common/search-bar";
 import SortFilter from "@/components/app/mass-selections/sort-filter";
 import { Suspense } from "react";
 import { getEnumByValue } from "@/lib/utils";
+import { getFilterPreferences } from "@/lib/actions/cookies";
 
 const seasons = [
   { label: "All Seasons", value: "all" },
@@ -27,12 +28,21 @@ export default async function MassSelectionsPage(props: {
 }) {
   const filters = await props.searchParams;
 
+  // Get saved preferences from cookies
+  const savedPreferences = await getFilterPreferences("selections");
+
   const page = Number(filters["page"]) || 1;
   const query = filters["query"] || "";
   const season = getEnumByValue(LiturgicalSeason, filters["season"] || "");
   const year = getEnumByValue(LiturgicalYear, filters["year"] || "");
-  const sort_by = getEnumByValue(SortBy, filters["sort_by"] || "");
-  const order = getEnumByValue(SortOrder, filters["order"] || "");
+  const sort_by =
+    getEnumByValue(SortBy, filters["sort_by"] || "") ||
+    getEnumByValue(SortBy, savedPreferences.sortBy || "") ||
+    SortBy.DATE;
+  const order =
+    getEnumByValue(SortOrder, filters["order"] || "") ||
+    getEnumByValue(SortOrder, savedPreferences.order || "") ||
+    SortOrder.DESC;
 
   const searchKey = [page, query, season, year].join("-");
 
@@ -69,7 +79,7 @@ export default async function MassSelectionsPage(props: {
             queryName={"year"}
             items={years}
           />
-          <SortFilter sortBy={sort_by} order={order} />
+          <SortFilter filterType="selections" sortBy={sort_by} order={order} />
         </div>
       </div>
 
