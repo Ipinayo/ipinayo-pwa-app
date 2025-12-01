@@ -3,35 +3,41 @@
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import AppPagination from "../app-pagination";
+import { createQueryString } from "@/lib/utils";
+import { useCallback } from "react";
 
 interface UrlPaginationProps {
   currentPage: number;
   totalPages: number;
   className?: string;
+  onPageChange?:
+    | ((pageNumber: number) => void)
+    | ((pageNumber: number) => Promise<void>);
 }
 
 export function UrlPagination({
   currentPage,
   totalPages,
   className,
+  onPageChange,
 }: UrlPaginationProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const createPageURL = (pageNumber: number) => {
-    const params = new URLSearchParams(searchParams);
-    if (pageNumber === 1) {
-      params.delete("page");
-    } else {
-      params.set("page", pageNumber.toString());
-    }
-    return `${pathname}?${params.toString()}`;
-  };
+  const handlePageChange = useCallback(
+    async (pageNumber: number) => {
+      await onPageChange?.(pageNumber);
 
-  const handlePageChange = (pageNumber: number) => {
-    router.push(createPageURL(pageNumber));
-  };
+      router.push(
+        `${pathname}?${createQueryString(
+          { page: pageNumber.toString() },
+          searchParams
+        )}`
+      );
+    },
+    [pathname, router, searchParams, onPageChange]
+  );
 
   return (
     <AppPagination

@@ -15,11 +15,12 @@ import Link from "next/link";
 import MassSelectionList from "@/components/app/mass-selections/mass-selection-list";
 import MassSelectionListSkeleton from "@/components/app/mass-selections/mass-selection-list/index-skeleton";
 import QueryFilter from "@/components/common/query-filter";
-import SearchBar from "@/components/common/search-bar";
+import Search from "@/components/app/mass-selections/search";
 import SortFilter from "@/components/app/mass-selections/sort-filter";
 import { Suspense } from "react";
 import { auth } from "@/auth";
 import { getEnumByValue } from "@/lib/utils";
+import { getFilterPreferences } from "@/lib/actions/filter";
 import { getMassSelectionStats } from "@/lib/actions/mass-selections";
 import { redirect } from "next/navigation";
 
@@ -37,17 +38,29 @@ export default async function DashboardPage(props: {
   if (!session?.user) redirect("/signin");
 
   const filters = await props.searchParams;
+  const stats = await getMassSelectionStats();
 
-  const page = Number(filters["page"]) || 1;
-  const query = filters["query"] || "";
-  const season = getEnumByValue(LiturgicalSeason, filters["season"] || "");
-  const year = getEnumByValue(LiturgicalYear, filters["year"] || "");
-  const sort_by = getEnumByValue(SortBy, filters["sort_by"] || "");
-  const order = getEnumByValue(SortOrder, filters["order"] || "");
+  // Get saved preferences from cookies
+  const savedPreferences = await getFilterPreferences("dashboard");
+
+  const page = Number(filters["page"]) || Number(savedPreferences.page) || 1;
+  const query = filters["query"] || savedPreferences.query;
+  const season =
+    getEnumByValue(LiturgicalSeason, filters["season"] || "") ||
+    getEnumByValue(LiturgicalSeason, savedPreferences.season || "");
+  const year =
+    getEnumByValue(LiturgicalYear, filters["year"] || "") ||
+    getEnumByValue(LiturgicalYear, savedPreferences.year || "");
+  const sort_by =
+    getEnumByValue(SortBy, filters["sort_by"] || "") ||
+    getEnumByValue(SortBy, savedPreferences.sortBy || "") ||
+    SortBy.UPDATED_AT;
+  const order =
+    getEnumByValue(SortOrder, filters["order"] || "") ||
+    getEnumByValue(SortOrder, savedPreferences.order || "") ||
+    SortOrder.DESC;
 
   const searchKey = [page, query, season, year].join("-");
-
-  const stats = await getMassSelectionStats();
 
   return (
     <div className="max-w-full w-full">
@@ -173,19 +186,29 @@ export default async function DashboardPage(props: {
           </div>
 
           <div className="flex flex-col sm:flex-row gap-4 mb-6">
-            <SearchBar placeholder="Search selections..." />
+            <Search
+              filterType="dashboard"
+              query={query}
+              placeholder="Search my selections..."
+            />
             <div className="flex flex-col xs:flex-row gap-2">
               <QueryFilter
+                filterType="dashboard"
                 selected={season ?? "all"}
                 queryName={"season"}
                 items={seasons}
               />
               <QueryFilter
+                filterType="dashboard"
                 selected={year ?? "all"}
                 queryName={"year"}
                 items={years}
               />
-              <SortFilter sortBy={sort_by || SortBy.UPDATED_AT} order={order} />
+              <SortFilter
+                filterType="dashboard"
+                sortBy={sort_by}
+                order={order}
+              />
             </div>
           </div>
 
@@ -196,6 +219,7 @@ export default async function DashboardPage(props: {
             key={searchKey}
           >
             <MassSelectionList
+              filterType="dashboard"
               query={query}
               year={year}
               season={season}

@@ -11,10 +11,11 @@ import MassSelectionList from "@/components/app/mass-selections/mass-selection-l
 import MassSelectionListSkeleton from "@/components/app/mass-selections/mass-selection-list/index-skeleton";
 import { Plus } from "lucide-react";
 import QueryFilter from "@/components/common/query-filter";
-import SearchBar from "@/components/common/search-bar";
+import Search from "@/components/app/mass-selections/search";
 import SortFilter from "@/components/app/mass-selections/sort-filter";
 import { Suspense } from "react";
 import { getEnumByValue } from "@/lib/utils";
+import { getFilterPreferences } from "@/lib/actions/filter";
 
 const seasons = [
   { label: "All Seasons", value: "all" },
@@ -27,12 +28,25 @@ export default async function MassSelectionsPage(props: {
 }) {
   const filters = await props.searchParams;
 
-  const page = Number(filters["page"]) || 1;
-  const query = filters["query"] || "";
-  const season = getEnumByValue(LiturgicalSeason, filters["season"] || "");
-  const year = getEnumByValue(LiturgicalYear, filters["year"] || "");
-  const sort_by = getEnumByValue(SortBy, filters["sort_by"] || "");
-  const order = getEnumByValue(SortOrder, filters["order"] || "");
+  // Get saved preferences from cookies
+  const savedPreferences = await getFilterPreferences("selections");
+
+  const page = Number(filters["page"]) || Number(savedPreferences.page) || 1;
+  const query = filters["query"] || savedPreferences.query;
+  const season =
+    getEnumByValue(LiturgicalSeason, filters["season"] || "") ||
+    getEnumByValue(LiturgicalSeason, savedPreferences.season || "");
+  const year =
+    getEnumByValue(LiturgicalYear, filters["year"] || "") ||
+    getEnumByValue(LiturgicalYear, savedPreferences.year || "");
+  const sort_by =
+    getEnumByValue(SortBy, filters["sort_by"] || "") ||
+    getEnumByValue(SortBy, savedPreferences.sortBy || "") ||
+    SortBy.DATE;
+  const order =
+    getEnumByValue(SortOrder, filters["order"] || "") ||
+    getEnumByValue(SortOrder, savedPreferences.order || "") ||
+    SortOrder.DESC;
 
   const searchKey = [page, query, season, year].join("-");
 
@@ -57,24 +71,27 @@ export default async function MassSelectionsPage(props: {
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-4 mb-6">
-        <SearchBar placeholder="Search selections..." />
+        <Search filterType="selections" query={query} placeholder="Search selections..." />
         <div className="flex gap-2">
           <QueryFilter
+            filterType="selections"
             selected={season ?? "all"}
             queryName={"season"}
             items={seasons}
           />
           <QueryFilter
+            filterType="selections"
             selected={year ?? "all"}
             queryName={"year"}
             items={years}
           />
-          <SortFilter sortBy={sort_by} order={order} />
+          <SortFilter filterType="selections" sortBy={sort_by} order={order} />
         </div>
       </div>
 
       <Suspense fallback={<MassSelectionListSkeleton />} key={searchKey}>
         <MassSelectionList
+          filterType="selections"
           query={query}
           year={year}
           season={season}

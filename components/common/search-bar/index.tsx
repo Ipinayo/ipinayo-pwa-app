@@ -10,15 +10,20 @@ import { useCallback } from "react";
 
 export default function SearchBar({
   placeholder = "Search...",
+  query,
+  onSearch,
 }: {
   placeholder?: string;
+  query?: string;
+  onSearch?: ((term: string) => void) | ((term: string) => Promise<void>);
 }) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
   const debouncedSearch = useCallback(
-    debounce((term: string) => {
+    debounce(async (term: string) => {
+      await onSearch?.(term);
       router.push(
         `${pathname}?${createQueryString(
           { query: term, page: "1" },
@@ -35,7 +40,7 @@ export default function SearchBar({
       <Input
         placeholder={placeholder}
         type="text"
-        defaultValue={searchParams.get("query") ?? ""}
+        defaultValue={query ?? ""}
         onChange={(e) => debouncedSearch(e.target.value)}
         className="pl-10"
       />

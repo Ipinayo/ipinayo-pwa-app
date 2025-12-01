@@ -5,6 +5,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import AppFilter from "@/components/common/app-filter";
 import { createQueryString } from "@/lib/utils";
+import { saveSortPreferences } from "@/lib/actions/filter";
 import { useCallback } from "react";
 
 const items = [
@@ -17,9 +18,11 @@ const items = [
 ];
 
 export default function SortFilter({
+  filterType,
   sortBy = SortBy.DATE,
   order = SortOrder.DESC,
 }: {
+  filterType: "selections" | "dashboard";
   sortBy?: SortBy;
   order?: SortOrder;
 }) {
@@ -28,8 +31,12 @@ export default function SortFilter({
   const searchParams = useSearchParams();
 
   const onSelected = useCallback(
-    (value: string) => {
+    async (value: string) => {
       const [sort_by, order] = value.split("-");
+
+      // Save to cookies via server action
+      await saveSortPreferences(filterType, sort_by, order);
+
       router.push(
         `${pathname}?${createQueryString(
           { sort_by, order, page: "1" },
