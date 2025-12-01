@@ -74,7 +74,7 @@ import { withToast } from "@/lib/with-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import MassPartRow from "../mass-part-row";
 
-type SaveFormProps =
+type EditFormProps =
   | {
       mode: "create";
       template: string;
@@ -97,7 +97,7 @@ type SaveFormProps =
     };
 
 // Initialize default values
-const getDefaultValues = (props: SaveFormProps): NewMassSelection => {
+const getDefaultValues = (props: EditFormProps): NewMassSelection => {
   if (props.mode === "edit") {
     const { selection } = props;
     return {
@@ -146,7 +146,7 @@ const getDefaultValues = (props: SaveFormProps): NewMassSelection => {
   };
 };
 
-export default function SaveForm(props: SaveFormProps) {
+export default function EditForm(props: EditFormProps) {
   const router = useRouter();
 
   const sensors = useSensors(

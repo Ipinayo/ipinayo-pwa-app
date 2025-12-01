@@ -1,7 +1,7 @@
 import { getAllPartNames, getThemes } from "@/lib/actions/mass-selections";
 
 import BackButton from "@/components/common/back-button";
-import SaveForm from "@/components/app/mass-selections/save-form";
+import EditForm from "@/components/app/mass-selections/edit-selection";
 import { SearchParams } from "@/types/utils";
 import { auth } from "@/auth";
 import { getUserParishAndChoirInfo } from "@/lib/actions/user";
@@ -47,7 +47,7 @@ export default async function CreateMassSelectionPage(props: {
           </div>
         </div>
 
-        <SaveForm
+        <EditForm
           mode="create"
           template={template}
           themes={themes}

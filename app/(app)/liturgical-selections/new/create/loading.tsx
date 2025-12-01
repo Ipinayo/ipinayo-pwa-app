@@ -1,4 +1,4 @@
-import { SaveFormSkeleton } from "@/components/app/mass-selections/save-form/index-skeleton";
+import { SaveFormSkeleton } from "@/components/app/mass-selections/edit-selection/index-skeleton";
 
 export default function Loading() {
   return (
