@@ -16,9 +16,11 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import {
+  KeySignature,
   LiturgicalSeason,
   LiturgicalYear,
   Location,
+  MassSelectionDraft,
   MassSelectionWithParts,
   NewMassSelection,
 } from "@/types/models";
@@ -67,49 +69,73 @@ import { Input } from "@/components/ui/input";
 import LocationSelector from "@/components/common/location-selector";
 import MultipleSelector from "@/components/common/multiple-selector";
 import { Switch } from "@/components/ui/switch";
-import { createMassSelectionSchema } from "@/types/schemas/mass-selections";
+import {
+  createMassSelectionSchema,
+  DraftMassSelection,
+  draftMassSelectionSchema,
+} from "@/types/schemas/mass-selections";
 import { useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { withToast } from "@/lib/with-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import MassPartRow from "../mass-part-row";
+import { getEnumByKey } from "@/lib/utils";
 
-type EditFormProps =
-  | {
-      mode: "create";
-      template: string;
-      themes: string[];
-      partNames: string[];
-      parishLocation: Location | null;
-      choirName: string | null;
-      parishName: string | null;
-      selection?: never;
-    }
-  | {
-      mode: "edit";
-      selection: MassSelectionWithParts;
-      themes: string[];
-      partNames: string[];
-      parishLocation?: never;
-      choirName?: never;
-      parishName?: never;
-      template?: never;
-    };
+type CreateFormProps = {
+  draftId: string;
+  draftSelection: MassSelectionDraft;
+  themes: string[];
+  partNames: string[];
+  template?: string;
+};
 
-// Initialize default values
-const getDefaultValues = (props: EditFormProps): NewMassSelection => {
-  if (props.mode === "edit") {
-    const { selection } = props;
-    return {
-      ...selection,
-      themes: selection.themes.map((theme) => theme.name),
-    };
-  }
-
+const getDefaultValues = (props: CreateFormProps): DraftMassSelection => {
   const liturgy = liturgyTemplates.find((temp) => temp.id === props.template);
   const parts = liturgy?.parts || [];
 
-  const initialParts =
+  let formattedParts;
+
+  if (
+    props.draftSelection.parts &&
+    typeof props.draftSelection.parts === "string"
+  ) {
+    try {
+      const parsedParts = JSON.parse(props.draftSelection.parts);
+      formattedParts = Array.isArray(parsedParts)
+        ? parsedParts.map((part, index) => ({
+            id: `temp-${(index + 1).toString()}`,
+            order: Number(part.order) || index,
+            partName: String(part.partName) || "",
+            keySignature: getEnumByKey(KeySignature, part.keySignature) || null,
+            notes: String(part.notes) || "",
+            songTitle: String(part.songTitle) || "",
+          }))
+        : [
+            {
+              id: "temp-1",
+              order: 0,
+              partName: "",
+              keySignature: null,
+              notes: "",
+              songTitle: "",
+            },
+          ];
+    } catch (error) {
+      console.error("Failed to parse parts JSON:", error);
+      formattedParts = [
+        {
+          id: "temp-1",
+          order: 0,
+          partName: "",
+          keySignature: null,
+          notes: "",
+          songTitle: "",
+        },
+      ];
+    }
+  }
+
+  let initialParts =
     parts.length > 0
       ? parts.map((partName, index) => ({
           id: `temp-${(index + 1).toString()}`,
@@ -119,34 +145,31 @@ const getDefaultValues = (props: EditFormProps): NewMassSelection => {
           notes: "",
           songTitle: "",
         }))
-      : [
-          {
-            id: "temp-1",
-            order: 0,
-            partName: "",
-            keySignature: null,
-            notes: "",
-            songTitle: "",
-          },
-        ];
+      : formattedParts;
+
+  let initialParishLocation;
+  if (
+    props.draftSelection.parishLocation &&
+    typeof props.draftSelection.parishLocation === "string"
+  ) {
+    const location = JSON.parse(props.draftSelection.parishLocation);
+    initialParishLocation = {
+      ...location,
+    } as Location;
+  }
 
   return {
+    ...props.draftSelection,
     title: "",
     date: new Date(),
-    liturgicalYear: null,
-    liturgicalSeason: null,
     themes: liturgy?.themes || [],
-    pastoralFocus: "",
     liturgy: liturgy?.liturgy || "",
-    isPublic: true,
-    parishLocation: props.parishLocation,
-    choirName: props.choirName,
-    parishName: props.parishName,
-    parts: initialParts,
+    parishLocation: initialParishLocation || null,
+    parts: initialParts || [],
   };
 };
 
-export default function EditForm(props: EditFormProps) {
+export default function CreateForm(props: CreateFormProps) {
   const router = useRouter();
 
   const sensors = useSensors(
@@ -160,8 +183,8 @@ export default function EditForm(props: EditFormProps) {
     })
   );
 
-  const form = useForm<NewMassSelection>({
-    resolver: zodResolver(createMassSelectionSchema),
+  const form = useForm<DraftMassSelection>({
+    resolver: zodResolver(draftMassSelectionSchema),
     defaultValues: getDefaultValues(props),
     mode: "onBlur",
   });
@@ -246,27 +269,39 @@ export default function EditForm(props: EditFormProps) {
     }
   };
 
-  const { mode } = props;
+  const handleSubmit = async (data: DraftMassSelection) => {
+    const validationResult = createMassSelectionSchema.safeParse(data);
 
-  const handleSubmit = async (data: NewMassSelection) => {
-    data.date = normalizeDate(data.date);
+    if (!validationResult.success) {
+      // Set errors on form fields
+      validationResult.error.issues.forEach((error) => {
+        const fieldName = error.path.join(".") as keyof DraftMassSelection;
 
-    if (mode === "edit") {
-      const { selection } = props;
-      await withToast(() => updateSelection(selection.id, data), {
-        success: () => {
-          router.push(`/liturgical-selections/${selection.id}`);
-          return "Successfully updated selection!";
-        },
+        form.setError(fieldName, {
+          type: "manual",
+          message: error.message,
+        });
       });
-    } else {
-      await withToast(() => createSelection(data), {
-        success: (newSelection) => {
-          router.push(`/liturgical-selections/${newSelection.id}`);
-          return "Successfully created selection!";
-        },
-      });
+
+      // Optionally set a general form error
+      // form.setError("root", {
+      //   type: "manual",
+      //   message: "Please fix the errors above",
+      // });
+
+      return;
     }
+
+    const selection = validationResult.data;
+
+    selection.date = normalizeDate(selection.date);
+
+    await withToast(() => createSelection(selection), {
+      success: (newSelection) => {
+        router.push(`/liturgical-selections/${newSelection.id}`);
+        return "Successfully created selection!";
+      },
+    });
   };
 
   const partNames = transformStringsToOptions(props.partNames);
@@ -331,7 +366,7 @@ export default function EditForm(props: EditFormProps) {
                     </FormLabel>
                     <FormControl>
                       <DateSelect
-                        value={field.value}
+                        value={field.value || undefined}
                         onChange={field.onChange}
                       />
                     </FormControl>
@@ -561,9 +596,9 @@ export default function EditForm(props: EditFormProps) {
                 {fields.map((field, index) => (
                   <MassPartRow
                     key={field.id}
-                    mode="edit"
                     partId={field.id}
                     partNames={partNames}
+                    mode="draft"
                     index={index}
                     onRemove={() => removePart(index)}
                     canRemove={fields.length > 1}

@@ -93,4 +93,6 @@ export type AppUser = Prisma.UserGetPayload<{
     }
 }>;
 
+export type MassSelectionDraft = Prisma.MassSelectionDraftGetPayload<{}>;
+
 export { KeySignature, LiturgicalSeason, LiturgicalYear }

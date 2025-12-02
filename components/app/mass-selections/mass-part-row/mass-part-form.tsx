@@ -15,27 +15,33 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { cn, getEnumByKey } from "@/lib/utils";
 
 import AppSelect from "@/components/common/app-select";
-import { Control } from "react-hook-form";
+import { DraftMassSelection } from "@/types/schemas/mass-selections";
 import { Input } from "@/components/ui/input";
 import { SelectOption } from "@/types/components/select";
 import { Textarea } from "@/components/ui/textarea";
+import { getEnumByKey } from "@/lib/utils";
 import { keySignatureItems } from "@/lib/constants";
+import { useFormContext } from "react-hook-form";
 
 interface MassPartFormProps {
+  mode: "draft" | "edit";
   index: number;
-  control: Control<NewMassSelection>;
   partNames: SelectOption[];
 }
 
-export function MassPartForm({ index, control, partNames }: MassPartFormProps) {
+export function MassPartForm({ mode, index, partNames }: MassPartFormProps) {
+  const form =
+    mode === "edit"
+      ? useFormContext<NewMassSelection>()
+      : useFormContext<DraftMassSelection>();
+
   return (
     <div className="bg-card grid gap-4 rounded-lg border p-3 sm:p-4 transition-colors">
       <div className="grid gap-4 md:grid-cols-2">
         <FormField
-          control={control}
+          control={form.control as any}
           name={`parts.${index}.partName`}
           render={({ field, fieldState }) => (
             <FormItem>
@@ -59,7 +65,7 @@ export function MassPartForm({ index, control, partNames }: MassPartFormProps) {
         />
 
         <FormField
-          control={control}
+          control={form.control as any}
           name={`parts.${index}.keySignature`}
           render={({ field }) => (
             <FormItem>
@@ -90,7 +96,7 @@ export function MassPartForm({ index, control, partNames }: MassPartFormProps) {
       </div>
 
       <FormField
-        control={control}
+        control={form.control as any}
         name={`parts.${index}.songTitle`}
         render={({ field }) => (
           <FormItem>
@@ -106,7 +112,7 @@ export function MassPartForm({ index, control, partNames }: MassPartFormProps) {
       />
 
       <FormField
-        control={control}
+        control={form.control as any}
         name={`parts.${index}.notes`}
         render={({ field }) => (
           <FormItem>

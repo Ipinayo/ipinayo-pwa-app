@@ -4,15 +4,13 @@ import { GripVertical, Plus, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { CSS } from "@dnd-kit/utilities";
-import { Control } from "react-hook-form";
 import { MassPartForm } from "./mass-part-form";
-import { NewMassSelection } from "@/types/models";
 import { SelectOption } from "@/types/components/select";
 import { useSortable } from "@dnd-kit/sortable";
 
 interface MassPartRowProps {
   partId: string;
-  control: Control<NewMassSelection>;
+  mode: "draft" | "edit";
   index: number;
   canRemove: boolean;
   partNames: SelectOption[];
@@ -22,7 +20,7 @@ interface MassPartRowProps {
 
 export default function MassPartRow({
   partId,
-  control,
+  mode,
   index,
   canRemove,
   partNames,
@@ -59,7 +57,7 @@ export default function MassPartRow({
 
         {/* Part Content */}
         <div className="flex-1 min-w-0">
-          <MassPartForm control={control} index={index} partNames={partNames} />
+          <MassPartForm mode={mode} index={index} partNames={partNames} />
         </div>
       </div>
 

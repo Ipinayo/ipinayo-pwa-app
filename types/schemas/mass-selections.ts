@@ -6,8 +6,8 @@ import { z } from "zod";
 
 // schema for creating a draft mass selection
 export const draftMassSelectionSchema = z.object({
-    title: z.string().optional(),
-    date: z.date("Invalid date"),
+    title: z.string(),
+    date: z.date("Invalid date").nullable().optional(),
     liturgicalYear: z.enum(LiturgicalYear).nullable().optional(),
     liturgicalSeason: z.enum(LiturgicalSeason).nullable().optional(),
     liturgy: z.string().nullable().optional(),
@@ -16,7 +16,7 @@ export const draftMassSelectionSchema = z.object({
         .max(50, "Each theme must be at most 50 characters long"))
         .max(10, "Cannot have more than 10 themes"),
     pastoralFocus: z.string().nullable().optional(),
-    isPublic: z.boolean().default(false),
+    isPublic: z.boolean(),
     parishName: z.string().nullable().optional(),
     choirName: z.string().nullable().optional(),
     parishLocation: locationSchema.nullable().optional(),
