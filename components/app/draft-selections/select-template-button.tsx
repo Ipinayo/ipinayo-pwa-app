@@ -6,7 +6,6 @@ import { createNewDraft } from "@/lib/actions/draft";
 import { liturgyTemplates } from "@/lib/constants";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
 import { useState } from "react";
 
 interface SelectTemplateButtonProps {
@@ -26,16 +25,9 @@ export default function SelectTemplateButton({
 
   const router = useRouter();
 
-  const { data: session } = useSession();
-
   const handleCreate = async () => {
     setIsCreating(true);
     try {
-      if (!session?.user) {
-        toast.info("Please sign in to create your own selections");
-        router.push("/signin");
-        return;
-      }
       const draftSelection = await createNewDraft(templateId);
       router.push(`/liturgical-selections/new/${draftSelection.id}`);
     } catch (error) {

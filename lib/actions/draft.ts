@@ -96,7 +96,12 @@ export async function createNewDraft(templateId: string) {
         };
 
         const newDraft = await createDraft(draft, session.user.id);
+
+        revalidatePath('/liturgical-selections/new');
+        revalidatePath('/dashboard/drafts');
+
         return newDraft;
+
     } catch (error: any) {
         console.error("Error creating draft:", error);
         throw new Error("Error creating draft: " + error?.message);
