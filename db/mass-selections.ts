@@ -214,13 +214,13 @@ export async function findAllUserSelections({
     return { selections, total }
 }
 
-export async function saveSelection(selection: NewMassSelection, userId: string) {
+export async function saveSelection(selection: NewMassSelection, userId: string, draftId: string) {
 
     const { parts, date, themes, parishLocation, ...rest } = selection
 
     const data: Prisma.MassSelectionCreateInput = {
         ...rest,
-        date: new Date(date),
+        date: date,
         themes: {
             connectOrCreate: themes.map(name => ({
                 where: { name: name.toLowerCase() },
@@ -266,9 +266,17 @@ export async function saveSelection(selection: NewMassSelection, userId: string)
         }
     }
 
-    const createdSelection = await prisma.massSelection.create({
-        data
-    })
+    const createdSelection = await prisma.$transaction(async (tx) => {
+        const selection = await tx.massSelection.create({
+            data
+        })
+        await tx.massSelectionDraft.delete({
+            where: { id: draftId, createdById: userId }
+        })
+
+        return selection;
+
+    });
 
     // Attempt update of user profile with parish and choir info if not already set
     addParishAndChoirInfoToUserProfile(userId, createdSelection.parishLocationId, createdSelection.choirName, createdSelection.parishName);

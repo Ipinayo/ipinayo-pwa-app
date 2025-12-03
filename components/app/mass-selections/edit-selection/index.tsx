@@ -260,9 +260,9 @@ export default function EditForm(props: EditFormProps) {
         },
       });
     } else {
-      await withToast(() => createSelection(data), {
+      await withToast(() => createSelection(data, ""), {
         success: (newSelection) => {
-          router.push(`/liturgical-selections/${newSelection.id}`);
+          // router.push(`/liturgical-selections/${newSelection.id}`);
           return "Successfully created selection!";
         },
       });

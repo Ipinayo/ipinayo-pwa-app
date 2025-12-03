@@ -1,6 +1,7 @@
 'use server'
 
 import { MassSelectionFilter, SortBy, SortOrder } from "@/types/utils";
+import { RedirectType, isRedirectError } from "next/dist/client/components/redirect-error";
 import { createMassSelectionSchema, updateMassSelectionSchema } from "@/types/schemas/mass-selections";
 import {
     findAllPartNames,
@@ -20,7 +21,6 @@ import {
 import { NewMassSelection } from "@/types/models";
 import { auth } from "@/auth";
 import { findUserParishAndChoirInfo } from "@/db/user";
-import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import z from "zod";
@@ -163,7 +163,7 @@ export async function getSelectionById(id: string) {
 }
 
 // Create new selection with validation
-export async function createSelection(data: NewMassSelection) {
+export async function createSelection(data: NewMassSelection, draftId: string) {
     try {
         const session = await auth();
         if (!session?.user?.id) {
@@ -176,12 +176,13 @@ export async function createSelection(data: NewMassSelection) {
             throw new Error(validationResult.error.message);
         }
 
-        const result = await saveSelection(validationResult.data, session.user.id);
+        const result = await saveSelection(validationResult.data, session.user.id, draftId);
 
         revalidatePath('/liturgical-selections');
         revalidatePath('/dashboard');
 
-        return result;
+        redirect(`/liturgical-selections/${result.id}`, RedirectType.replace)
+
     } catch (error: any) {
         console.error("Error creating mass selection:", error);
         throw new Error("Error creating mass selection: " + error?.message);
@@ -189,7 +190,7 @@ export async function createSelection(data: NewMassSelection) {
 }
 
 // Create new selection with FormData
-export async function createSelectionFromForm(formData: FormData) {
+export async function createSelectionFromForm(formData: FormData, draftId: string) {
     try {
         const session = await auth();
         if (!session?.user?.id) {
@@ -211,12 +212,12 @@ export async function createSelectionFromForm(formData: FormData) {
             return { success: false, errors };
         }
 
-        const result = await saveSelection(validationResult.data, session.user.id);
+        const result = await saveSelection(validationResult.data, session.user.id, draftId);
 
         revalidatePath('/liturgical-selections');
         revalidatePath('/dashboard');
 
-        return { success: true, data: result };
+        redirect(`/liturgical-selections/${result.id}`, RedirectType.replace)
     } catch (error: any) {
         console.error("Error creating mass selection:", error);
         return {

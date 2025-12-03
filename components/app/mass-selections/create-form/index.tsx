@@ -8,7 +8,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
-  Form,
   FormControl,
   FormField,
   FormItem,
@@ -16,13 +15,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import {
-  KeySignature,
   LiturgicalSeason,
   LiturgicalYear,
-  Location,
   MassSelectionDraft,
-  MassSelectionWithParts,
-  NewMassSelection,
 } from "@/types/models";
 import { Save } from "lucide-react";
 import {
@@ -32,21 +27,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  createSelection,
-  updateSelection,
-} from "@/lib/actions/mass-selections";
+import { createSelection } from "@/lib/actions/mass-selections";
 import {
   getEnum,
   getValuesFromOptions,
   normalizeDate,
   transformStringsToOptions,
 } from "@/lib/utils";
-import {
-  liturgicalSeasonItems,
-  liturgicalYearItems,
-  liturgyTemplates,
-} from "@/lib/constants";
+import { liturgicalSeasonItems, liturgicalYearItems } from "@/lib/constants";
 import { FormProvider, useFieldArray, useForm } from "react-hook-form";
 import {
   DndContext,
@@ -79,37 +67,40 @@ import { useRouter } from "next/navigation";
 import { withToast } from "@/lib/with-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import MassPartRow from "../mass-part-row";
-import { getEnumByKey } from "@/lib/utils";
 
 type CreateFormProps = {
-  draftId: string;
   draftSelection: MassSelectionDraft;
   themes: string[];
   partNames: string[];
-  template?: string;
 };
 
 const getDefaultValues = (props: CreateFormProps): DraftMassSelection => {
-  const liturgy = liturgyTemplates.find((temp) => temp.id === props.template);
-  const parts = liturgy?.parts || [];
-
   let formattedParts;
 
-  if (
-    props.draftSelection.parts &&
-    typeof props.draftSelection.parts === "string"
-  ) {
+  if (props.draftSelection.parts) {
     try {
-      const parsedParts = JSON.parse(props.draftSelection.parts);
-      formattedParts = Array.isArray(parsedParts)
-        ? parsedParts.map((part, index) => ({
-            id: `temp-${(index + 1).toString()}`,
-            order: Number(part.order) || index,
-            partName: String(part.partName) || "",
-            keySignature: getEnumByKey(KeySignature, part.keySignature) || null,
-            notes: String(part.notes) || "",
-            songTitle: String(part.songTitle) || "",
-          }))
+      formattedParts = Array.isArray(props.draftSelection.parts)
+        ? props.draftSelection.parts.map((part, index) => {
+            const result =
+              draftMassSelectionSchema.shape.parts.element.safeParse(part);
+            if (result.success) {
+              return result.data;
+            } else {
+              console.error(
+                "Invalid part data:",
+                result.error,
+                "Using default values."
+              );
+              return {
+                id: `temp-${Date.now()}-${index}`,
+                order: index,
+                partName: "",
+                keySignature: null,
+                notes: "",
+                songTitle: "",
+              };
+            }
+          })
         : [
             {
               id: "temp-1",
@@ -135,37 +126,20 @@ const getDefaultValues = (props: CreateFormProps): DraftMassSelection => {
     }
   }
 
-  let initialParts =
-    parts.length > 0
-      ? parts.map((partName, index) => ({
-          id: `temp-${(index + 1).toString()}`,
-          order: index,
-          partName,
-          keySignature: null,
-          notes: "",
-          songTitle: "",
-        }))
-      : formattedParts;
-
   let initialParishLocation;
-  if (
-    props.draftSelection.parishLocation &&
-    typeof props.draftSelection.parishLocation === "string"
-  ) {
-    const location = JSON.parse(props.draftSelection.parishLocation);
-    initialParishLocation = {
-      ...location,
-    } as Location;
+  const result = draftMassSelectionSchema.shape.parishLocation.safeParse(
+    props.draftSelection.parishLocation
+  );
+  if (result.success) {
+    initialParishLocation = result.data;
+  } else {
+    console.error(result.error);
   }
 
   return {
     ...props.draftSelection,
-    title: "",
-    date: new Date(),
-    themes: liturgy?.themes || [],
-    liturgy: liturgy?.liturgy || "",
     parishLocation: initialParishLocation || null,
-    parts: initialParts || [],
+    parts: formattedParts || [],
   };
 };
 
@@ -296,9 +270,9 @@ export default function CreateForm(props: CreateFormProps) {
 
     selection.date = normalizeDate(selection.date);
 
-    await withToast(() => createSelection(selection), {
+    await withToast(() => createSelection(selection, props.draftSelection.id), {
       success: (newSelection) => {
-        router.push(`/liturgical-selections/${newSelection.id}`);
+        // router.push(`/liturgical-selections/${newSelection.id}`);
         return "Successfully created selection!";
       },
     });

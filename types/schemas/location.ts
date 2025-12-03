@@ -1,6 +1,7 @@
 import z from "zod";
 
 export const locationSchema = z.object({
+    id: z.string().optional(),
     country: z.string().optional(),
     countryCode: z.string().optional().nullable(),
     state: z.string().optional(),

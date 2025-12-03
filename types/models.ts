@@ -33,6 +33,7 @@ export type NewMassSelectionPart = Omit<Prisma.MassPartCreateInput, 'id' | 'mass
 };
 
 export type NewLocation = Omit<Prisma.LocationCreateInput, 'id' | 'massSelections' | 'userProfiles' | 'createdAt' | 'updatedAt' | 'country'> & {
+    id?: string
     country?: string
 };
 

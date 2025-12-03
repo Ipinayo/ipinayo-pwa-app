@@ -23,7 +23,6 @@ export async function createDraft(selection: DraftMassSelection, userId: string)
     return await prisma.massSelectionDraft.create({
         data: {
             ...selection,
-            title: selection.title || 'Untitled Draft',
             parishLocation: selection.parishLocation || undefined,
             createdById: userId,
         }
@@ -35,7 +34,6 @@ export async function updateDraftById(draftId: string, selection: DraftMassSelec
         where: { id: draftId, createdById: userId },
         data: {
             ...selection,
-            title: selection.title || 'Untitled Draft',
             parishLocation: selection.parishLocation || undefined,
             createdById: userId,
         }
