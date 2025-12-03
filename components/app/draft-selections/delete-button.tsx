@@ -4,8 +4,8 @@ import { Loader2, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { deleteDraft } from "@/lib/actions/draft";
-import { toast } from "sonner";
 import { useState } from "react";
+import { withToast } from "@/lib/with-toast";
 
 interface DeleteButtonProps {
   draftId: string;
@@ -24,13 +24,10 @@ export default function DeleteButton({
 
   const handleDelete = async () => {
     setIsDeletingDraft(true);
-    try {
-      await deleteDraft(draftId);
-    } catch (error) {
-      toast.error("Error deleting selection, please try again");
-    } finally {
-      setIsDeletingDraft(false);
-    }
+    await withToast(() => deleteDraft(draftId), {
+      success: "Successfully deleted draft!",
+    });
+    setIsDeletingDraft(false);
   };
 
   return (
