@@ -179,9 +179,10 @@ export async function createSelection(data: NewMassSelection, draftId: string) {
         const result = await saveSelection(validationResult.data, session.user.id, draftId);
 
         revalidatePath('/liturgical-selections');
+        revalidatePath('/liturgical-selections/new');
         revalidatePath('/dashboard');
 
-        redirect(`/liturgical-selections/${result.id}`, RedirectType.replace)
+        return result;
 
     } catch (error: any) {
         console.error("Error creating mass selection:", error);
@@ -215,9 +216,10 @@ export async function createSelectionFromForm(formData: FormData, draftId: strin
         const result = await saveSelection(validationResult.data, session.user.id, draftId);
 
         revalidatePath('/liturgical-selections');
+        revalidatePath('/liturgical-selections/new');
         revalidatePath('/dashboard');
 
-        redirect(`/liturgical-selections/${result.id}`, RedirectType.replace)
+        return { success: true, data: result };
     } catch (error: any) {
         console.error("Error creating mass selection:", error);
         return {

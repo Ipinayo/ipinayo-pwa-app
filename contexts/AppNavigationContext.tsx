@@ -22,6 +22,7 @@ interface AppNavigationContextType {
   handleForward: () => void;
   handleRefresh: () => void;
   navigateTo: (path: string) => void;
+  replacePath: (path: string) => void;
   currentPath: string;
   history: NavigationEntry[];
 }
@@ -123,6 +124,17 @@ export function AppNavigationProvider({ children }: { children: ReactNode }) {
     router.push(path);
   };
 
+  const replacePath = (path: string) => {
+    isNavigatingRef.current = true;
+    setHistory((prev) => {
+      // Replace the entry at currentIndex
+      const newHistory = [...prev];
+      newHistory[currentIndex] = { path, timestamp: Date.now() };
+      return newHistory;
+    });
+    router.replace(path, { scroll: true });
+  };
+
   const value: AppNavigationContextType = {
     canGoBack,
     canGoForward,
@@ -130,6 +142,7 @@ export function AppNavigationProvider({ children }: { children: ReactNode }) {
     handleForward,
     handleRefresh,
     navigateTo,
+    replacePath,
     currentPath: pathname,
     history,
   };

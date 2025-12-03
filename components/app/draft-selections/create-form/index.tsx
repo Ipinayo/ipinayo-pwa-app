@@ -67,6 +67,7 @@ import { useRouter } from "next/navigation";
 import { withToast } from "@/lib/with-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import MassPartRow from "@/components/common/mass-part-row";
+import { useAppNavigation } from "@/contexts/AppNavigationContext";
 
 type CreateFormProps = {
   draftSelection: MassSelectionDraft;
@@ -144,7 +145,7 @@ const getDefaultValues = (props: CreateFormProps): DraftMassSelection => {
 };
 
 export default function CreateForm(props: CreateFormProps) {
-  const router = useRouter();
+  const { replacePath } = useAppNavigation();
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -272,7 +273,7 @@ export default function CreateForm(props: CreateFormProps) {
 
     await withToast(() => createSelection(selection, props.draftSelection.id), {
       success: (newSelection) => {
-        // router.push(`/liturgical-selections/${newSelection.id}`);
+        replacePath(`/liturgical-selections/${newSelection.id}`);
         return "Successfully created selection!";
       },
     });
