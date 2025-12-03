@@ -1,4 +1,4 @@
-import { Box, Edit2, Music } from "lucide-react";
+import { Box, Edit2 } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -9,9 +9,9 @@ import {
 
 import BackButton from "@/components/common/back-button";
 import { Button } from "@/components/ui/button";
-import DeleteDraftButton from "@/components/app/mass-selections/delete-draft-button";
+import DeleteButton from "@/components/app/draft-selections/delete-button";
 import Link from "next/link";
-import SelectTemplateButton from "@/components/app/mass-selections/select-template-button";
+import SelectTemplateButton from "@/components/app/draft-selections/select-template-button";
 import { auth } from "@/auth";
 import { formatDate } from "@/lib/utils";
 import { getAllDrafts } from "@/lib/actions/draft";
@@ -50,7 +50,7 @@ export default async function SelectLiturgyTemplatePage() {
                   No Drafts
                 </p>
                 <p className="text-muted-foreground mb-6">
-                  Any drafts - unsaved selections - will appear here for you to
+                  Any drafts - incomplete selections - will appear here for you to
                   continue later.
                 </p>
               </CardContent>
@@ -72,7 +72,7 @@ export default async function SelectLiturgyTemplatePage() {
                           Last updated {formatDate(draft.updatedAt)}
                         </CardDescription>
                       </div>
-                      <DeleteDraftButton
+                      <DeleteButton
                         draftId={draft.id}
                         variant="ghost"
                         size="icon"

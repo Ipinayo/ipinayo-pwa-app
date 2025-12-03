@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
-import MassPartRowSkeleton from "../mass-part-row/index-skeleton";
+import MassPartRowSkeleton from "@/components/common/mass-part-row/index-skeleton";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export function SaveFormSkeleton() {

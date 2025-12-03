@@ -66,7 +66,7 @@ import { useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { withToast } from "@/lib/with-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
-import MassPartRow from "../mass-part-row";
+import MassPartRow from "@/components/common/mass-part-row";
 
 type CreateFormProps = {
   draftSelection: MassSelectionDraft;

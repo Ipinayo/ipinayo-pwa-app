@@ -46,12 +46,7 @@ export default async function EditPage(props: { params: Params }) {
         </div>
       </div>
 
-      <EditForm
-        mode="edit"
-        selection={selection}
-        themes={themes}
-        partNames={partNames}
-      />
+      <EditForm selection={selection} themes={themes} partNames={partNames} />
     </div>
   );
 }

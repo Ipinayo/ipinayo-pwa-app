@@ -1,7 +1,7 @@
 import { getAllPartNames, getThemes } from "@/lib/actions/mass-selections";
 
 import BackButton from "@/components/common/back-button";
-import CreateForm from "@/components/app/mass-selections/create-form";
+import CreateForm from "@/components/app/draft-selections/create-form";
 import { Params } from "@/types/utils";
 import { auth } from "@/auth";
 import { getDraftById } from "@/lib/actions/draft";

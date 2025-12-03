@@ -28,7 +28,7 @@ export default function SelectTemplateButton({
 
   const { data: session } = useSession();
 
-  const handleClone = async () => {
+  const handleCreate = async () => {
     setIsCreating(true);
     try {
       if (!session?.user) {
@@ -54,7 +54,7 @@ export default function SelectTemplateButton({
       type="button"
       variant={variant}
       size={size}
-      onClick={handleClone}
+      onClick={handleCreate}
       disabled={isCreating}
       className={className}
       title={`Create a selection using the ${templateName} template`}

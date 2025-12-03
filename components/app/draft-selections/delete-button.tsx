@@ -7,19 +7,19 @@ import { deleteDraft } from "@/lib/actions/draft";
 import { toast } from "sonner";
 import { useState } from "react";
 
-interface DeleteDraftButtonProps {
+interface DeleteButtonProps {
   draftId: string;
   variant?: "default" | "outline" | "ghost";
   size?: "default" | "sm" | "lg" | "icon";
   className?: string;
 }
 
-export default function DeleteDraftButton({
+export default function DeleteButton({
   draftId,
   variant = "outline",
   size = "default",
   className,
-}: DeleteDraftButtonProps) {
+}: DeleteButtonProps) {
   const [isDeletingDraft, setIsDeletingDraft] = useState(false);
 
   const handleDelete = async () => {

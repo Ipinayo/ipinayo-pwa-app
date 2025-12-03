@@ -8,7 +8,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
-  Form,
   FormControl,
   FormField,
   FormItem,
@@ -18,7 +17,6 @@ import {
 import {
   LiturgicalSeason,
   LiturgicalYear,
-  Location,
   MassSelectionWithParts,
   NewMassSelection,
 } from "@/types/models";
@@ -30,21 +28,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  createSelection,
-  updateSelection,
-} from "@/lib/actions/mass-selections";
+import { updateSelection } from "@/lib/actions/mass-selections";
 import {
   getEnum,
   getValuesFromOptions,
   normalizeDate,
   transformStringsToOptions,
 } from "@/lib/utils";
-import {
-  liturgicalSeasonItems,
-  liturgicalYearItems,
-  liturgyTemplates,
-} from "@/lib/constants";
+import { liturgicalSeasonItems, liturgicalYearItems } from "@/lib/constants";
 import { FormProvider, useFieldArray, useForm } from "react-hook-form";
 import {
   DndContext,
@@ -72,77 +63,20 @@ import { useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { withToast } from "@/lib/with-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
-import MassPartRow from "../mass-part-row";
+import MassPartRow from "@/components/common/mass-part-row";
 
-type EditFormProps =
-  | {
-      mode: "create";
-      template: string;
-      themes: string[];
-      partNames: string[];
-      parishLocation: Location | null;
-      choirName: string | null;
-      parishName: string | null;
-      selection?: never;
-    }
-  | {
-      mode: "edit";
-      selection: MassSelectionWithParts;
-      themes: string[];
-      partNames: string[];
-      parishLocation?: never;
-      choirName?: never;
-      parishName?: never;
-      template?: never;
-    };
+interface EditFormProps {
+  selection: MassSelectionWithParts;
+  themes: string[];
+  partNames: string[];
+}
 
 // Initialize default values
 const getDefaultValues = (props: EditFormProps): NewMassSelection => {
-  if (props.mode === "edit") {
-    const { selection } = props;
-    return {
-      ...selection,
-      themes: selection.themes.map((theme) => theme.name),
-    };
-  }
-
-  const liturgy = liturgyTemplates.find((temp) => temp.id === props.template);
-  const parts = liturgy?.parts || [];
-
-  const initialParts =
-    parts.length > 0
-      ? parts.map((partName, index) => ({
-          id: `temp-${(index + 1).toString()}`,
-          order: index,
-          partName,
-          keySignature: null,
-          notes: "",
-          songTitle: "",
-        }))
-      : [
-          {
-            id: "temp-1",
-            order: 0,
-            partName: "",
-            keySignature: null,
-            notes: "",
-            songTitle: "",
-          },
-        ];
-
+  const { selection } = props;
   return {
-    title: "",
-    date: new Date(),
-    liturgicalYear: null,
-    liturgicalSeason: null,
-    themes: liturgy?.themes || [],
-    pastoralFocus: "",
-    liturgy: liturgy?.liturgy || "",
-    isPublic: true,
-    parishLocation: props.parishLocation,
-    choirName: props.choirName,
-    parishName: props.parishName,
-    parts: initialParts,
+    ...selection,
+    themes: selection.themes.map((theme) => theme.name),
   };
 };
 
@@ -246,27 +180,16 @@ export default function EditForm(props: EditFormProps) {
     }
   };
 
-  const { mode } = props;
-
   const handleSubmit = async (data: NewMassSelection) => {
     data.date = normalizeDate(data.date);
 
-    if (mode === "edit") {
-      const { selection } = props;
-      await withToast(() => updateSelection(selection.id, data), {
-        success: () => {
-          router.push(`/liturgical-selections/${selection.id}`);
-          return "Successfully updated selection!";
-        },
-      });
-    } else {
-      await withToast(() => createSelection(data, ""), {
-        success: (newSelection) => {
-          // router.push(`/liturgical-selections/${newSelection.id}`);
-          return "Successfully created selection!";
-        },
-      });
-    }
+    const { selection } = props;
+    await withToast(() => updateSelection(selection.id, data), {
+      success: () => {
+        router.push(`/liturgical-selections/${selection.id}`);
+        return "Successfully updated selection!";
+      },
+    });
   };
 
   const partNames = transformStringsToOptions(props.partNames);
