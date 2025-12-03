@@ -100,7 +100,7 @@ export default function EditForm(props: EditFormProps) {
     mode: "onBlur",
   });
 
-  const { fields, append, remove, move, insert, update } = useFieldArray({
+  const { fields, append, remove, move, insert } = useFieldArray({
     control: form.control,
     name: "parts",
   });
@@ -123,15 +123,6 @@ export default function EditForm(props: EditFormProps) {
 
     // Use the move function from useFieldArray
     move(oldIndex, newIndex);
-
-    // Update order field for all parts after the move
-    const currentParts = form.getValues("parts");
-    currentParts.forEach((part, idx) => {
-      update(idx, {
-        ...part,
-        order: idx,
-      });
-    });
   };
 
   const addPart = (afterIndex?: number) => {
@@ -153,30 +144,12 @@ export default function EditForm(props: EditFormProps) {
     } else {
       append(newPart);
     }
-
-    // Update order field for all parts after the insertion
-    const currentParts = form.getValues("parts");
-    currentParts.forEach((part, idx) => {
-      update(idx, {
-        ...part,
-        order: idx,
-      });
-    });
   };
 
   const removePart = (index: number) => {
     if (fields.length > 1) {
       // Use remove from useFieldArray
       remove(index);
-
-      // Update order field for remaining parts
-      const currentParts = form.getValues("parts");
-      currentParts.forEach((part, idx) => {
-        update(idx, {
-          ...part,
-          order: idx,
-        });
-      });
     }
   };
 
@@ -184,6 +157,11 @@ export default function EditForm(props: EditFormProps) {
     data.date = normalizeDate(data.date);
 
     const { selection } = props;
+    data.parts = data.parts.map((part, idx) => ({
+      ...part,
+      order: idx,
+    }));
+
     await withToast(() => updateSelection(selection.id, data), {
       success: () => {
         router.push(`/liturgical-selections/${selection.id}`);
