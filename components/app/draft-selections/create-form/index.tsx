@@ -67,6 +67,7 @@ import { withToast } from "@/lib/with-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import MassPartRow from "@/components/common/mass-part-row";
 import { useAppNavigation } from "@/contexts/AppNavigationContext";
+import { updateDraft } from "@/lib/actions/draft";
 
 type CreateFormProps = {
   draftSelection: MassSelectionDraft;
@@ -144,7 +145,7 @@ const getDefaultValues = (props: CreateFormProps): DraftMassSelection => {
 };
 
 export default function CreateForm(props: CreateFormProps) {
-  const { replacePath } = useAppNavigation();
+  const { replacePath, handleBack } = useAppNavigation();
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -257,12 +258,6 @@ export default function CreateForm(props: CreateFormProps) {
         });
       });
 
-      // Optionally set a general form error
-      // form.setError("root", {
-      //   type: "manual",
-      //   message: "Please fix the errors above",
-      // });
-
       return;
     }
 
@@ -274,6 +269,16 @@ export default function CreateForm(props: CreateFormProps) {
       success: (newSelection) => {
         replacePath(`/liturgical-selections/${newSelection.id}`);
         return "Successfully created selection!";
+      },
+    });
+  };
+
+  const handleSaveDraft = async () => {
+    const data = form.getValues();
+    await withToast(() => updateDraft(props.draftSelection.id, data), {
+      success: () => {
+        handleBack("/dashboard/drafts");
+        return "Successfully saved draft!";
       },
     });
   };
@@ -584,7 +589,11 @@ export default function CreateForm(props: CreateFormProps) {
           </CardContent>
         </Card>
 
-        <div className="flex justify-end">
+        <div className="flex justify-between gap-4">
+          <Button type="button" variant="outline" onClick={handleSaveDraft}>
+            Save as Draft
+          </Button>
+
           <Button
             type="submit"
             disabled={form.formState.isSubmitting}

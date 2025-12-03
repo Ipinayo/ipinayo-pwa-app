@@ -115,9 +115,10 @@ export async function updateDraft(id: string, selection: DraftMassSelection) {
             throw new Error("Unauthorized");
         }
 
-        let updatedDraft;
-        if (id)
-            updatedDraft = await updateDraftById(id, selection, session.user.id);
+        const updatedDraft = await updateDraftById(id, selection, session.user.id);
+
+        revalidatePath('/liturgical-selections/new');
+        revalidatePath('/dashboard/drafts');
 
         return updatedDraft;
     } catch (error: any) {

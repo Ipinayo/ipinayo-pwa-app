@@ -10,11 +10,6 @@ export default async function findDraftsByUserId(userId: string) {
 export async function findDraftById(draftId: string) {
     return await prisma.massSelectionDraft.findUnique({
         where: { id: draftId },
-        include: {
-            createdBy: {
-                select: { name: true, email: true },
-            },
-        },
     })
 }
 
@@ -35,7 +30,6 @@ export async function updateDraftById(draftId: string, selection: DraftMassSelec
         data: {
             ...selection,
             parishLocation: selection.parishLocation || undefined,
-            createdById: userId,
         }
     });
 }
