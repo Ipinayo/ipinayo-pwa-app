@@ -68,6 +68,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import MassPartRow from "@/components/common/mass-part-row";
 import { useAppNavigation } from "@/contexts/AppNavigationContext";
 import { updateDraft } from "@/lib/actions/draft";
+import { useDraftAutosave } from "@/hooks/use-draft-autosave";
+import { toast } from "sonner";
 
 type CreateFormProps = {
   draftSelection: MassSelectionDraft;
@@ -169,6 +171,20 @@ export default function CreateForm(props: CreateFormProps) {
     name: "parts",
   });
 
+  const { save } = useDraftAutosave({
+    draftId: props.draftSelection.id,
+    form,
+    onSaveSuccess: (isAutoSave) => {
+      if (!isAutoSave) {
+        toast.success("Successfully saved draft!");
+        handleBack("/dashboard/drafts");
+      }
+    },
+    onSaveError: () => {
+      toast.error("Error saving draft");
+    },
+  });
+
   const itemIds = useMemo(() => fields.map((item) => item.id), [fields]);
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -250,20 +266,20 @@ export default function CreateForm(props: CreateFormProps) {
     });
   };
 
-  const handleSaveDraft = async () => {
-    const data = form.getValues();
-    data.parts = data.parts.map((part, idx) => ({
-      ...part,
-      order: idx,
-    }));
+  // const handleSaveDraft = async () => {
+  //   const data = form.getValues();
+  //   data.parts = data.parts.map((part, idx) => ({
+  //     ...part,
+  //     order: idx,
+  //   }));
 
-    await withToast(() => updateDraft(props.draftSelection.id, data), {
-      success: () => {
-        handleBack("/dashboard/drafts");
-        return "Successfully saved draft!";
-      },
-    });
-  };
+  //   await withToast(() => updateDraft(props.draftSelection.id, data), {
+  //     success: () => {
+  //       handleBack("/dashboard/drafts");
+  //       return "Successfully saved draft!";
+  //     },
+  //   });
+  // };
 
   const partNames = transformStringsToOptions(props.partNames);
 
@@ -572,7 +588,7 @@ export default function CreateForm(props: CreateFormProps) {
         </Card>
 
         <div className="flex justify-between gap-4">
-          <Button type="button" variant="outline" onClick={handleSaveDraft}>
+          <Button type="button" variant="outline" onClick={() => save()}>
             Save as Draft
           </Button>
 
