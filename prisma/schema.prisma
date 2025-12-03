@@ -165,7 +165,6 @@ model MassSelectionDraft {
   isPublic         Boolean           @default(false)
   parishName       String?
   choirName        String?
-  parishLocationId String?
   createdById      String
   createdBy        User              @relation(fields: [createdById], references: [id], onDelete: Cascade)
   parts            Json              @default("[]")
