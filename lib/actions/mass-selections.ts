@@ -20,6 +20,7 @@ import {
 
 import { NewMassSelection } from "@/types/models";
 import { auth } from "@/auth";
+import { createDraft } from "@/db/draft";
 import { findUserParishAndChoirInfo } from "@/db/user";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
@@ -337,14 +338,14 @@ export async function deleteSelection(id: string) {
 }
 
 // Clone selection
-export async function cloneSelection(id: string) {
+export async function cloneSelection(selectionId: string) {
     try {
         const session = await auth();
         if (!session?.user?.id) {
             redirect("/signin");
         }
 
-        const originalSelection = await findSelection(id);
+        const originalSelection = await findSelection(selectionId);
         if (!originalSelection) {
             throw new Error("Mass selection not found");
         }
@@ -355,18 +356,20 @@ export async function cloneSelection(id: string) {
         }
 
         const parishAndChoirInfo = await findUserParishAndChoirInfo(session.user.id);
+        const { parishLocationId, themes, choirName, parishName, title, id, createdAt, updatedAt, createdById, isPublic, ...selection } = originalSelection;
 
-        const result = await saveSelectionBySelection({
-            ...originalSelection,
-            title: `${originalSelection.title} (Copy)`,
+        const result = await createDraft({
+            ...selection,
+            title: `${title} (Copy)`,
             isPublic: true,
-            parishLocationId: parishAndChoirInfo?.parishLocation?.id || null,
+            themes: themes.map(theme => theme.name),
+            parishLocation: parishAndChoirInfo?.parishLocation || null,
             choirName: parishAndChoirInfo?.choirName || null,
             parishName: parishAndChoirInfo?.parishName || null,
         }, session.user.id);
 
-        revalidatePath('/liturgical-selections');
-        revalidatePath('/dashboard');
+        revalidatePath('/liturgical-selections/new');
+        revalidatePath('/dashboard/drafts');
 
         return result;
 

@@ -38,7 +38,7 @@ export async function findSelection(id: string) {
     return await prisma.massSelection.findUnique({
         where: { id },
         include: {
-            themes: { select: { id: true } },
+            themes: true,
             parts: { orderBy: { order: "asc" } },
         }
     })
