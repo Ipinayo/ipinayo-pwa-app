@@ -15,51 +15,39 @@ import {
 
 import AppSelect from "../app-select";
 import { NewLocation } from "@/types/models";
-import { UseFormReturn } from "react-hook-form";
-import { useEffect } from "react";
+import { useFormContext } from "react-hook-form";
+import { useMemo } from "react";
 
 interface LocationSelectorProps {
-  form: UseFormReturn<any>; // Can be any form that has a location field
-  fieldName?: string; // The name of the location field in the form (default: "location")
+  fieldName?: string; // The name of the location field in the form
 }
 
+const countries = Country.getAllCountries();
+
 export default function LocationSelector({
-  form,
   fieldName = "parishLocation",
 }: LocationSelectorProps) {
+  const form = useFormContext<any>(); // Can be any form that has a location field
+
   // Watch location fields
   const location = form.watch(fieldName) as NewLocation | null | undefined;
   const selectedCountryCode = location?.countryCode;
   const selectedStateCode = location?.stateCode;
 
   // Get data based on selections
-  const countries = Country.getAllCountries();
-  const states = selectedCountryCode
-    ? State.getStatesOfCountry(selectedCountryCode)
-    : [];
-  const cities =
-    selectedCountryCode && selectedStateCode
-      ? City.getCitiesOfState(selectedCountryCode, selectedStateCode)
-      : [];
+  const states = useMemo(
+    () =>
+      selectedCountryCode ? State.getStatesOfCountry(selectedCountryCode) : [],
+    [selectedCountryCode]
+  );
 
-  // Reset dependent fields when parent changes
-  useEffect(() => {
-    if (selectedCountryCode && location) {
-      form.setValue(`${fieldName}.stateCode`, null);
-      form.setValue(`${fieldName}.state`, "");
-      form.setValue(`${fieldName}.city`, "");
-      form.setValue(`${fieldName}.latitude`, null);
-      form.setValue(`${fieldName}.longitude`, null);
-    }
-  }, [selectedCountryCode, fieldName, form]);
-
-  useEffect(() => {
-    if (selectedStateCode && location) {
-      form.setValue(`${fieldName}.city`, "");
-      form.setValue(`${fieldName}.latitude`, null);
-      form.setValue(`${fieldName}.longitude`, null);
-    }
-  }, [selectedStateCode, fieldName, form]);
+  const cities = useMemo(
+    () =>
+      selectedCountryCode && selectedStateCode
+        ? City.getCitiesOfState(selectedCountryCode, selectedStateCode)
+        : [],
+    [selectedCountryCode, selectedStateCode]
+  );
 
   // Helper to update location with full data
   const updateLocation = (updates: Partial<NewLocation>) => {

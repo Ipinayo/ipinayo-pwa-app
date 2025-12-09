@@ -374,7 +374,7 @@ export default function CreateForm(props: CreateFormProps) {
                 </FormItem>
               )}
             />
-            <LocationSelector form={form} />
+            <LocationSelector />
           </CardContent>
         </Card>
 

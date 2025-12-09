@@ -279,7 +279,7 @@ export default function EditForm(props: EditFormProps) {
                 </FormItem>
               )}
             />
-            <LocationSelector form={form} />
+            <LocationSelector />
           </CardContent>
         </Card>
 
