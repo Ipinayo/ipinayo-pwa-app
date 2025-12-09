@@ -62,12 +62,11 @@ import {
   DraftMassSelection,
   draftMassSelectionSchema,
 } from "@/types/schemas/mass-selections";
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { withToast } from "@/lib/with-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import MassPartRow from "@/components/common/mass-part-row";
 import { useAppNavigation } from "@/contexts/AppNavigationContext";
-import { updateDraft } from "@/lib/actions/draft";
 import { useDraftAutosave } from "@/hooks/use-draft-autosave";
 import { toast } from "sonner";
 
@@ -266,27 +265,7 @@ export default function CreateForm(props: CreateFormProps) {
     });
   };
 
-  // const handleSaveDraft = async () => {
-  //   const data = form.getValues();
-  //   data.parts = data.parts.map((part, idx) => ({
-  //     ...part,
-  //     order: idx,
-  //   }));
-
-  //   await withToast(() => updateDraft(props.draftSelection.id, data), {
-  //     success: () => {
-  //       handleBack("/dashboard/drafts");
-  //       return "Successfully saved draft!";
-  //     },
-  //   });
-  // };
-
   const partNames = transformStringsToOptions(props.partNames);
-
-  // Reset form when template changes
-  useEffect(() => {
-    form.reset(getDefaultValues(props));
-  }, [props]);
 
   return (
     <FormProvider {...form}>

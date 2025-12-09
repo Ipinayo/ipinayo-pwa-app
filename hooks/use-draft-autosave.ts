@@ -25,7 +25,7 @@ interface UseDraftAutosaveReturn {
 export function useDraftAutosave({
     draftId,
     form,
-    autoSaveInterval = 3000, // 3 seconds default
+    autoSaveInterval = 2000, // 2 seconds default
     enableAutoSave = true,
     onSaveSuccess,
     onSaveError,
@@ -79,10 +79,10 @@ export function useDraftAutosave({
                 const errorMessage = error instanceof Error ? error.message : 'Unknown error';
                 onSaveError?.(errorMessage, isAutoSave);
 
-                // Reset to idle after 3 seconds
+                // Reset to idle after 2 seconds
                 setTimeout(() => {
                     setSaveStatus('idle');
-                }, 3000);
+                }, 2000);
             } finally {
                 isSavingRef.current = false;
             }

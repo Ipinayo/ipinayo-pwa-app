@@ -59,7 +59,7 @@ import LocationSelector from "@/components/common/location-selector";
 import MultipleSelector from "@/components/common/multiple-selector";
 import { Switch } from "@/components/ui/switch";
 import { createMassSelectionSchema } from "@/types/schemas/mass-selections";
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { withToast } from "@/lib/with-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -171,11 +171,6 @@ export default function EditForm(props: EditFormProps) {
   };
 
   const partNames = transformStringsToOptions(props.partNames);
-
-  // Reset form when template changes
-  useEffect(() => {
-    form.reset(getDefaultValues(props));
-  }, [props]);
 
   return (
     <FormProvider {...form}>
