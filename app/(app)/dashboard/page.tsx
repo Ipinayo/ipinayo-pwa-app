@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { Button } from "@/components/ui/button";
 import DraftList from "@/components/app/dashboard/draft-list";
+import DraftListSkeleton from "@/components/app/dashboard/draft-list/index-skeleton";
 import Link from "next/link";
 import MassSelectionListSkeleton from "@/components/app/mass-selections/mass-selection-list/index-skeleton";
 import SelectionsList from "@/components/app/dashboard/selections-list";
@@ -74,20 +75,9 @@ export default async function DashboardPage() {
           </TabsContent>
 
           <TabsContent value="drafts" className="space-y-4">
-            {/* <div className="flex justify-between items-center">
-              <h3 className="text-lg">My Drafts</h3>
-              <Link href="/dashboard/drafts">
-                <Button variant="outline" size="sm">
-                  View all
-                </Button>
-              </Link>
-            </div>
-
-            <div className="space-y-4"> */}
-            <Suspense fallback={<div>Loading drafts...</div>}>
+            <Suspense fallback={<DraftListSkeleton />}>
               <DraftList />
             </Suspense>
-            {/* </div> */}
           </TabsContent>
         </Tabs>
 
