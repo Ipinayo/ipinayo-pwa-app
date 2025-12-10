@@ -1,4 +1,4 @@
-import { BookOpen, Globe, Lock, TrendingUp } from "lucide-react";
+import { BookOpen, Globe, Lock } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 import { getMassSelectionStats } from "@/lib/actions/mass-selections";

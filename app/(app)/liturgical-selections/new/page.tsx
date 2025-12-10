@@ -1,4 +1,3 @@
-import { Box, Edit2 } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -8,12 +7,10 @@ import {
 } from "@/components/ui/card";
 
 import BackButton from "@/components/common/back-button";
-import { Button } from "@/components/ui/button";
-import DeleteButton from "@/components/app/draft-selections/delete-button";
-import Link from "next/link";
+import { Box } from "lucide-react";
+import DraftCard from "@/components/common/draft-card";
 import SelectTemplateButton from "@/components/app/draft-selections/select-template-button";
 import { auth } from "@/auth";
-import { formatDate } from "@/lib/utils";
 import { getAllDrafts } from "@/lib/actions/draft";
 import { liturgyTemplates } from "@/lib/constants";
 import { redirect } from "next/navigation";
@@ -50,56 +47,15 @@ export default async function SelectLiturgyTemplatePage() {
                   No Drafts
                 </p>
                 <p className="text-muted-foreground mb-6">
-                  Any drafts - incomplete selections - will appear here for you to
-                  continue later.
+                  Any drafts - incomplete selections - will appear here for you
+                  to continue later.
                 </p>
               </CardContent>
             </Card>
           ) : (
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {drafts.map((draft) => (
-                <Card
-                  key={draft.id}
-                  className="cursor-pointer transition-all hover:shadow-lg hover:scale-[1.02] border-2 hover:border-amber-400 bg-amber-50/50 dark:bg-amber-950/10"
-                >
-                  <CardHeader>
-                    <div className="flex items-start justify-between mb-2">
-                      <div className="flex-1">
-                        <CardTitle className="text-base line-clamp-2">
-                          {draft.title || "Untitled Draft"}
-                        </CardTitle>
-                        <CardDescription className="text-xs mt-1">
-                          Last updated {formatDate(draft.updatedAt)}
-                        </CardDescription>
-                      </div>
-                      <DeleteButton
-                        draftId={draft.id}
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 -mt-1 -mr-2"
-                      />
-                    </div>
-                  </CardHeader>
-                  <CardContent className="space-y-2">
-                    <p className="text-xs text-muted-foreground">
-                      {Array.isArray(draft.parts) ? draft.parts.length : 0}{" "}
-                      part(s)
-                    </p>
-                    <div className="flex gap-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="w-full gap-1 bg-transparent"
-                        asChild
-                      >
-                        <Link href={`/liturgical-selections/new/${draft.id}`}>
-                          <Edit2 className="h-3 w-3" />
-                          Continue
-                        </Link>
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
+                <DraftCard key={draft.id} draft={draft} />
               ))}
             </div>
           )}

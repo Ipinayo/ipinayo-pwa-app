@@ -1,3 +1,4 @@
+import { BookOpen, FileText, Sparkles } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -5,63 +6,23 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { FileText, Plus, Sparkles, TrendingUp } from "lucide-react";
-import { LiturgicalSeason, LiturgicalYear } from "@/types/models";
-import { SearchParams, SortBy, SortOrder } from "@/types/utils";
-import { liturgicalSeasonItems, liturgicalYearItems } from "@/lib/constants";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { Button } from "@/components/ui/button";
+import DraftList from "@/components/app/dashboard/draft-list";
 import Link from "next/link";
-import MassSelectionList from "@/components/app/mass-selections/mass-selection-list";
 import MassSelectionListSkeleton from "@/components/app/mass-selections/mass-selection-list/index-skeleton";
-import QueryFilter from "@/components/common/query-filter";
-import Search from "@/components/app/mass-selections/search";
-import SortFilter from "@/components/app/mass-selections/sort-filter";
+import SelectionsList from "@/components/app/dashboard/selections-list";
 import Statistics from "@/components/app/dashboard/statistics";
 import StatisticsSkeleton from "@/components/app/dashboard/statistics/index-skeleton";
 import { Suspense } from "react";
 import { auth } from "@/auth";
-import { getEnumByValue } from "@/lib/utils";
-import { getFilterPreferences } from "@/lib/actions/filter";
-import { getMassSelectionStats } from "@/lib/actions/mass-selections";
 import { redirect } from "next/navigation";
 
-const seasons = [
-  { label: "All Seasons", value: "all" },
-  ...liturgicalSeasonItems,
-];
-const years = [{ label: "All Years", value: "all" }, ...liturgicalYearItems];
-
-export default async function DashboardPage(props: {
-  searchParams: SearchParams;
-}) {
+export default async function DashboardPage() {
   const session = await auth();
 
   if (!session?.user) redirect("/signin");
-
-  const filters = await props.searchParams;
-
-  // Get saved preferences from cookies
-  const savedPreferences = await getFilterPreferences("dashboard");
-
-  const page = Number(filters["page"]) || Number(savedPreferences.page) || 1;
-  const query = filters["query"] || savedPreferences.query;
-  const season =
-    getEnumByValue(LiturgicalSeason, filters["season"] || "") ||
-    getEnumByValue(LiturgicalSeason, savedPreferences.season || "");
-  const year =
-    getEnumByValue(LiturgicalYear, filters["year"] || "") ||
-    getEnumByValue(LiturgicalYear, savedPreferences.year || "");
-  const sort_by =
-    getEnumByValue(SortBy, filters["sort_by"] || "") ||
-    getEnumByValue(SortBy, savedPreferences.sortBy || "") ||
-    SortBy.UPDATED_AT;
-  const order =
-    getEnumByValue(SortOrder, filters["order"] || "") ||
-    getEnumByValue(SortOrder, savedPreferences.order || "") ||
-    SortOrder.DESC;
-
-  const searchKey = [page, query, season, year].join("-");
 
   return (
     <div className="max-w-full w-full">
@@ -81,6 +42,55 @@ export default async function DashboardPage(props: {
       </Suspense>
 
       <div className="grid gap-6 lg:grid-cols-3 mb-8">
+        <Tabs defaultValue="selections" className="lg:col-span-2 space-y-6">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="selections" className="gap-2">
+              <BookOpen className="h-4 w-4" />
+              My Selections
+            </TabsTrigger>
+            <TabsTrigger value="drafts" className="gap-2">
+              <BookOpen className="h-4 w-4 text-amber-500" />
+              My Drafts
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="selections" className="space-y-4">
+            <div className="flex justify-between items-center">
+              <h3 className="text-lg ">My Liturgical Selections</h3>
+              <Link href="/dashboard/liturgical-selections">
+                <Button variant="outline" size="sm">
+                  View All
+                </Button>
+              </Link>
+            </div>
+
+            <Suspense
+              fallback={
+                <MassSelectionListSkeleton className="grid gap-4 sm:grid-cols-2 2xl:grid-cols-3" />
+              }
+            >
+              <SelectionsList />
+            </Suspense>
+          </TabsContent>
+
+          <TabsContent value="drafts" className="space-y-4">
+            {/* <div className="flex justify-between items-center">
+              <h3 className="text-lg">My Drafts</h3>
+              <Link href="/dashboard/drafts">
+                <Button variant="outline" size="sm">
+                  View all
+                </Button>
+              </Link>
+            </div>
+
+            <div className="space-y-4"> */}
+            <Suspense fallback={<div>Loading drafts...</div>}>
+              <DraftList />
+            </Suspense>
+            {/* </div> */}
+          </TabsContent>
+        </Tabs>
+
         <Card className="lg:col-span-1 border-2 border-dashed border-primary/20 bg-linear-to-br from-primary/5 to-transparent h-fit">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -127,69 +137,6 @@ export default async function DashboardPage(props: {
             </div>
           </CardContent>
         </Card>
-
-        {/* My Selections Section */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Actions */}
-          <div className="flex items-center justify-between">
-            <h3 className="text-2xl font-display text-foreground">
-              My Liturgical Selections
-            </h3>
-            <Button asChild>
-              <Link href="/liturgical-selections/new">
-                <Plus className="mr-2 h-4 w-4" />
-                Create Selection
-              </Link>
-            </Button>
-          </div>
-
-          <div className="flex flex-col sm:flex-row gap-4 mb-6">
-            <Search
-              filterType="dashboard"
-              query={query}
-              placeholder="Search my selections..."
-            />
-            <div className="flex flex-col xs:flex-row gap-2">
-              <QueryFilter
-                filterType="dashboard"
-                selected={season ?? "all"}
-                queryName={"season"}
-                items={seasons}
-              />
-              <QueryFilter
-                filterType="dashboard"
-                selected={year ?? "all"}
-                queryName={"year"}
-                items={years}
-              />
-              <SortFilter
-                filterType="dashboard"
-                sortBy={sort_by}
-                order={order}
-              />
-            </div>
-          </div>
-
-          <Suspense
-            fallback={
-              <MassSelectionListSkeleton className="grid gap-4 sm:grid-cols-2 2xl:grid-cols-3" />
-            }
-            key={searchKey}
-          >
-            <MassSelectionList
-              filterType="dashboard"
-              query={query}
-              year={year}
-              season={season}
-              page={page}
-              sortBy={sort_by}
-              sortOrder={order}
-              userOnly={true}
-              className="grid gap-4 sm:grid-cols-2 2xl:grid-cols-3"
-              limit={8}
-            />
-          </Suspense>
-        </div>
       </div>
     </div>
   );
