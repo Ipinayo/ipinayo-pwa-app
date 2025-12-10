@@ -38,7 +38,7 @@ export async function findSelection(id: string) {
     return await prisma.massSelection.findUnique({
         where: { id },
         include: {
-            themes: { select: { id: true } },
+            themes: true,
             parts: { orderBy: { order: "asc" } },
         }
     })
@@ -214,13 +214,13 @@ export async function findAllUserSelections({
     return { selections, total }
 }
 
-export async function saveSelection(selection: NewMassSelection, userId: string) {
+export async function saveSelection(selection: NewMassSelection, userId: string, draftId: string) {
 
     const { parts, date, themes, parishLocation, ...rest } = selection
 
     const data: Prisma.MassSelectionCreateInput = {
         ...rest,
-        date: new Date(date),
+        date: date,
         themes: {
             connectOrCreate: themes.map(name => ({
                 where: { name: name.toLowerCase() },
@@ -266,9 +266,17 @@ export async function saveSelection(selection: NewMassSelection, userId: string)
         }
     }
 
-    const createdSelection = await prisma.massSelection.create({
-        data
-    })
+    const createdSelection = await prisma.$transaction(async (tx) => {
+        const selection = await tx.massSelection.create({
+            data
+        })
+        await tx.massSelectionDraft.delete({
+            where: { id: draftId, createdById: userId }
+        })
+
+        return selection;
+
+    });
 
     // Attempt update of user profile with parish and choir info if not already set
     addParishAndChoirInfoToUserProfile(userId, createdSelection.parishLocationId, createdSelection.choirName, createdSelection.parishName);
@@ -394,19 +402,55 @@ export async function findAllThemes() {
 export async function findMassSelectionStats(
     userId: string
 ): Promise<MassSelectionStats> {
-    const stats = await prisma.$queryRaw<MassSelectionStats[]>`
-    SELECT
-      COUNT(*)::int AS total,
-      COUNT(*) FILTER (WHERE "isPublic" = true)::int AS public,
-      COUNT(*) FILTER (WHERE "isPublic" = false)::int AS private,
-      COUNT(*) FILTER (WHERE "createdAt" >= date_trunc('month', now()))::int AS "thisMonth",
-      COUNT(*) FILTER (WHERE "createdAt" >= date_trunc('week', now()))::int AS "thisWeek"
-    FROM "MassSelection"
-    WHERE "createdById" = ${userId};
-  `
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const startOfWeek = new Date(now);
+    startOfWeek.setDate(now.getDate() - now.getDay());
 
-    // $queryRaw returns an array of rows, so we take the first one
-    return stats[0]
+    const [
+        total,
+        publicCount,
+        privateCount,
+        thisMonth,
+        thisWeek,
+        totalDrafts
+    ] = await Promise.all([
+        prisma.massSelection.count({
+            where: { createdById: userId }
+        }),
+        prisma.massSelection.count({
+            where: { createdById: userId, isPublic: true }
+        }),
+        prisma.massSelection.count({
+            where: { createdById: userId, isPublic: false }
+        }),
+        prisma.massSelection.count({
+            where: {
+                createdById: userId,
+                createdAt: { gte: startOfMonth }
+            }
+        }),
+        prisma.massSelection.count({
+            where: {
+                createdById: userId,
+                createdAt: { gte: startOfWeek }
+            }
+        }),
+        prisma.massSelectionDraft.count({
+            where: {
+                createdById: userId,
+            }
+        })
+    ]);
+
+    return {
+        total,
+        public: publicCount,
+        private: privateCount,
+        thisMonth,
+        thisWeek,
+        totalDrafts
+    };
 }
 
 export async function saveSelectionBySelection(selection: SingleMassSelectionWithParts, userId: string) {

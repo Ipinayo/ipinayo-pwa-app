@@ -203,6 +203,7 @@ export const formatCalendarDate = (date: string | Date) => {
  * @param date 
  * @returns date at UTC midnight
  */
-export function normalizeDate(date: Date) {
+export function normalizeDate(date: Date | null | undefined) {
+  if (!date) return new Date();
   return new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
 }

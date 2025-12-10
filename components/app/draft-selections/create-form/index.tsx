@@ -8,7 +8,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
-  Form,
   FormControl,
   FormField,
   FormItem,
@@ -18,9 +17,7 @@ import {
 import {
   LiturgicalSeason,
   LiturgicalYear,
-  Location,
-  MassSelectionWithParts,
-  NewMassSelection,
+  MassSelectionDraft,
 } from "@/types/models";
 import { Save } from "lucide-react";
 import {
@@ -30,22 +27,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  createSelection,
-  updateSelection,
-} from "@/lib/actions/mass-selections";
+import { createSelection } from "@/lib/actions/mass-selections";
 import {
   getEnum,
   getValuesFromOptions,
   normalizeDate,
   transformStringsToOptions,
 } from "@/lib/utils";
-import {
-  liturgicalSeasonItems,
-  liturgicalYearItems,
-  liturgyTemplates,
-} from "@/lib/constants";
-import { useFieldArray, useForm } from "react-hook-form";
+import { liturgicalSeasonItems, liturgicalYearItems } from "@/lib/constants";
+import { FormProvider, useFieldArray, useForm } from "react-hook-form";
 import {
   DndContext,
   closestCenter,
@@ -67,87 +57,96 @@ import { Input } from "@/components/ui/input";
 import LocationSelector from "@/components/common/location-selector";
 import MultipleSelector from "@/components/common/multiple-selector";
 import { Switch } from "@/components/ui/switch";
-import { createMassSelectionSchema } from "@/types/schemas/mass-selections";
-import { useEffect, useMemo } from "react";
-import { useRouter } from "next/navigation";
+import {
+  createMassSelectionSchema,
+  DraftMassSelection,
+  draftMassSelectionSchema,
+} from "@/types/schemas/mass-selections";
+import { useMemo } from "react";
 import { withToast } from "@/lib/with-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
-import MassPartRow from "../mass-part-row";
+import MassPartRow from "@/components/common/mass-part-row";
+import { useAppNavigation } from "@/contexts/AppNavigationContext";
+import { useDraftAutosave } from "@/hooks/use-draft-autosave";
+import { toast } from "sonner";
 
-type SaveFormProps =
-  | {
-      mode: "create";
-      template: string;
-      themes: string[];
-      partNames: string[];
-      parishLocation: Location | null;
-      choirName: string | null;
-      parishName: string | null;
-      selection?: never;
-    }
-  | {
-      mode: "edit";
-      selection: MassSelectionWithParts;
-      themes: string[];
-      partNames: string[];
-      parishLocation?: never;
-      choirName?: never;
-      parishName?: never;
-      template?: never;
-    };
+type CreateFormProps = {
+  draftSelection: MassSelectionDraft;
+  themes: string[];
+  partNames: string[];
+};
 
-// Initialize default values
-const getDefaultValues = (props: SaveFormProps): NewMassSelection => {
-  if (props.mode === "edit") {
-    const { selection } = props;
-    return {
-      ...selection,
-      themes: selection.themes.map((theme) => theme.name),
-    };
-  }
+const getDefaultValues = (props: CreateFormProps): DraftMassSelection => {
+  let formattedParts;
 
-  const liturgy = liturgyTemplates.find((temp) => temp.id === props.template);
-  const parts = liturgy?.parts || [];
-
-  const initialParts =
-    parts.length > 0
-      ? parts.map((partName, index) => ({
-          id: `temp-${(index + 1).toString()}`,
-          order: index,
-          partName,
+  if (props.draftSelection.parts) {
+    try {
+      formattedParts = Array.isArray(props.draftSelection.parts)
+        ? props.draftSelection.parts.map((part, index) => {
+            const result =
+              draftMassSelectionSchema.shape.parts.element.safeParse(part);
+            if (result.success) {
+              return result.data;
+            } else {
+              console.error(
+                "Invalid part data:",
+                result.error,
+                "Using default values."
+              );
+              return {
+                id: `temp-${Date.now()}-${index}`,
+                order: index,
+                partName: "",
+                keySignature: null,
+                notes: "",
+                songTitle: "",
+              };
+            }
+          })
+        : [
+            {
+              id: "temp-1",
+              order: 0,
+              partName: "",
+              keySignature: null,
+              notes: "",
+              songTitle: "",
+            },
+          ];
+    } catch (error) {
+      console.error("Failed to parse parts JSON:", error);
+      formattedParts = [
+        {
+          id: "temp-1",
+          order: 0,
+          partName: "",
           keySignature: null,
           notes: "",
           songTitle: "",
-        }))
-      : [
-          {
-            id: "temp-1",
-            order: 0,
-            partName: "",
-            keySignature: null,
-            notes: "",
-            songTitle: "",
-          },
-        ];
+        },
+      ];
+    }
+  }
+
+  let initialParishLocation;
+  const result = draftMassSelectionSchema.shape.parishLocation.safeParse(
+    props.draftSelection.parishLocation
+  );
+  if (result.success) {
+    initialParishLocation = result.data;
+  } else {
+    console.error(result.error);
+  }
 
   return {
-    title: "",
-    date: new Date(),
-    liturgicalYear: null,
-    liturgicalSeason: null,
-    themes: liturgy?.themes || [],
-    pastoralFocus: "",
-    liturgy: liturgy?.liturgy || "",
-    isPublic: true,
-    parishLocation: props.parishLocation,
-    choirName: props.choirName,
-    parishName: props.parishName,
-    parts: initialParts,
+    ...props.draftSelection,
+    parishLocation: initialParishLocation || null,
+    parts: formattedParts || [],
   };
 };
 
-export default function SaveForm(props: SaveFormProps) {
-  const router = useRouter();
+export default function CreateForm(props: CreateFormProps) {
+  const { replacePath, handleBack } = useAppNavigation();
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -160,15 +159,29 @@ export default function SaveForm(props: SaveFormProps) {
     })
   );
 
-  const form = useForm<NewMassSelection>({
-    resolver: zodResolver(createMassSelectionSchema),
+  const form = useForm<DraftMassSelection>({
+    resolver: zodResolver(draftMassSelectionSchema),
     defaultValues: getDefaultValues(props),
     mode: "onBlur",
   });
 
-  const { fields, append, remove, move, insert, update } = useFieldArray({
+  const { fields, append, remove, move, insert } = useFieldArray({
     control: form.control,
     name: "parts",
+  });
+
+  const { save } = useDraftAutosave({
+    draftId: props.draftSelection.id,
+    form,
+    onSaveSuccess: (isAutoSave) => {
+      if (!isAutoSave) {
+        toast.success("Successfully saved draft!");
+        handleBack("/dashboard");
+      }
+    },
+    onSaveError: () => {
+      toast.error("Error saving draft");
+    },
   });
 
   const itemIds = useMemo(() => fields.map((item) => item.id), [fields]);
@@ -189,15 +202,6 @@ export default function SaveForm(props: SaveFormProps) {
 
     // Use the move function from useFieldArray
     move(oldIndex, newIndex);
-
-    // Update order field for all parts after the move
-    const currentParts = form.getValues("parts");
-    currentParts.forEach((part, idx) => {
-      update(idx, {
-        ...part,
-        order: idx,
-      });
-    });
   };
 
   const addPart = (afterIndex?: number) => {
@@ -219,65 +223,52 @@ export default function SaveForm(props: SaveFormProps) {
     } else {
       append(newPart);
     }
-
-    // Update order field for all parts after the insertion
-    const currentParts = form.getValues("parts");
-    currentParts.forEach((part, idx) => {
-      update(idx, {
-        ...part,
-        order: idx,
-      });
-    });
   };
 
   const removePart = (index: number) => {
     if (fields.length > 1) {
       // Use remove from useFieldArray
       remove(index);
-
-      // Update order field for remaining parts
-      const currentParts = form.getValues("parts");
-      currentParts.forEach((part, idx) => {
-        update(idx, {
-          ...part,
-          order: idx,
-        });
-      });
     }
   };
 
-  const { mode } = props;
+  const handleSubmit = async (data: DraftMassSelection) => {
+    const validationResult = createMassSelectionSchema.safeParse(data);
 
-  const handleSubmit = async (data: NewMassSelection) => {
-    data.date = normalizeDate(data.date);
+    if (!validationResult.success) {
+      // Set errors on form fields
+      validationResult.error.issues.forEach((error) => {
+        const fieldName = error.path.join(".") as keyof DraftMassSelection;
 
-    if (mode === "edit") {
-      const { selection } = props;
-      await withToast(() => updateSelection(selection.id, data), {
-        success: () => {
-          router.push(`/liturgical-selections/${selection.id}`);
-          return "Successfully updated selection!";
-        },
+        form.setError(fieldName, {
+          type: "manual",
+          message: error.message,
+        });
       });
-    } else {
-      await withToast(() => createSelection(data), {
-        success: (newSelection) => {
-          router.push(`/liturgical-selections/${newSelection.id}`);
-          return "Successfully created selection!";
-        },
-      });
+
+      return;
     }
+
+    const selection = validationResult.data;
+
+    selection.date = normalizeDate(selection.date);
+    selection.parts = selection.parts.map((part, idx) => ({
+      ...part,
+      order: idx,
+    }));
+
+    await withToast(() => createSelection(selection, props.draftSelection.id), {
+      success: (newSelection) => {
+        replacePath(`/liturgical-selections/${newSelection.id}`);
+        return "Successfully created selection!";
+      },
+    });
   };
 
   const partNames = transformStringsToOptions(props.partNames);
 
-  // Reset form when template changes
-  useEffect(() => {
-    form.reset(getDefaultValues(props));
-  }, [props]);
-
   return (
-    <Form {...form}>
+    <FormProvider {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
@@ -331,7 +322,7 @@ export default function SaveForm(props: SaveFormProps) {
                     </FormLabel>
                     <FormControl>
                       <DateSelect
-                        value={field.value}
+                        value={field.value || undefined}
                         onChange={field.onChange}
                       />
                     </FormControl>
@@ -383,7 +374,7 @@ export default function SaveForm(props: SaveFormProps) {
                 </FormItem>
               )}
             />
-            <LocationSelector form={form} />
+            <LocationSelector />
           </CardContent>
         </Card>
 
@@ -563,7 +554,7 @@ export default function SaveForm(props: SaveFormProps) {
                     key={field.id}
                     partId={field.id}
                     partNames={partNames}
-                    control={form.control}
+                    mode="draft"
                     index={index}
                     onRemove={() => removePart(index)}
                     canRemove={fields.length > 1}
@@ -575,7 +566,11 @@ export default function SaveForm(props: SaveFormProps) {
           </CardContent>
         </Card>
 
-        <div className="flex justify-end">
+        <div className="flex justify-between gap-4">
+          <Button type="button" variant="outline" onClick={() => save()}>
+            Save as Draft
+          </Button>
+
           <Button
             type="submit"
             disabled={form.formState.isSubmitting}
@@ -586,6 +581,6 @@ export default function SaveForm(props: SaveFormProps) {
           </Button>
         </div>
       </form>
-    </Form>
+    </FormProvider>
   );
 }

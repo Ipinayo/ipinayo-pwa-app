@@ -9,3 +9,12 @@ export const massSelectionPartSchema = z.object({
     keySignature: z.enum(KeySignature).nullable().optional(),
     notes: z.string().nullable().optional(),
 });
+
+export const draftMassSelectionPartSchema = z.object({
+    id: z.string(),
+    order: z.number().min(0),
+    partName: z.string().optional(),
+    songTitle: z.string().optional(),
+    keySignature: z.enum(KeySignature).nullable().optional(),
+    notes: z.string().nullable().optional(),
+});

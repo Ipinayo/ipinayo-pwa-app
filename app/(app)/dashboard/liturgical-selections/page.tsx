@@ -1,10 +1,8 @@
-import {
-  LiturgicalSeason,
-  LiturgicalYear,
-} from "../../../lib/generated/prisma/index";
+import { LiturgicalSeason, LiturgicalYear } from "@/lib/generated/prisma/index";
 import { SearchParams, SortBy, SortOrder } from "@/types/utils";
 import { liturgicalSeasonItems, liturgicalYearItems } from "@/lib/constants";
 
+import BackButton from "@/components/common/back-button";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import MassSelectionList from "@/components/app/mass-selections/mass-selection-list";
@@ -14,8 +12,10 @@ import QueryFilter from "@/components/common/query-filter";
 import Search from "@/components/app/mass-selections/search";
 import SortFilter from "@/components/app/mass-selections/sort-filter";
 import { Suspense } from "react";
+import { auth } from "@/auth";
 import { getEnumByValue } from "@/lib/utils";
 import { getFilterPreferences } from "@/lib/actions/filter";
+import { redirect } from "next/navigation";
 
 const seasons = [
   { label: "All Seasons", value: "all" },
@@ -26,10 +26,14 @@ const years = [{ label: "All Years", value: "all" }, ...liturgicalYearItems];
 export default async function MassSelectionsPage(props: {
   searchParams: SearchParams;
 }) {
+  const session = await auth();
+
+  if (!session?.user) redirect("/signin");
+
   const filters = await props.searchParams;
 
   // Get saved preferences from cookies
-  const savedPreferences = await getFilterPreferences("selections");
+  const savedPreferences = await getFilterPreferences("dashboard");
 
   const page = Number(filters["page"]) || Number(savedPreferences.page) || 1;
   const query = filters["query"] || savedPreferences.query;
@@ -42,7 +46,7 @@ export default async function MassSelectionsPage(props: {
   const sort_by =
     getEnumByValue(SortBy, filters["sort_by"] || "") ||
     getEnumByValue(SortBy, savedPreferences.sortBy || "") ||
-    SortBy.DATE;
+    SortBy.UPDATED_AT;
   const order =
     getEnumByValue(SortOrder, filters["order"] || "") ||
     getEnumByValue(SortOrder, savedPreferences.order || "") ||
@@ -52,56 +56,55 @@ export default async function MassSelectionsPage(props: {
 
   return (
     <div className="max-w-full w-full">
-      <div className="mb-8">
-        <div className="flex items-center justify-between">
+      <BackButton to="/dashboard" backText="Back to dashboard" />
+      <div className="mb-8 flex items-center justify-between">
+        <div>
           <h2 className="text-3xl font-display text-foreground">
-            Liturgical Selections
+            My Liturgical Selections
           </h2>
-          <Link href="/liturgical-selections/new">
-            <Button size="lg" className="gap-2">
-              <Plus className="h-5 w-5" />
-              Create Selection
-            </Button>
-          </Link>
         </div>
-        <p className="text-muted-foreground mt-2">
-          Plan and organize liturgical music with ease
-        </p>
+        <Link href="/liturgical-selections/new">
+          <Button size="lg" className="gap-2">
+            <Plus className="h-5 w-5" />
+            Create Selection
+          </Button>
+        </Link>
       </div>
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-4 mb-6">
         <Search
-          filterType="selections"
+          filterType="dashboard"
           query={query}
-          placeholder="Search selections..."
+          placeholder="Search my selections..."
         />
         <div className="flex gap-2">
           <QueryFilter
-            filterType="selections"
+            filterType="dashboard"
             selected={season ?? "all"}
             queryName={"season"}
             items={seasons}
           />
           <QueryFilter
-            filterType="selections"
+            filterType="dashboard"
             selected={year ?? "all"}
             queryName={"year"}
             items={years}
           />
-          <SortFilter filterType="selections" sortBy={sort_by} order={order} />
+          <SortFilter filterType="dashboard" sortBy={sort_by} order={order} />
         </div>
       </div>
 
       <Suspense fallback={<MassSelectionListSkeleton />} key={searchKey}>
         <MassSelectionList
-          filterType="selections"
+          filterType="dashboard"
           query={query}
           year={year}
           season={season}
           page={page}
           sortBy={sort_by}
           sortOrder={order}
+          userOnly={true}
         />
       </Suspense>
     </div>

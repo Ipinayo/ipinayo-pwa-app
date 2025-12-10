@@ -33,6 +33,7 @@ export type NewMassSelectionPart = Omit<Prisma.MassPartCreateInput, 'id' | 'mass
 };
 
 export type NewLocation = Omit<Prisma.LocationCreateInput, 'id' | 'massSelections' | 'userProfiles' | 'createdAt' | 'updatedAt' | 'country'> & {
+    id?: string
     country?: string
 };
 
@@ -62,6 +63,7 @@ export interface MassSelectionStats {
     private: number
     thisMonth: number
     thisWeek: number
+    totalDrafts: number
 }
 
 export type Location = Prisma.LocationGetPayload<{}>;
@@ -92,5 +94,7 @@ export type AppUser = Prisma.UserGetPayload<{
         }
     }
 }>;
+
+export type MassSelectionDraft = Prisma.MassSelectionDraftGetPayload<{}>;
 
 export { KeySignature, LiturgicalSeason, LiturgicalYear }
