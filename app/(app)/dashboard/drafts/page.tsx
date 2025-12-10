@@ -1,0 +1,52 @@
+import BackButton from "@/components/common/back-button";
+import { Button } from "@/components/ui/button";
+import DraftSelectionsList from "@/components/app/draft-selections/draft-selections-list";
+import Link from "next/link";
+import MassSelectionListSkeleton from "@/components/app/mass-selections/mass-selection-list/index-skeleton";
+import { Plus } from "lucide-react";
+import SearchBar from "@/components/common/search-bar";
+import { SearchParams } from "@/types/utils";
+import { Suspense } from "react";
+import { auth } from "@/auth";
+import { redirect } from "next/navigation";
+
+export default async function DraftsPage(props: {
+  searchParams: SearchParams;
+}) {
+  const session = await auth();
+
+  if (!session?.user) redirect("/signin");
+
+  const filters = await props.searchParams;
+
+  const page = Number(filters["page"]) || 1;
+  const query = filters["query"] || "";
+
+  const searchKey = [page, query].join("-");
+
+  return (
+    <div className="max-w-full w-full">
+      <BackButton to="/dashboard" backText="Back to dashboard" />
+      <div className="mb-8 flex items-center justify-between">
+        <div>
+          <h2 className="text-3xl font-display text-foreground">My Drafts</h2>
+        </div>
+        <Link href="/liturgical-selections/new">
+          <Button size="lg" className="gap-2">
+            <Plus className="h-5 w-5" />
+            Create Selection
+          </Button>
+        </Link>
+      </div>
+
+      {/* Filters */}
+      <div className="flex flex-col sm:flex-row gap-4 mb-6">
+        <SearchBar query={query} placeholder="Search my drafts..." />
+      </div>
+
+      <Suspense fallback={<MassSelectionListSkeleton />} key={searchKey}>
+        <DraftSelectionsList query={query} page={page} />
+      </Suspense>
+    </div>
+  );
+}
