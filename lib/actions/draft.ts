@@ -3,6 +3,7 @@
 import findDraftsByUserId, { createDraft, deleteDraftById, findDraftById, updateDraftById } from "@/db/draft";
 
 import { DraftMassSelection } from "@/types/schemas/mass-selections";
+import { DraftSelectionFilter } from "@/types/utils";
 import { auth } from "@/auth";
 import { findUserParishAndChoirInfo } from "@/db/user";
 import { liturgyTemplates } from "../constants";
@@ -30,7 +31,9 @@ export async function getDraftById(id: string) {
     }
 }
 
-export async function getAllDrafts() {
+export async function getAllDrafts({ page = 1,
+    limit = 12,
+    query = '', }: DraftSelectionFilter) {
     try {
 
         const session = await auth();
@@ -38,8 +41,16 @@ export async function getAllDrafts() {
             throw new Error("Unauthorized");
         }
 
-        const drafts = await findDraftsByUserId(session.user.id);
-        return drafts;
+        const { drafts, total } = await findDraftsByUserId({ page, limit, query }, session.user.id);
+        return {
+            drafts: drafts,
+            pagination: {
+                page,
+                limit,
+                total: total,
+                pages: Math.ceil(total / limit),
+            },
+        };
     } catch (error: any) {
         console.error("Error fetching drafts:", error);
         throw new Error("Error fetching drafts: " + error?.message);
@@ -98,6 +109,7 @@ export async function createNewDraft(templateId: string) {
         const newDraft = await createDraft(draft, session.user.id);
 
         revalidatePath('/liturgical-selections/new');
+        revalidatePath('/dashboard');
         revalidatePath('/dashboard/drafts');
 
         return newDraft;

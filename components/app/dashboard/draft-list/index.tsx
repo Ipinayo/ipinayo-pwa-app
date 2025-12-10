@@ -7,13 +7,15 @@ import Link from "next/link";
 import { getAllDrafts } from "@/lib/actions/draft";
 
 export default async function DraftList() {
-  const drafts = await getAllDrafts();
+  const draftsResponse = await getAllDrafts({ limit: 6 });
+
+  const drafts = draftsResponse.drafts;
 
   return (
     <>
       <div className="flex justify-between items-center">
         <h3 className="text-lg">My Drafts</h3>
-        {drafts.length > 6 && (
+        {draftsResponse.pagination.total > 6 && (
           <Link href="/dashboard/drafts">
             <Button variant="outline" size="sm">
               View all

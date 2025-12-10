@@ -8,7 +8,9 @@ import {
 
 import BackButton from "@/components/common/back-button";
 import { Box } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import DraftCard from "@/components/common/draft-card";
+import Link from "next/link";
 import SelectTemplateButton from "@/components/app/draft-selections/select-template-button";
 import { auth } from "@/auth";
 import { getAllDrafts } from "@/lib/actions/draft";
@@ -20,7 +22,9 @@ export default async function SelectLiturgyTemplatePage() {
 
   if (!session?.user) redirect("/signin");
 
-  const drafts = await getAllDrafts();
+  const draftsResponse = await getAllDrafts({ limit: 6 });
+
+  const drafts = draftsResponse.drafts;
 
   return (
     <div className="w-full">
@@ -38,7 +42,16 @@ export default async function SelectLiturgyTemplatePage() {
         </div>
 
         <div className="mb-8">
-          <h3 className="text-lg font-semibold mb-4">Continue Draft</h3>
+          <div className="flex justify-between items-center">
+            <h3 className="text-lg font-semibold mb-4">Continue Draft</h3>
+            {draftsResponse.pagination.total > 6 && (
+              <Link href="/dashboard/drafts">
+                <Button variant="outline" size="sm">
+                  View all
+                </Button>
+              </Link>
+            )}
+          </div>
           {drafts.length === 0 ? (
             <Card className="text-center">
               <CardContent>

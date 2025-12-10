@@ -23,7 +23,7 @@ export default function DraftCard({ draft }: { draft: MassSelectionDraft }) {
               {draft.title || "Untitled Draft"}
             </CardTitle>
             <CardDescription className="text-xs mt-1">
-              Last updated {formatDate(draft.updatedAt)}
+              Last updated: {formatDate(draft.updatedAt)}
             </CardDescription>
           </div>
           <DeleteButton

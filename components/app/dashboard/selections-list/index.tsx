@@ -19,7 +19,7 @@ export default async function SelectionsList() {
     <>
       <div className="flex justify-between items-center">
         <h3 className="text-lg ">My Liturgical Selections</h3>
-        {selections.length > 4 && (
+        {selectionsResponse.pagination.total > 4 && (
           <Button variant="outline" size="sm" asChild>
             <Link href="/dashboard/liturgical-selections">View All</Link>
           </Button>

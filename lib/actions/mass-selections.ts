@@ -369,6 +369,7 @@ export async function cloneSelection(selectionId: string) {
         }, session.user.id);
 
         revalidatePath('/liturgical-selections/new');
+        revalidatePath('/dashboard');
         revalidatePath('/dashboard/drafts');
 
         return result;
