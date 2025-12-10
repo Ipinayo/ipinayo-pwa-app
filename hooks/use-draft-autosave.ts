@@ -87,7 +87,7 @@ export function useDraftAutosave({
                 isSavingRef.current = false;
             }
         },
-        [form, draftId, updateDraft, onSaveSuccess, onSaveError]
+        [form, draftId, onSaveSuccess, onSaveError]
     );
 
     // Manual save function
@@ -157,7 +157,7 @@ export function useDraftAutosave({
             window.addEventListener('beforeunload', handleBeforeUnload);
             return () => window.removeEventListener('beforeunload', handleBeforeUnload);
         }
-    }, [hasUnsavedChanges, form, draftId, updateDraft, enableAutoSave]);
+    }, [hasUnsavedChanges, form, draftId, enableAutoSave]);
 
     // Cleanup timeout on unmount
     useEffect(() => {

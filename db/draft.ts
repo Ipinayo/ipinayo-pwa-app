@@ -37,7 +37,7 @@ export default async function findDraftsByUserId({
     // Get drafts with pagination
     const drafts = await prisma.massSelectionDraft.findMany({
         where: whereClause,
-        orderBy: { 'updatedAt': 'asc' },
+        orderBy: { 'updatedAt': 'desc' },
         skip,
         take: limit,
     })
