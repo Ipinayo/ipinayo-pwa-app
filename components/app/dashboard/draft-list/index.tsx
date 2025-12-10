@@ -2,7 +2,7 @@ import { Box, Plus } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
 import { Button } from "@/components/ui/button";
-import DraftCard from "@/components/common/draft-card";
+import DraftCard from "@/components/app/draft-selections/draft-card";
 import Link from "next/link";
 import { getAllDrafts } from "@/lib/actions/draft";
 

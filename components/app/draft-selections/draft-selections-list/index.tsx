@@ -2,7 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Music, Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import DraftCard from "@/components/common/draft-card";
+import DraftCard from "@/components/app/draft-selections/draft-card";
 import { DraftSelectionFilter } from "@/types/utils";
 import Link from "next/link";
 import { UrlPagination } from "@/components/common/url-pagination";

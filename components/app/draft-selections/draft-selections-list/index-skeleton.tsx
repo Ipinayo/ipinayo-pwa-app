@@ -1,4 +1,4 @@
-import DraftCardSkeleton from "@/components/common/draft-card/index-skeleton";
+import DraftCardSkeleton from "@/components/app/draft-selections/draft-card/index-skeleton";
 
 export default function DraftSelectionListSkeleton() {
   return (

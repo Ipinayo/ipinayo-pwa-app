@@ -9,7 +9,7 @@ import {
 import BackButton from "@/components/common/back-button";
 import { Box } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import DraftCard from "@/components/common/draft-card";
+import DraftCard from "@/components/app/draft-selections/draft-card";
 import Link from "next/link";
 import SelectTemplateButton from "@/components/app/draft-selections/select-template-button";
 import { auth } from "@/auth";
