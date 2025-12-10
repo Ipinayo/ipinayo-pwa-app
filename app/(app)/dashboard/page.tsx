@@ -1,4 +1,4 @@
-import { BookOpen, FileText, Sparkles } from "lucide-react";
+import { BookOpen, FileText, Plus, Sparkles } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -12,8 +12,8 @@ import { Button } from "@/components/ui/button";
 import DraftList from "@/components/app/dashboard/draft-list";
 import DraftListSkeleton from "@/components/app/dashboard/draft-list/index-skeleton";
 import Link from "next/link";
-import MassSelectionListSkeleton from "@/components/app/mass-selections/mass-selection-list/index-skeleton";
 import SelectionsList from "@/components/app/dashboard/selections-list";
+import SelectionsListSkeleton from "@/components/app/dashboard/selections-list/index-skeleton";
 import Statistics from "@/components/app/dashboard/statistics";
 import StatisticsSkeleton from "@/components/app/dashboard/statistics/index-skeleton";
 import { Suspense } from "react";
@@ -29,11 +29,18 @@ export default async function DashboardPage() {
     <div className="max-w-full w-full">
       {/* Welcome Section */}
       <div className="mb-8">
-        <h2 className="text-3xl font-display text-foreground mb-2">
-          Welcome back, {session.user.name?.split(" ")[0] || session.user.email}
-          !
-        </h2>
-        <p className="text-muted-foreground">
+        <div className="flex items-center gap-5 w-full justify-between">
+          <h2 className="text-3xl font-display text-foreground">
+            Welcome Back
+          </h2>
+          <Button size="lg" className="gap-2" asChild>
+            <Link href="/liturgical-selections/new">
+              <Plus className="h-5 w-5" />
+              Create Selection
+            </Link>
+          </Button>
+        </div>
+        <p className="text-muted-foreground mt-2">
           Plan and organize your liturgical music.
         </p>
       </div>
@@ -56,20 +63,7 @@ export default async function DashboardPage() {
           </TabsList>
 
           <TabsContent value="selections" className="space-y-4">
-            <div className="flex justify-between items-center">
-              <h3 className="text-lg ">My Liturgical Selections</h3>
-              <Link href="/dashboard/liturgical-selections">
-                <Button variant="outline" size="sm">
-                  View All
-                </Button>
-              </Link>
-            </div>
-
-            <Suspense
-              fallback={
-                <MassSelectionListSkeleton className="grid gap-4 sm:grid-cols-2 2xl:grid-cols-3" />
-              }
-            >
+            <Suspense fallback={<SelectionsListSkeleton />}>
               <SelectionsList />
             </Suspense>
           </TabsContent>

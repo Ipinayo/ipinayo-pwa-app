@@ -52,26 +52,30 @@ export default async function MassSelectionsPage(props: {
 
   return (
     <div className="max-w-full w-full">
-      <div className="mb-8 flex items-center justify-between">
-        <div>
+      <div className="mb-8">
+        <div className="flex items-center justify-between">
           <h2 className="text-3xl font-display text-foreground">
             Liturgical Selections
           </h2>
-          <p className="text-muted-foreground mt-2">
-            Plan and organize liturgical music with ease
-          </p>
+          <Link href="/liturgical-selections/new">
+            <Button size="lg" className="gap-2">
+              <Plus className="h-5 w-5" />
+              Create Selection
+            </Button>
+          </Link>
         </div>
-        <Link href="/liturgical-selections/new">
-          <Button size="lg" className="gap-2">
-            <Plus className="h-5 w-5" />
-            Create Selection
-          </Button>
-        </Link>
+        <p className="text-muted-foreground mt-2">
+          Plan and organize liturgical music with ease
+        </p>
       </div>
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-4 mb-6">
-        <Search filterType="selections" query={query} placeholder="Search selections..." />
+        <Search
+          filterType="selections"
+          query={query}
+          placeholder="Search selections..."
+        />
         <div className="flex gap-2">
           <QueryFilter
             filterType="selections"
