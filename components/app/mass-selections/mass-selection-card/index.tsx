@@ -28,7 +28,7 @@ import CloneButton from "@/components/app/mass-selections/clone-button";
 import DownloadButton from "@/components/app/mass-selections/download-button";
 import Link from "next/link";
 import { MassSelection } from "@/types/models";
-import Options from "./options";
+import Options from "../options";
 import { liturgicalSeasonItems } from "@/lib/constants";
 
 export default function MassSelectionCard({
