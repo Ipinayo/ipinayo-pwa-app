@@ -95,19 +95,11 @@ export function useDraftAutosave({
         return performSave(false);
     }, [performSave]);
 
-    // Auto-save function
-    const autoSave = useCallback(async (): Promise<void> => {
-        if (hasUnsavedChanges && saveStatus === 'idle') {
-            return performSave(true);
-        }
-    }, [performSave, hasUnsavedChanges, saveStatus]);
-
     // Watch for form changes
     useEffect(() => {
         const subscription = form.watch((values) => {
             const currentValues = JSON.stringify(values);
 
-            // Check if values have actually changed
             if (currentValues !== previousValuesRef.current) {
                 setHasUnsavedChanges(true);
 
@@ -118,14 +110,16 @@ export function useDraftAutosave({
                     }
 
                     autoSaveTimeoutRef.current = setTimeout(() => {
-                        autoSave();
+                        // AutoSave
+                        if (isSavingRef.current || saveStatus !== 'idle') return;
+                        performSave(true);
                     }, autoSaveInterval);
                 }
             }
         });
 
         return () => subscription.unsubscribe();
-    }, [form, autoSaveInterval, enableAutoSave, autoSave]);
+    }, [form, autoSaveInterval, enableAutoSave, performSave, saveStatus]);
 
     // Keyboard shortcut for manual save (Ctrl+S / Cmd+S)
     useEffect(() => {
@@ -146,10 +140,6 @@ export function useDraftAutosave({
             if (hasUnsavedChanges) {
                 e.preventDefault();
                 e.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
-
-                // Attempt synchronous save (may not complete)
-                const formData = form.getValues();
-                updateDraft(draftId, formData);
             }
         };
 

@@ -130,6 +130,7 @@ export async function updateDraft(id: string, selection: DraftMassSelection) {
         const updatedDraft = await updateDraftById(id, selection, session.user.id);
 
         revalidatePath('/liturgical-selections/new');
+        revalidatePath('/dashboard');
         revalidatePath('/dashboard/drafts');
 
         return updatedDraft;
@@ -149,6 +150,7 @@ export async function deleteDraft(id: string) {
         await deleteDraftById(id, session.user.id);
 
         revalidatePath('/liturgical-selections/new');
+        revalidatePath('/dashboard');
         revalidatePath('/dashboard/drafts');
 
     } catch (error: any) {

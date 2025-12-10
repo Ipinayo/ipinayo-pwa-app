@@ -176,7 +176,7 @@ export default function CreateForm(props: CreateFormProps) {
     onSaveSuccess: (isAutoSave) => {
       if (!isAutoSave) {
         toast.success("Successfully saved draft!");
-        handleBack("/dashboard/drafts");
+        handleBack("/dashboard");
       }
     },
     onSaveError: () => {
