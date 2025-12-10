@@ -5,8 +5,8 @@ import {
 } from "@/lib/actions/mass-selections";
 
 import BackButton from "@/components/common/back-button";
+import EditForm from "@/components/app/mass-selections/edit-selection";
 import { Params } from "@/types/utils";
-import SaveForm from "@/components/app/mass-selections/save-form";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 
@@ -46,12 +46,7 @@ export default async function EditPage(props: { params: Params }) {
         </div>
       </div>
 
-      <SaveForm
-        mode="edit"
-        selection={selection}
-        themes={themes}
-        partNames={partNames}
-      />
+      <EditForm selection={selection} themes={themes} partNames={partNames} />
     </div>
   );
 }

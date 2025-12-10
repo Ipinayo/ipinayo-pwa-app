@@ -15,6 +15,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { FormProvider, useForm } from "react-hook-form";
 import { MapPin, Music, Save } from "lucide-react";
 import {
   Select,
@@ -44,7 +45,6 @@ import { UserProfile } from "@/types/models";
 import { updateUserProfileAction } from "@/lib/actions/user";
 import { updateUserProfileSchema } from "@/types/schemas/user";
 import { useEffect } from "react";
-import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { withToast } from "@/lib/with-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -92,7 +92,7 @@ export default function ProfileForm({ user }: { user: UserProfile }) {
   }, [user]);
 
   return (
-    <Form {...form}>
+    <FormProvider {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
         {/* Basic Information */}
         <Card>
@@ -219,7 +219,7 @@ export default function ProfileForm({ user }: { user: UserProfile }) {
                 )}
               />
             </div>
-            <LocationSelector form={form} />
+            <LocationSelector />
           </CardContent>
         </Card>
 
@@ -328,6 +328,6 @@ export default function ProfileForm({ user }: { user: UserProfile }) {
           </Button>
         </div>
       </form>
-    </Form>
+    </FormProvider>
   );
 }

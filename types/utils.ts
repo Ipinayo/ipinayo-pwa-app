@@ -36,3 +36,9 @@ export interface UpdateUserProfile {
     choirName?: string | null;
     parishLocation?: NewLocation | null;
 }
+
+export interface DraftSelectionFilter {
+    page?: number,
+    limit?: number,
+    query?: string,
+}

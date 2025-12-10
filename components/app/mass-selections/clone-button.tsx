@@ -38,7 +38,7 @@ export default function CloneButton({
         return;
       }
       const clonedSelection = await cloneSelection(selectionId);
-      router.push(`/liturgical-selections/${clonedSelection.id}/edit`);
+      router.push(`/liturgical-selections/new/${clonedSelection.id}`);
     } catch (error) {
       // Ignore redirect errors
       if (isRedirectError(error)) {

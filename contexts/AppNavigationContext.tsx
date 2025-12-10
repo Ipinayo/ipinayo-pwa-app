@@ -18,10 +18,11 @@ interface NavigationEntry {
 interface AppNavigationContextType {
   canGoBack: boolean;
   canGoForward: boolean;
-  handleBack: () => void;
+  handleBack: (path?: string) => void;
   handleForward: () => void;
   handleRefresh: () => void;
   navigateTo: (path: string) => void;
+  replacePath: (path: string) => void;
   currentPath: string;
   history: NavigationEntry[];
 }
@@ -97,12 +98,14 @@ export function AppNavigationProvider({ children }: { children: ReactNode }) {
   const canGoBack = currentIndex > 0;
   const canGoForward = currentIndex < history.length - 1;
 
-  const handleBack = () => {
+  const handleBack = (path?: string) => {
     if (canGoBack) {
       isNavigatingRef.current = true;
       const newIndex = currentIndex - 1;
       setCurrentIndex(newIndex);
       router.push(history[newIndex].path);
+    } else if (path) {
+      router.push(path);
     }
   };
 
@@ -123,6 +126,17 @@ export function AppNavigationProvider({ children }: { children: ReactNode }) {
     router.push(path);
   };
 
+  const replacePath = (path: string) => {
+    isNavigatingRef.current = true;
+    setHistory((prev) => {
+      // Replace the entry at currentIndex
+      const newHistory = [...prev];
+      newHistory[currentIndex] = { path, timestamp: Date.now() };
+      return newHistory;
+    });
+    router.replace(path, { scroll: true });
+  };
+
   const value: AppNavigationContextType = {
     canGoBack,
     canGoForward,
@@ -130,6 +144,7 @@ export function AppNavigationProvider({ children }: { children: ReactNode }) {
     handleForward,
     handleRefresh,
     navigateTo,
+    replacePath,
     currentPath: pathname,
     history,
   };
