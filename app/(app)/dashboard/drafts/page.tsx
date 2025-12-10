@@ -1,8 +1,8 @@
 import BackButton from "@/components/common/back-button";
 import { Button } from "@/components/ui/button";
+import DraftSelectionListSkeleton from "@/components/app/draft-selections/draft-selections-list/index-skeleton";
 import DraftSelectionsList from "@/components/app/draft-selections/draft-selections-list";
 import Link from "next/link";
-import MassSelectionListSkeleton from "@/components/app/mass-selections/mass-selection-list/index-skeleton";
 import { Plus } from "lucide-react";
 import SearchBar from "@/components/common/search-bar";
 import { SearchParams } from "@/types/utils";
@@ -44,7 +44,7 @@ export default async function DraftsPage(props: {
         <SearchBar query={query} placeholder="Search my drafts..." />
       </div>
 
-      <Suspense fallback={<MassSelectionListSkeleton />} key={searchKey}>
+      <Suspense fallback={<DraftSelectionListSkeleton />} key={searchKey}>
         <DraftSelectionsList query={query} page={page} />
       </Suspense>
     </div>
