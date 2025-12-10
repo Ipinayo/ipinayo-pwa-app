@@ -63,6 +63,7 @@ export interface MassSelectionStats {
     private: number
     thisMonth: number
     thisWeek: number
+    totalDrafts: number
 }
 
 export type Location = Prisma.LocationGetPayload<{}>;

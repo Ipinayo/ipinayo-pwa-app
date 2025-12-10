@@ -17,6 +17,8 @@ import MassSelectionListSkeleton from "@/components/app/mass-selections/mass-sel
 import QueryFilter from "@/components/common/query-filter";
 import Search from "@/components/app/mass-selections/search";
 import SortFilter from "@/components/app/mass-selections/sort-filter";
+import Statistics from "@/components/app/dashboard/statistics";
+import StatisticsSkeleton from "@/components/app/dashboard/statistics/index-skeleton";
 import { Suspense } from "react";
 import { auth } from "@/auth";
 import { getEnumByValue } from "@/lib/utils";
@@ -38,7 +40,6 @@ export default async function DashboardPage(props: {
   if (!session?.user) redirect("/signin");
 
   const filters = await props.searchParams;
-  const stats = await getMassSelectionStats();
 
   // Get saved preferences from cookies
   const savedPreferences = await getFilterPreferences("dashboard");
@@ -75,52 +76,9 @@ export default async function DashboardPage(props: {
         </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-4 mb-8">
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Total Selections
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">{stats?.total || 0}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Public Selections
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">{stats?.public || 0}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Private Selections
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">{stats?.private || 0}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              This Month
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="flex gap-2">
-            <div className="text-3xl font-bold">{stats?.thisMonth || 0}</div>
-            <p className="text-xs text-muted-foreground mt-1">
-              <TrendingUp className="inline h-3 w-3 mr-1" />
-              {stats?.thisWeek || 0} this week
-            </p>
-          </CardContent>
-        </Card>
-      </div>
+      <Suspense fallback={<StatisticsSkeleton />}>
+        <Statistics />
+      </Suspense>
 
       <div className="grid gap-6 lg:grid-cols-3 mb-8">
         <Card className="lg:col-span-1 border-2 border-dashed border-primary/20 bg-linear-to-br from-primary/5 to-transparent h-fit">

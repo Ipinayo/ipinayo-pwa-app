@@ -402,19 +402,55 @@ export async function findAllThemes() {
 export async function findMassSelectionStats(
     userId: string
 ): Promise<MassSelectionStats> {
-    const stats = await prisma.$queryRaw<MassSelectionStats[]>`
-    SELECT
-      COUNT(*)::int AS total,
-      COUNT(*) FILTER (WHERE "isPublic" = true)::int AS public,
-      COUNT(*) FILTER (WHERE "isPublic" = false)::int AS private,
-      COUNT(*) FILTER (WHERE "createdAt" >= date_trunc('month', now()))::int AS "thisMonth",
-      COUNT(*) FILTER (WHERE "createdAt" >= date_trunc('week', now()))::int AS "thisWeek"
-    FROM "MassSelection"
-    WHERE "createdById" = ${userId};
-  `
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const startOfWeek = new Date(now);
+    startOfWeek.setDate(now.getDate() - now.getDay());
 
-    // $queryRaw returns an array of rows, so we take the first one
-    return stats[0]
+    const [
+        total,
+        publicCount,
+        privateCount,
+        thisMonth,
+        thisWeek,
+        totalDrafts
+    ] = await Promise.all([
+        prisma.massSelection.count({
+            where: { createdById: userId }
+        }),
+        prisma.massSelection.count({
+            where: { createdById: userId, isPublic: true }
+        }),
+        prisma.massSelection.count({
+            where: { createdById: userId, isPublic: false }
+        }),
+        prisma.massSelection.count({
+            where: {
+                createdById: userId,
+                createdAt: { gte: startOfMonth }
+            }
+        }),
+        prisma.massSelection.count({
+            where: {
+                createdById: userId,
+                createdAt: { gte: startOfWeek }
+            }
+        }),
+        prisma.massSelectionDraft.count({
+            where: {
+                createdById: userId,
+            }
+        })
+    ]);
+
+    return {
+        total,
+        public: publicCount,
+        private: privateCount,
+        thisMonth,
+        thisWeek,
+        totalDrafts
+    };
 }
 
 export async function saveSelectionBySelection(selection: SingleMassSelectionWithParts, userId: string) {
