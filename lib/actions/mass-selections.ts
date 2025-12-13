@@ -110,7 +110,7 @@ export async function getSelections({
 // Get user selections
 export async function getUserSelections({
     page = 1,
-    limit = 10,
+    limit = 12,
     query = '',
     season,
     year,
