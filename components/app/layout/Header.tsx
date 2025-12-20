@@ -52,7 +52,7 @@ export default async function Header({
                   >
                     <Avatar>
                       <AvatarImage
-                        src={user.image || "/placeholder.svg"}
+                        src={user.image || undefined}
                         alt={user?.name || ""}
                       />
                       <AvatarFallback>
