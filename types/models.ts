@@ -98,4 +98,15 @@ export type AppUser = Prisma.UserGetPayload<{
 
 export type MassSelectionDraft = Prisma.MassSelectionDraftGetPayload<{}>;
 
+export interface AdminDashboardStats {
+    totalSelections: number
+    totalPublicSelections: number
+    totalPrivateSelections: number
+    totalDrafts: number
+    totalUsers: number
+    newUsersThisWeek: number
+    newUsersThisMonth: number
+    notificationsSent: number
+}
+
 export { KeySignature, LiturgicalSeason, LiturgicalYear, UserRole }
