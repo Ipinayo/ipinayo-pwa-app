@@ -9,7 +9,7 @@ export default function HomePage() {
     <div>
       {/* Hero Section */}
       <section>
-        <div className="from-primary-light to-primary relative overflow-hidden rounded-2xl bg-gradient-to-r p-4 text-white md:p-6">
+        <div className="from-primary-light to-primary relative overflow-hidden rounded-2xl bg-linear-to-r p-4 text-white md:p-6">
           {/* Animated background elements */}
           <div className="absolute right-0 top-0 h-24 w-24 rounded-full bg-white/20 md:h-32 md:w-32" />
           <div className="absolute -bottom-12 -left-12 h-32 w-32 rounded-full bg-white/10 md:h-48 md:w-48" />
