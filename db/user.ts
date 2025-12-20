@@ -87,6 +87,7 @@ export async function findUser(userId: string) {
             name: true,
             email: true,
             image: true,
+            userRole: true,
             profile: {
                 select: {
                     id: true,

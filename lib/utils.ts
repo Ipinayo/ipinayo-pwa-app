@@ -3,7 +3,7 @@ import { ReadonlyURLSearchParams } from "next/navigation";
 import { twMerge } from "tailwind-merge"
 import { enGB } from "date-fns/locale";
 import { formatInTimeZone } from 'date-fns-tz';
-import { Location } from "@/types/models";
+import { Location, UserRole } from "@/types/models";
 import { SelectOption } from "@/types/components/select";
 
 export function cn(...inputs: ClassValue[]) {
@@ -206,4 +206,8 @@ export const formatCalendarDate = (date: string | Date) => {
 export function normalizeDate(date: Date | null | undefined) {
   if (!date) return new Date();
   return new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+}
+
+export function isAdmin(userRole: UserRole | null | undefined): boolean {
+  return userRole === UserRole.ADMIN || userRole === UserRole.SUPERADMIN;
 }

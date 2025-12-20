@@ -1,4 +1,4 @@
-import { KeySignature, LiturgicalSeason, LiturgicalYear, Prisma } from "@/lib/generated/prisma";
+import { KeySignature, LiturgicalSeason, LiturgicalYear, Prisma, UserRole } from "@/lib/generated/prisma";
 
 export type GenerateMassSelection = Prisma.MassSelectionGetPayload<{
     include: {
@@ -86,6 +86,7 @@ export type AppUser = Prisma.UserGetPayload<{
         name: true,
         email: true,
         image: true,
+        userRole: true,
         profile: {
             select: {
                 id: true,
@@ -97,4 +98,4 @@ export type AppUser = Prisma.UserGetPayload<{
 
 export type MassSelectionDraft = Prisma.MassSelectionDraftGetPayload<{}>;
 
-export { KeySignature, LiturgicalSeason, LiturgicalYear }
+export { KeySignature, LiturgicalSeason, LiturgicalYear, UserRole }

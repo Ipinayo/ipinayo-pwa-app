@@ -1,12 +1,18 @@
 "use client";
 
 import {
+  Activity,
+  Bell,
   BookOpen,
   ChevronRight,
+  FileClock,
+  FileText,
   Home,
+  LayoutDashboard,
   Library,
   Settings,
   User,
+  Users,
 } from "lucide-react";
 import {
   Collapsible,
@@ -27,6 +33,7 @@ interface Route {
 }
 
 interface NavLinksProps {
+  adminNav: boolean;
   className?: string;
   itemClassName?: string;
   iconClassName?: string;
@@ -36,6 +43,7 @@ interface NavLinksProps {
 }
 
 export default function NavLinks({
+  adminNav,
   className,
   itemClassName,
   iconClassName,
@@ -45,47 +53,90 @@ export default function NavLinks({
 }: NavLinksProps) {
   const pathname = usePathname();
 
-  const routes: Route[] = [
-    {
-      href: "/",
-      label: "Home",
-      icon: Home,
-      active: pathname === "/" || pathname === "",
-    },
-    {
-      href: "/liturgical-selections",
-      label: "Liturgical Selections",
-      icon: BookOpen,
-      active:
-        pathname === "/liturgical-selections" ||
-        pathname.startsWith("/liturgical-selections/"),
-    },
-    {
-      href: "/dashboard",
-      label: "My Dashboard",
-      icon: Library,
-      active: pathname === "/dashboard",
-    },
-    {
-      href: "/profile",
-      label: "My Profile",
-      icon: User,
-      active: pathname === "/profile",
-    },
-    {
-      href: "/settings",
-      label: "Settings",
-      icon: Settings,
-      active: pathname === "/settings" || pathname.startsWith("/settings/"),
-      children: [
+  const routes: Route[] = adminNav
+    ? [
         {
-          href: "/settings/profile",
-          label: "Profile",
-          icon: User,
+          label: "Dashboard",
+          href: "/admin",
+          icon: LayoutDashboard,
+          active: pathname === "/admin",
         },
-      ],
-    },
-  ];
+        {
+          label: "Users",
+          href: "/admin/users",
+          icon: Users,
+          active: pathname.startsWith("/admin/users"),
+        },
+        {
+          label: "Selections",
+          href: "/admin/selections",
+          icon: FileText,
+          active: pathname.startsWith("/admin/selections"),
+        },
+        {
+          label: "Drafts",
+          href: "/admin/drafts",
+          icon: FileClock,
+          active: pathname.startsWith("/admin/drafts"),
+        },
+        {
+          label: "Notifications",
+          href: "/admin/notifications",
+          icon: Bell,
+          active: pathname.startsWith("/admin/notifications"),
+        },
+        {
+          label: "Activity Logs",
+          href: "/admin/activity",
+          icon: Activity,
+          active: pathname.startsWith("/admin/activity"),
+        },
+        {
+          label: "Settings",
+          href: "/admin/settings",
+          icon: Settings,
+          active: pathname.startsWith("/admin/settings"),
+        },
+      ]
+    : [
+        {
+          href: "/",
+          label: "Home",
+          icon: Home,
+          active: pathname === "/" || pathname === "",
+        },
+        {
+          href: "/liturgical-selections",
+          label: "Liturgical Selections",
+          icon: BookOpen,
+          active: pathname.startsWith("/liturgical-selections"),
+        },
+        {
+          href: "/dashboard",
+          label: "My Dashboard",
+          icon: Library,
+          active: pathname === "/dashboard",
+        },
+        {
+          href: "/profile",
+          label: "My Profile",
+          icon: User,
+          active: pathname === "/profile",
+        },
+        {
+          href: "/settings",
+          label: "Settings",
+          icon: Settings,
+          active: pathname.startsWith("/settings"),
+          children: [
+            {
+              href: "/settings/profile",
+              label: "Profile",
+              icon: User,
+            },
+          ],
+        },
+      ];
 
   const RouteLink = ({ route }: { route: Route }) => {
     return (

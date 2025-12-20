@@ -8,19 +8,26 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+import AdminAppToggle from "./AdminAppToggle";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import MobileMenuTrigger from "./MobileMenuTrigger";
+import SignInButton from "./SignInButton";
 import SignoutButton from "./SignoutButton";
 import { getUser } from "@/lib/actions/user";
+import { isAdmin } from "@/lib/utils";
 
-export default async function Header() {
+export default async function Header({
+  adminNav = false,
+}: {
+  adminNav?: boolean;
+}) {
   const user = await getUser();
 
   return (
     <div className="bg-background sticky top-0 z-40 w-full border-b">
       <div className="flex h-16 items-center px-4 md:px-6">
-        <MobileMenuTrigger />
+        <MobileMenuTrigger adminNav={adminNav} />
 
         <Link href="/" className="flex items-center">
           <img
@@ -33,6 +40,7 @@ export default async function Header() {
         <div className="ml-auto flex items-center space-x-4">
           {user ? (
             <div className="flex items-center gap-2">
+              {isAdmin(user.userRole) && <AdminAppToggle />}
               <span className="hidden text-sm font-medium md:inline-block">
                 {user.name}
               </span>
@@ -81,11 +89,7 @@ export default async function Header() {
               </DropdownMenu>
             </div>
           ) : (
-            <div className="flex items-center gap-2">
-              <Button variant="ghost" size="sm" asChild>
-                <Link href="/signin">Sign In</Link>
-              </Button>
-            </div>
+            <SignInButton />
           )}
         </div>
       </div>

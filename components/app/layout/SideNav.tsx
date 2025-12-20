@@ -1,13 +1,17 @@
 import LazyThemeToggle from "./LazyThemeToggle";
 import NavLinks from "./NavLinks";
-import SignoutButton from "./SignoutButton";
+import SignInOutToggle from "./SignInOutToggle";
 import { cn } from "@/lib/utils";
 
 interface SideNavProps {
   isMobileMenuOpen?: boolean;
+  adminNav?: boolean;
 }
 
-export default function SideNav({ isMobileMenuOpen }: SideNavProps) {
+export default function SideNav({
+  isMobileMenuOpen,
+  adminNav = false,
+}: SideNavProps) {
   return (
     <>
       {/* Mobile Navigation - In TopNav component */}
@@ -17,10 +21,10 @@ export default function SideNav({ isMobileMenuOpen }: SideNavProps) {
           isMobileMenuOpen ? "flex flex-col py-10" : "hidden"
         )}
       >
-        <NavLinks />
+        <NavLinks adminNav={adminNav} />
         <div className="mt-auto px-3 py-4">
           <LazyThemeToggle className="mb-2 w-full justify-start py-2" />
-          <SignoutButton />
+          <SignInOutToggle />
         </div>
       </div>
 
@@ -28,6 +32,7 @@ export default function SideNav({ isMobileMenuOpen }: SideNavProps) {
       <div className="bg-background group fixed bottom-0 left-0 top-16 z-30 hidden w-16 border-r transition-all duration-300 ease-in-out hover:w-64 md:block">
         <div className="flex h-full flex-col py-4">
           <NavLinks
+            adminNav={adminNav}
             iconClassName="min-w-4"
             itemClassName="transition-all"
             labelClassName="opacity-0 transition-opacity duration-300 group-hover:opacity-100"
@@ -42,7 +47,7 @@ export default function SideNav({ isMobileMenuOpen }: SideNavProps) {
                 textClassName="hidden group-hover:inline"
               />
             </div>
-            <SignoutButton textClassName="hidden group-hover:inline" />
+            <SignInOutToggle textClassName="hidden group-hover:inline" />
           </div>
         </div>
       </div>
