@@ -1,4 +1,6 @@
-import { UpdateUserProfile } from "@/types/utils";
+import { SortOrder, SortUsersBy, UpdateUserProfile, UsersFilter } from "@/types/utils";
+
+import { Prisma } from "@/lib/generated/prisma";
 import { capitalize } from "@/lib/utils";
 import prisma from "@/lib/prisma";
 
@@ -127,4 +129,60 @@ export async function findUserParishAndChoirInfo(userId: string) {
             parishLocation: true
         }
     });
+}
+
+export default async function findAllUsers({
+    page = 1,
+    limit = 12,
+    query = '',
+    userRole,
+    sortBy = SortUsersBy.CREATED_AT,
+    sortOrder = SortOrder.DESC
+}: UsersFilter) {
+    const skip = (page - 1) * limit
+
+    // Build where clause with search and filter conditions
+    const whereClause: Prisma.UserWhereInput = {}
+
+    // Build AND conditions array
+    const andConditions: Prisma.UserWhereInput[] = []
+
+    // Add search functionality
+    if (query) {
+        andConditions.push({
+            OR: [
+                { name: { contains: query, mode: "insensitive" } },
+                { email: { contains: query, mode: "insensitive" } },
+            ],
+        })
+    }
+
+    // Add user role filter
+    if (userRole) {
+        andConditions.push({ userRole })
+    }
+
+    // Only add AND clause if there are conditions
+    if (andConditions.length > 0) {
+        whereClause.AND = andConditions
+    }
+
+    // Build order by clause
+    const orderBy = {
+        [sortBy]: sortOrder
+    }
+
+    // Get users with pagination
+    const users = await prisma.user.findMany({
+        where: whereClause,
+        orderBy,
+        skip,
+        take: limit,
+    })
+
+    const total = await prisma.user.count({
+        where: whereClause,
+    })
+
+    return { users, total }
 }
