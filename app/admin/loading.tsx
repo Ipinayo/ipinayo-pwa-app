@@ -15,7 +15,7 @@ export default function AdminDashboardLoading() {
       </div>
 
       <div className="grid gap-4 xs:grid-cols-2 lg:grid-cols-4">
-        {Array.from({ length: 5 }).map((_, i) => (
+        {Array.from({ length: 4 }).map((_, i) => (
           <StatsCardSkeleton key={i} />
         ))}
       </div>
