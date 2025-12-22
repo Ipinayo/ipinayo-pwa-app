@@ -15,6 +15,10 @@ const FILTER_CONFIGS: Record<string, FilterConfig> = {
     dashboard: {
         path: '/dashboard',
         storageKey: 'dash',
+    },
+    admin_users: {
+        path: '/admin/users',
+        storageKey: 'admin-users'
     }
 };
 
@@ -40,7 +44,7 @@ export async function saveSortPreferences(
 
 export async function saveQueryFilterPreferences(
     filterType: keyof typeof FILTER_CONFIGS,
-    queryName: "season" | "year" | "query" | "page",
+    queryName: "season" | "year" | "query" | "page" | "role",
     value: string
 ) {
     const config = FILTER_CONFIGS[filterType];
@@ -58,6 +62,9 @@ export async function saveQueryFilterPreferences(
         case "page":
             await setCookie(`${config.storageKey}_pg`, value, config.path);
             break;
+        case "role":
+            await setCookie(`${config.storageKey}_r`, value, config.path);
+            break;
         default:
             break;
     }
@@ -74,5 +81,6 @@ export async function getFilterPreferences(filterType: keyof typeof FILTER_CONFI
         page: cookieStore.get(`${config.storageKey}_pg`)?.value,
         query: cookieStore.get(`${config.storageKey}_q`)?.value,
         season: cookieStore.get(`${config.storageKey}_ss`)?.value,
+        role: cookieStore.get(`${config.storageKey}_r`)?.value,
     };
 }

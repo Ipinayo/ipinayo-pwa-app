@@ -13,8 +13,8 @@ export default function QueryFilter({
   items,
   selected,
 }: {
-  filterType: "selections" | "dashboard";
-  queryName: "season" | "year";
+  filterType: "selections" | "dashboard" | "admin_users";
+  queryName: "season" | "year" | "role";
   items: { label: string; value: string }[] | string[];
   selected?: string;
 }) {
