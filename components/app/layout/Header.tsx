@@ -1,4 +1,3 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,6 +13,7 @@ import Link from "next/link";
 import MobileMenuTrigger from "./MobileMenuTrigger";
 import SignInButton from "./SignInButton";
 import SignoutButton from "./SignoutButton";
+import UserAvatar from "@/components/common/user-avatar";
 import { getUser } from "@/lib/actions/user";
 import { isAdmin } from "@/lib/utils";
 
@@ -50,19 +50,7 @@ export default async function Header({
                     variant="ghost"
                     className="relative h-10 w-10 rounded-full"
                   >
-                    <Avatar>
-                      <AvatarImage
-                        src={user.image || undefined}
-                        alt={user?.name || ""}
-                      />
-                      <AvatarFallback>
-                        {(user.name || user.email)
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")
-                          .toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
+                    <UserAvatar user={user} />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-56" align="end">
