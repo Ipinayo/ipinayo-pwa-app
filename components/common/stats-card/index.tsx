@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 export function StatsCard({ metric }: { metric: Metric }) {
   const Icon = metric.icon;
   return (
-    <Card key={metric.title} className="hover:shadow-md transition-shadow">
+    <Card className="hover:shadow-md transition-shadow">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle className="text-sm font-medium text-muted-foreground">
           {metric.title}
