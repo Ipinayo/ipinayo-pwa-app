@@ -1,13 +1,4 @@
-import {
-  Bell,
-  BookOpen,
-  Eye,
-  Globe,
-  Lock,
-  Plus,
-  UserPlus,
-  Users,
-} from "lucide-react";
+import { Bell, BookOpen, Eye, Plus, UserPlus, Users } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -18,7 +9,7 @@ import {
 
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
+import { StatsCard } from "@/components/common/stats-card";
 import { getAdminDashboardStats } from "@/lib/actions/admin";
 
 export default async function AdminDashboard() {
@@ -34,22 +25,6 @@ export default async function AdminDashboard() {
       color: "text-muted-foreground",
     },
     {
-      title: "Total Public Selections",
-      value: stats.totalPublicSelections,
-      description: "Across all users",
-      icon: Globe,
-      href: "/admin/selections",
-      color: "text-muted-foreground",
-    },
-    {
-      title: "Total Private Selections",
-      value: stats.totalPrivateSelections,
-      description: "Across all users",
-      icon: Lock,
-      href: "/admin/selections",
-      color: "text-muted-foreground",
-    },
-    {
       title: "Total Drafts",
       value: stats.totalDrafts,
       description: "Across all users",
@@ -60,19 +35,19 @@ export default async function AdminDashboard() {
     {
       title: "Total Users",
       value: stats.totalUsers,
-      description: `${stats.newUsersThisMonth} new this month`,
+      description: `${stats.newUsersThisWeek} new this week`,
       icon: Users,
       href: "/admin/users",
-      color: "text-muted-foreground",
+      color: "text-primary",
     },
-    // {
-    //   title: "Notifications Sent",
-    //   value: stats.notificationsSent,
-    //   description: "Total announcements",
-    //   icon: Bell,
-    //   href: "/admin/notifications",
-    //   color: "text-cyan-500",
-    // },
+    {
+      title: "Notifications Sent",
+      value: stats.notificationsSent,
+      description: "Total announcements",
+      icon: Bell,
+      href: "/admin/notifications",
+      color: "text-cyan-500",
+    },
   ];
 
   return (
@@ -92,39 +67,10 @@ export default async function AdminDashboard() {
         <p className="text-muted-foreground mt-2">Monitor and manage Ìpínayò</p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-        {metricsCards.map((metric) => {
-          const Icon = metric.icon;
-          return (
-            <Card
-              key={metric.title}
-              className="hover:shadow-md transition-shadow"
-            >
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
-                  {metric.title}
-                </CardTitle>
-                <Icon className={cn("h-4 w-4", metric.color)} />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{metric.value}</div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {metric.description}
-                </p>
-                <Link href={metric.href}>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="mt-2 h-7 px-2 text-xs"
-                  >
-                    <Eye className="mr-1 h-3 w-3" />
-                    View Details
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
-          );
-        })}
+      <div className="grid gap-4 xs:grid-cols-2 lg:grid-cols-4">
+        {metricsCards.map((metric) => (
+          <StatsCard key={metric.title} metric={metric} />
+        ))}
       </div>
 
       <div className="grid gap-6">

@@ -100,13 +100,26 @@ export type MassSelectionDraft = Prisma.MassSelectionDraftGetPayload<{}>;
 
 export interface AdminDashboardStats {
     totalSelections: number
-    totalPublicSelections: number
-    totalPrivateSelections: number
     totalDrafts: number
     totalUsers: number
     newUsersThisWeek: number
-    newUsersThisMonth: number
     notificationsSent: number
+}
+
+export interface UsersStats {
+    totalUsers: number
+    totalAdmins: number
+    newUsersThisWeek: number
+    newUsersThisMonth: number
+}
+
+export interface SelectionsStats {
+    totalSelections: number
+    totalPublicSelections: number
+    totalPrivateSelections: number
+    totalDrafts: number
+    newDraftsThisWeek: number
+    newSelectionsThisWeek: number
 }
 
 export { KeySignature, LiturgicalSeason, LiturgicalYear, UserRole }
