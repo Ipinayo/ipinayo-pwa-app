@@ -96,6 +96,17 @@ export type AppUser = Prisma.UserGetPayload<{
     }
 }>;
 
+export type User = Prisma.UserGetPayload<{
+    include: {
+        _count: {
+            select: {
+                selections: true,
+                massSelectionDrafts: true
+            },
+        },
+    },
+}>;
+
 export type MassSelectionDraft = Prisma.MassSelectionDraftGetPayload<{}>;
 
 export interface AdminDashboardStats {

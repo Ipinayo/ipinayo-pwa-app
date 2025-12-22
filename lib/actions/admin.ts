@@ -1,8 +1,8 @@
 import { SortOrder, SortUsersBy, UsersFilter } from "@/types/utils";
+import { findAdminDashboardStats, findUsersStats } from "@/db/admin";
 import findAllUsers, { findUser } from "@/db/user";
 
 import { auth } from "@/auth";
-import { findAdminDashboardStats } from "@/db/admin";
 import { isAdmin } from "../utils";
 
 export async function getAdminDashboardStats() {
@@ -30,10 +30,10 @@ export async function getUsersStats() {
         throw new Error("Forbidden");
     }
 
-    return findAdminDashboardStats()
+    return findUsersStats()
 }
 
-// Get all selections (public)
+// Get all users
 export async function getAllUsers({
     page = 1,
     limit = 12,

@@ -175,6 +175,14 @@ export default async function findAllUsers({
     // Get users with pagination
     const users = await prisma.user.findMany({
         where: whereClause,
+        include: {
+            _count: {
+                select: {
+                    selections: true,
+                    massSelectionDrafts: true
+                },
+            },
+        },
         orderBy,
         skip,
         take: limit,
