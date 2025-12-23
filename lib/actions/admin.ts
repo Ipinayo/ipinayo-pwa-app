@@ -1,9 +1,9 @@
+import { AppUser, UserProfile } from "@/types/models";
 import { DraftSelectionFilter, MassSelectionFilter, SortBy, SortOrder, SortUsersBy, UsersFilter } from "@/types/utils";
 import { findAdminDashboardStats, findUsersStats, updateUserAdminStatus } from "@/db/admin";
 import { findAllUserSelections, findMassSelectionStats } from "@/db/mass-selections";
 import findAllUsers, { findUser, findUserProfile } from "@/db/user";
 
-import { UserProfile } from "@/types/models";
 import { auth } from "@/auth";
 import findDraftsByUserId from "@/db/draft";
 import { isAdmin } from "../utils";
@@ -82,7 +82,21 @@ export async function getAllUsers({
     }
 }
 
-export async function getUserProfile({ userId }: { userId: string }): Promise<UserProfile> {
+export async function getUser(userId: string): Promise<AppUser | null> {
+    const session = await auth();
+    if (!session?.user?.id) {
+        return null;
+    }
+
+    const user = await findUser(session.user.id);
+    if (!isAdmin(user?.userRole)) {
+        throw new Error("Forbidden");
+    }
+
+    return findUser(userId);
+}
+
+export async function getUserProfile(userId: string): Promise<UserProfile> {
     const session = await auth();
     if (!session?.user) {
         throw new Error("Unauthorized");
@@ -96,7 +110,7 @@ export async function getUserProfile({ userId }: { userId: string }): Promise<Us
     return findUserProfile(userId);
 }
 
-export async function getMassSelectionStats({ userId }: { userId: string }) {
+export async function getMassSelectionStats(userId: string) {
     const session = await auth();
     if (!session?.user) {
         throw new Error("Unauthorized");
