@@ -12,19 +12,21 @@ export default function QueryFilter({
   queryName,
   items,
   selected,
-}: {
-  filterType: "selections" | "dashboard" | "admin_users";
+}: Readonly<{
+  filterType?: "selections" | "dashboard" | "admin_users";
   queryName: "season" | "year" | "role";
   items: { label: string; value: string }[] | string[];
   selected?: string;
-}) {
+}>) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
   const onSelected = useCallback(
     async (value: string) => {
-      await saveQueryFilterPreferences(filterType, queryName, value);
+      // Save to cookies via server action
+      if (filterType)
+        await saveQueryFilterPreferences(filterType, queryName, value);
 
       router.push(
         `${pathname}?${createQueryString(

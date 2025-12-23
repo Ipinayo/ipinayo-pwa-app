@@ -11,20 +11,25 @@ import MassSelectionCard from "../mass-selection-card";
 import { MassSelectionFilter } from "@/types/utils";
 import Pagination from "../pagination";
 import { cn } from "@/lib/utils";
+import { getUserSelections as getUserSelectionsAdmin } from "@/lib/actions/admin";
 
 type MassSelectionListProps = MassSelectionFilter & {
-  filterType: "selections" | "dashboard";
+  filterType?: "selections" | "dashboard";
   userOnly?: boolean;
+  userId?: string;
   className?: string;
 };
 
 export default async function MassSelectionList({
   filterType,
   userOnly = false,
+  userId,
   className,
   ...filter
 }: MassSelectionListProps) {
-  const selectionsResponse = userOnly
+  const selectionsResponse = userId
+    ? await getUserSelectionsAdmin(userId, filter)
+    : userOnly
     ? await getUserSelections(filter)
     : await getSelections(filter);
 
