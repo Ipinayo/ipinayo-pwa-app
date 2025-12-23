@@ -1,3 +1,5 @@
+'use server'
+
 import { AppUser, UserProfile } from "@/types/models";
 import { DraftSelectionFilter, MassSelectionFilter, SortBy, SortOrder, SortUsersBy, UsersFilter } from "@/types/utils";
 import { findAdminDashboardStats, findUsersStats, updateUserAdminStatus } from "@/db/admin";
@@ -110,7 +112,7 @@ export async function getUserProfile(userId: string): Promise<UserProfile> {
     return findUserProfile(userId);
 }
 
-export async function getMassSelectionStats(userId: string) {
+export async function getUserSelectionStats(userId: string) {
     const session = await auth();
     if (!session?.user) {
         throw new Error("Unauthorized");
