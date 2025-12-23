@@ -75,6 +75,8 @@ export type UserProfile = Prisma.UserProfileGetPayload<{
                 name: true;
                 email: true;
                 image: true;
+                userRole: true;
+                createdAt: true;
             }
         },
         parishLocation: true

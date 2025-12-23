@@ -5,6 +5,7 @@ import { findUser, findUserParishAndChoirInfo, findUserProfile, updateUserProfil
 
 import { UpdateUserProfile } from "@/types/utils";
 import { auth } from "@/auth";
+import { revalidatePath } from "next/cache";
 import { updateUserProfileSchema } from "@/types/schemas/user";
 
 export async function getUserProfile(): Promise<UserProfile> {
@@ -28,7 +29,12 @@ export async function updateUserProfileAction(updates: UpdateUserProfile) {
         throw new Error(validationResult.error.message);
     }
 
-    return updateUserProfile(session.user.id, updates);
+    const result = await updateUserProfile(session.user.id, updates);
+
+    revalidatePath('/profile');
+    revalidatePath('/settings/profile');
+
+    return result
 }
 
 export async function getUser(): Promise<AppUser | null> {

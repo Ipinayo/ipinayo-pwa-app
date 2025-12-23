@@ -1,9 +1,13 @@
-import { SortOrder, SortUsersBy, UsersFilter } from "@/types/utils";
-import { findAdminDashboardStats, findUsersStats } from "@/db/admin";
-import findAllUsers, { findUser } from "@/db/user";
+import { DraftSelectionFilter, MassSelectionFilter, SortBy, SortOrder, SortUsersBy, UsersFilter } from "@/types/utils";
+import { findAdminDashboardStats, findUsersStats, updateUserAdminStatus } from "@/db/admin";
+import { findAllUserSelections, findMassSelectionStats } from "@/db/mass-selections";
+import findAllUsers, { findUser, findUserProfile } from "@/db/user";
 
+import { UserProfile } from "@/types/models";
 import { auth } from "@/auth";
+import findDraftsByUserId from "@/db/draft";
 import { isAdmin } from "../utils";
+import { revalidatePath } from "next/cache";
 
 export async function getAdminDashboardStats() {
     const session = await auth();
@@ -76,4 +80,128 @@ export async function getAllUsers({
         console.error("Error fetching mass selections:", error);
         throw new Error("Error fetching mass selections: " + error?.message);
     }
+}
+
+export async function getUserProfile({ userId }: { userId: string }): Promise<UserProfile> {
+    const session = await auth();
+    if (!session?.user) {
+        throw new Error("Unauthorized");
+    }
+
+    const user = await findUser(session.user.id);
+    if (!isAdmin(user?.userRole)) {
+        throw new Error("Forbidden");
+    }
+
+    return findUserProfile(userId);
+}
+
+export async function getMassSelectionStats({ userId }: { userId: string }) {
+    const session = await auth();
+    if (!session?.user) {
+        throw new Error("Unauthorized");
+    }
+
+    const user = await findUser(session.user.id);
+    if (!isAdmin(user?.userRole)) {
+        throw new Error("Forbidden");
+    }
+
+    return findMassSelectionStats(userId)
+}
+
+// Get user selections
+export async function getUserSelections(userId: string, {
+    page = 1,
+    limit = 12,
+    query = '',
+    season,
+    year,
+    sortBy = SortBy.DATE,
+    sortOrder = SortOrder.DESC
+}: MassSelectionFilter) {
+    try {
+        const session = await auth();
+        if (!session?.user?.id) {
+            throw new Error("Unauthorized");
+        }
+
+        const user = await findUser(session.user.id);
+        if (!isAdmin(user?.userRole)) {
+            throw new Error("Forbidden");
+        }
+
+        const { selections, total } = await findAllUserSelections({
+            page,
+            limit,
+            query,
+            season,
+            sortBy,
+            sortOrder,
+            year
+        }, userId);
+
+        return {
+            selections,
+            pagination: {
+                page,
+                limit,
+                total,
+                pages: Math.ceil(total / limit),
+            },
+        };
+    } catch (error: any) {
+        console.error("Error fetching user selections:", error);
+        throw new Error("Error fetching user selections: " + error?.message);
+    }
+}
+
+export async function getUserDrafts(userId: string, { page = 1,
+    limit = 12,
+    query = '', }: DraftSelectionFilter) {
+    try {
+
+        const session = await auth();
+        if (!session?.user?.id) {
+            throw new Error("Unauthorized");
+        }
+
+        const user = await findUser(session.user.id);
+        if (!isAdmin(user?.userRole)) {
+            throw new Error("Forbidden");
+        }
+
+        const { drafts, total } = await findDraftsByUserId({ page, limit, query }, userId);
+        return {
+            drafts: drafts,
+            pagination: {
+                page,
+                limit,
+                total: total,
+                pages: Math.ceil(total / limit),
+            },
+        };
+    } catch (error: any) {
+        console.error("Error fetching drafts:", error);
+        throw new Error("Error fetching drafts: " + error?.message);
+    }
+}
+
+export async function updateUserAdminStatusAction(userId: string, makeAdmin: boolean) {
+    const session = await auth();
+    if (!session?.user?.id) {
+        throw new Error("Unauthorized");
+    }
+
+    const user = await findUser(session.user.id);
+    if (!isAdmin(user?.userRole)) {
+        throw new Error("Forbidden");
+    }
+
+    const result = await updateUserAdminStatus(userId, makeAdmin);
+
+    revalidatePath('/admin/users');
+    revalidatePath(`/admin/users/${result.id}`);
+
+    return result;
 }

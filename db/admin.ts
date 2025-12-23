@@ -119,3 +119,12 @@ export async function findSelectionsStats(): Promise<SelectionsStats> {
         newSelectionsThisWeek,
     };
 }
+
+export async function updateUserAdminStatus(userId: string, isAdmin: boolean) {
+    return await prisma.user.update({
+        where: { id: userId, userRole: isAdmin ? UserRole.USER : UserRole.ADMIN },
+        data: {
+            userRole: isAdmin ? UserRole.ADMIN : UserRole.USER
+        }
+    })
+}

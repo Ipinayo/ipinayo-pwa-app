@@ -19,6 +19,8 @@ export async function findUserProfile(userId: string) {
                     email: true,
                     name: true,
                     image: true,
+                    userRole: true,
+                    createdAt: true
                 }
             },
             parishLocation: true
@@ -33,6 +35,8 @@ export async function findUserProfile(userId: string) {
                     email: true,
                     name: true,
                     image: true,
+                    userRole: true,
+                    createdAt: true
                 }
             },
             parishLocation: true
