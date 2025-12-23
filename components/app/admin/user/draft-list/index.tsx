@@ -37,7 +37,7 @@ export default async function DraftList({
         ) : (
           <div className="grid gap-4 xs:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {drafts.map((draft) => (
-              <DraftCard key={draft.id} draft={draft} />
+              <DraftCard key={draft.id} draft={draft} canEdit={false} />
             ))}
           </div>
         )}

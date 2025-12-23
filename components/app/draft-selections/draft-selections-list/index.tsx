@@ -62,7 +62,7 @@ export default async function DraftSelectionsList({
         )}
       >
         {drafts.map((draft) => (
-          <DraftCard key={draft.id} draft={draft} />
+          <DraftCard key={draft.id} draft={draft} canEdit={!userId} />
         ))}
       </div>
 
