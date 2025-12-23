@@ -8,16 +8,21 @@ import Link from "next/link";
 import { UrlPagination } from "@/components/common/url-pagination";
 import { cn } from "@/lib/utils";
 import { getAllDrafts } from "@/lib/actions/draft";
+import { getUserDrafts } from "@/lib/actions/admin";
 
 type DraftSelectionsListProps = DraftSelectionFilter & {
+  userId?: string;
   className?: string;
 };
 
 export default async function DraftSelectionsList({
+  userId,
   className,
   ...filter
 }: DraftSelectionsListProps) {
-  const selectionsResponse = await getAllDrafts(filter);
+  const selectionsResponse = userId
+    ? await getUserDrafts(userId, filter)
+    : await getAllDrafts(filter);
 
   const draftsPage = selectionsResponse.pagination;
   const drafts = selectionsResponse.drafts;
@@ -33,16 +38,20 @@ export default async function DraftSelectionsList({
         </h3>
         <p className="text-muted-foreground mb-6">
           {isDefaultFilter
-            ? "Any drafts - incomplete selections - will appear here for you to continue later."
+            ? userId
+              ? ""
+              : "Any drafts - incomplete selections - will appear here for you to continue later."
             : "Try adjusting your search to find what you're looking for."}
         </p>
 
-        <Button asChild size="lg" className="gap-2">
-          <Link href="/liturgical-selections/new">
-            <Plus className="h-5 w-5" />
-            Create Selection
-          </Link>
-        </Button>
+        {!userId && (
+          <Button asChild size="lg" className="gap-2">
+            <Link href="/liturgical-selections/new">
+              <Plus className="h-5 w-5" />
+              Create Selection
+            </Link>
+          </Button>
+        )}
       </CardContent>
     </Card>
   ) : (
