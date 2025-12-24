@@ -14,7 +14,7 @@ import { cn } from "@/lib/utils";
 import { getUserSelections as getUserSelectionsAdmin } from "@/lib/actions/admin";
 
 type MassSelectionListProps = MassSelectionFilter & {
-  filterType?: "selections" | "dashboard";
+  filterType?: "selections" | "dashboard" | "admin_selections";
   userOnly?: boolean;
   userId?: string;
   className?: string;

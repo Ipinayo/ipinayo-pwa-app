@@ -130,9 +130,15 @@ export interface SelectionsStats {
     totalSelections: number
     totalPublicSelections: number
     totalPrivateSelections: number
-    totalDrafts: number
-    newDraftsThisWeek: number
+    newSelectionsThisMonth: number
     newSelectionsThisWeek: number
+}
+
+export interface DraftStats {
+    totalDrafts: number
+    newDraftsThisMonth: number,
+    newDraftsThisWeek: number,
+    oldDrafts: number
 }
 
 export { KeySignature, LiturgicalSeason, LiturgicalYear, UserRole }

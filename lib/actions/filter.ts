@@ -19,6 +19,10 @@ const FILTER_CONFIGS: Record<string, FilterConfig> = {
     admin_users: {
         path: '/admin/users',
         storageKey: 'admin-users'
+    },
+    admin_selections: {
+        path: "/admin/selections",
+        storageKey: "admin-sel"
     }
 };
 

@@ -13,7 +13,7 @@ export default function QueryFilter({
   items,
   selected,
 }: Readonly<{
-  filterType?: "selections" | "dashboard" | "admin_users";
+  filterType?: "selections" | "dashboard" | "admin_users" | "admin_selections";
   queryName: "season" | "year" | "role";
   items: { label: string; value: string }[] | string[];
   selected?: string;

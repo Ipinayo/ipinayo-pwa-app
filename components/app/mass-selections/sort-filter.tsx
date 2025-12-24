@@ -22,7 +22,7 @@ export default function SortFilter({
   sortBy = SortBy.DATE,
   order = SortOrder.DESC,
 }: Readonly<{
-  filterType?: "selections" | "dashboard";
+  filterType?: "selections" | "dashboard" | "admin_selections";
   sortBy?: SortBy;
   order?: SortOrder;
 }>) {

@@ -2,7 +2,7 @@
 
 import { AppUser, UserProfile } from "@/types/models";
 import { DraftSelectionFilter, MassSelectionFilter, SortBy, SortOrder, SortUsersBy, UsersFilter } from "@/types/utils";
-import { findAdminDashboardStats, findUsersStats, updateUserAdminStatus } from "@/db/admin";
+import { findAdminDashboardStats, findSelectionsStats, findUsersStats, updateUserAdminStatus } from "@/db/admin";
 import { findAllUserSelections, findMassSelectionStats } from "@/db/mass-selections";
 import findAllUsers, { findUser, findUserProfile } from "@/db/user";
 
@@ -220,4 +220,18 @@ export async function updateUserAdminStatusAction(userId: string, makeAdmin: boo
     revalidatePath(`/admin/users/${result.id}`);
 
     return result;
+}
+
+export async function getSelectionsStats() {
+    const session = await auth();
+    if (!session?.user) {
+        throw new Error("Unauthorized");
+    }
+
+    const user = await findUser(session.user.id);
+    if (!isAdmin(user?.userRole)) {
+        throw new Error("Forbidden");
+    }
+
+    return findSelectionsStats()
 }

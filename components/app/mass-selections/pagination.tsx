@@ -5,7 +5,7 @@ import { saveQueryFilterPreferences } from "@/lib/actions/filter";
 import { useEffect } from "react";
 
 interface PaginationProps {
-  filterType?: "selections" | "dashboard";
+  filterType?: "selections" | "dashboard" | "admin_selections";
   currentPage: number;
   totalPages: number;
   className?: string;

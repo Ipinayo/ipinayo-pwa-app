@@ -1,4 +1,4 @@
-import { AdminDashboardStats, SelectionsStats, UserRole, UsersStats } from "@/types/models";
+import { AdminDashboardStats, DraftStats, SelectionsStats, UserRole, UsersStats } from "@/types/models";
 
 import prisma from "@/lib/prisma";
 
@@ -79,6 +79,7 @@ export async function findUsersStats(): Promise<UsersStats> {
 
 export async function findSelectionsStats(): Promise<SelectionsStats> {
     const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
     const startOfWeek = new Date(now);
     startOfWeek.setDate(now.getDate() - now.getDay());
 
@@ -86,8 +87,7 @@ export async function findSelectionsStats(): Promise<SelectionsStats> {
         totalSelections,
         totalPublicSelections,
         totalPrivateSelections,
-        totalDrafts,
-        newDraftsThisWeek,
+        newSelectionsThisMonth,
         newSelectionsThisWeek
     ] = await Promise.all([
         prisma.massSelection.count(),
@@ -97,10 +97,9 @@ export async function findSelectionsStats(): Promise<SelectionsStats> {
         prisma.massSelection.count({
             where: { isPublic: false }
         }),
-        prisma.massSelectionDraft.count(),
-        prisma.massSelectionDraft.count({
+        prisma.massSelection.count({
             where: {
-                createdAt: { gte: startOfWeek }
+                createdAt: { gte: startOfMonth }
             }
         }),
         prisma.massSelection.count({
@@ -114,9 +113,51 @@ export async function findSelectionsStats(): Promise<SelectionsStats> {
         totalSelections,
         totalPublicSelections,
         totalPrivateSelections,
+        newSelectionsThisMonth,
+        newSelectionsThisWeek
+    };
+}
+
+export async function findDraftsStats(): Promise<DraftStats> {
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const startOfWeek = new Date(now);
+    startOfWeek.setDate(now.getDate() - now.getDay());
+
+    const fifteenDaysAgo = new Date();
+    fifteenDaysAgo.setDate(fifteenDaysAgo.getDate() - 15); // 15 days ago
+
+    const [
         totalDrafts,
+        newDraftsThisMonth,
         newDraftsThisWeek,
-        newSelectionsThisWeek,
+        oldDrafts
+    ] = await Promise.all([
+        prisma.massSelectionDraft.count(),
+        prisma.massSelectionDraft.count({
+            where: {
+                createdAt: { gte: startOfMonth }
+            }
+        }),
+        prisma.massSelectionDraft.count({
+            where: {
+                createdAt: { gte: startOfWeek }
+            }
+        }),
+        prisma.massSelectionDraft.count({
+            where: {
+                updatedAt: {
+                    lt: fifteenDaysAgo
+                }
+            },
+        }),
+    ]);
+
+    return {
+        totalDrafts,
+        newDraftsThisMonth,
+        newDraftsThisWeek,
+        oldDrafts
     };
 }
 

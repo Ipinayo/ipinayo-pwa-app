@@ -9,7 +9,7 @@ export default function Search({
   query,
   placeholder,
 }: Readonly<{
-  filterType?: "selections" | "dashboard";
+  filterType?: "selections" | "dashboard" | "admin_selections";
   query?: string;
   placeholder?: string;
 }>) {
