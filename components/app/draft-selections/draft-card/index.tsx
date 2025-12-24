@@ -15,8 +15,7 @@ import { formatDate } from "@/lib/utils";
 
 export default function DraftCard({
   draft,
-  canEdit,
-}: Readonly<{ draft: MassSelectionDraft; canEdit: boolean }>) {
+}: Readonly<{ draft: MassSelectionDraft }>) {
   return (
     <Card className="cursor-pointer transition-all hover:shadow-lg hover:scale-[1.02] border-2 hover:border-amber-400 bg-amber-50/50 dark:bg-amber-950/10">
       <CardHeader>
@@ -29,35 +28,31 @@ export default function DraftCard({
               Last updated: {formatDate(draft.updatedAt)}
             </CardDescription>
           </div>
-          {canEdit && (
-            <DeleteButton
-              draftId={draft.id}
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 -mt-1 -mr-2"
-            />
-          )}
+          <DeleteButton
+            draftId={draft.id}
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 -mt-1 -mr-2"
+          />
         </div>
       </CardHeader>
       <CardContent className="space-y-2">
         <p className="text-xs text-muted-foreground">
           {Array.isArray(draft.parts) ? draft.parts.length : 0} part(s)
         </p>
-        {canEdit && (
-          <div className="flex gap-2">
-            <Button
-              size="sm"
-              variant="outline"
-              className="w-full gap-1 bg-transparent"
-              asChild
-            >
-              <Link href={`/liturgical-selections/new/${draft.id}`}>
-                <Edit2 className="h-3 w-3" />
-                Continue
-              </Link>
-            </Button>
-          </div>
-        )}
+        <div className="flex gap-2">
+          <Button
+            size="sm"
+            variant="outline"
+            className="w-full gap-1 bg-transparent"
+            asChild
+          >
+            <Link href={`/liturgical-selections/new/${draft.id}`}>
+              <Edit2 className="h-3 w-3" />
+              Continue
+            </Link>
+          </Button>
+        </div>
       </CardContent>
     </Card>
   );
