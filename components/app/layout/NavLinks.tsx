@@ -6,7 +6,6 @@ import {
   BookOpen,
   ChevronRight,
   FileClock,
-  FileText,
   Home,
   LayoutDashboard,
   Library,
@@ -70,7 +69,7 @@ export default function NavLinks({
         {
           label: "Selections",
           href: "/admin/selections",
-          icon: FileText,
+          icon: BookOpen,
           active: pathname.startsWith("/admin/selections"),
         },
         {
