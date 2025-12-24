@@ -8,9 +8,9 @@ import MassSelectionListSkeleton from "@/components/app/mass-selections/mass-sel
 import QueryFilter from "@/components/common/query-filter";
 import Search from "@/components/app/mass-selections/search";
 import SelectionsStats from "@/components/app/admin/selections/selections-stats";
+import SelectionsStatsSkeleton from "@/components/app/admin/selections/selections-stats/index-skeleton";
 import SortFilter from "@/components/app/mass-selections/sort-filter";
 import { Suspense } from "react";
-import UsersStatsSkeleton from "@/components/app/admin/users/users-stats/index-skeleton";
 import { getFilterPreferences } from "@/lib/actions/filter";
 
 export default async function SelectionsManagement(
@@ -55,7 +55,7 @@ export default async function SelectionsManagement(
       </div>
 
       {/* Stats Cards */}
-      <Suspense fallback={<UsersStatsSkeleton />}>
+      <Suspense fallback={<SelectionsStatsSkeleton />}>
         <SelectionsStats />
       </Suspense>
 
