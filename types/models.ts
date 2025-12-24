@@ -111,6 +111,18 @@ export type User = Prisma.UserGetPayload<{
 
 export type MassSelectionDraft = Prisma.MassSelectionDraftGetPayload<{}>;
 
+export type AdminMassSelectionDraft = Prisma.MassSelectionDraftGetPayload<{
+    include: {
+        createdBy: {
+            select: {
+                id: true,
+                name: true,
+                email: true,
+            }
+        }
+    },
+}>;
+
 export interface AdminDashboardStats {
     totalSelections: number
     totalDrafts: number

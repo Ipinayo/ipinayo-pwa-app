@@ -1,5 +1,7 @@
 import { AdminDashboardStats, DraftStats, SelectionsStats, UserRole, UsersStats } from "@/types/models";
 
+import { DraftSelectionFilter } from "@/types/utils";
+import { Prisma } from "@/lib/generated/prisma";
 import prisma from "@/lib/prisma";
 
 export async function findAdminDashboardStats(): Promise<AdminDashboardStats> {
@@ -167,5 +169,82 @@ export async function updateUserAdminStatus(userId: string, isAdmin: boolean) {
         data: {
             userRole: isAdmin ? UserRole.ADMIN : UserRole.USER
         }
+    })
+}
+
+export default async function findAllDrafts({
+    page = 1,
+    limit = 12,
+    query = '',
+}: DraftSelectionFilter) {
+    const skip = (page - 1) * limit
+
+    // Build where clause with search and filter conditions
+    const whereClause: Prisma.MassSelectionDraftWhereInput = {}
+
+    // Build AND conditions array
+    const andConditions: Prisma.MassSelectionDraftWhereInput[] = []
+
+    // Add search functionality
+    if (query) {
+        andConditions.push({
+            OR: [
+                { title: { contains: query, mode: "insensitive" } },
+                {
+                    createdBy: {
+                        name: { contains: query, mode: "insensitive" },
+                        email: { contains: query, mode: "insensitive" }
+                    }
+                },
+            ],
+        })
+    }
+
+    // Only add AND clause if there are conditions
+    if (andConditions.length > 0) {
+        whereClause.AND = andConditions
+    }
+
+    // Get drafts with pagination
+    const drafts = await prisma.massSelectionDraft.findMany({
+        where: whereClause,
+        include: {
+            createdBy: {
+                select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                }
+            }
+        },
+        orderBy: { 'updatedAt': 'desc' },
+        skip,
+        take: limit,
+    })
+
+    const total = await prisma.massSelectionDraft.count({
+        where: whereClause,
+    })
+
+    return { drafts, total }
+}
+
+export async function deleteDraftById(draftId: string) {
+    return await prisma.massSelectionDraft.delete({
+        where: { id: draftId },
+    })
+}
+
+export async function deleteAllOldDrafts() {
+
+    const fifteenDaysAgo = new Date();
+    fifteenDaysAgo.setDate(fifteenDaysAgo.getDate() - 15); // 15 days ago
+
+    return await prisma.massSelectionDraft.deleteMany({
+        where: {
+            updatedAt: {
+                lt: fifteenDaysAgo
+            }
+        },
     })
 }

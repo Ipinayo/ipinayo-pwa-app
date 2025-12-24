@@ -2,7 +2,7 @@
 
 import { AppUser, UserProfile } from "@/types/models";
 import { DraftSelectionFilter, MassSelectionFilter, SortBy, SortOrder, SortUsersBy, UsersFilter } from "@/types/utils";
-import { findAdminDashboardStats, findSelectionsStats, findUsersStats, updateUserAdminStatus } from "@/db/admin";
+import findAllDrafts, { deleteAllOldDrafts, deleteDraftById, findAdminDashboardStats, findDraftsStats, findSelectionsStats, findUsersStats, updateUserAdminStatus } from "@/db/admin";
 import { findAllUserSelections, findMassSelectionStats } from "@/db/mass-selections";
 import findAllUsers, { findUser, findUserProfile } from "@/db/user";
 
@@ -236,4 +236,89 @@ export async function getSelectionsStats() {
     }
 
     return findSelectionsStats()
+}
+
+export async function getDraftsStats() {
+    const session = await auth();
+    if (!session?.user) {
+        throw new Error("Unauthorized");
+    }
+
+    const user = await findUser(session.user.id);
+    if (!isAdmin(user?.userRole)) {
+        throw new Error("Forbidden");
+    }
+
+    return findDraftsStats()
+}
+
+export async function getAllDrafts({ page = 1,
+    limit = 12,
+    query = '', }: DraftSelectionFilter) {
+    const session = await auth();
+    if (!session?.user) {
+        throw new Error("Unauthorized");
+    }
+
+    const user = await findUser(session.user.id);
+    if (!isAdmin(user?.userRole)) {
+        throw new Error("Forbidden");
+    }
+
+    const { drafts, total } = await findAllDrafts({ page, limit, query });
+    return {
+        drafts: drafts,
+        pagination: {
+            page,
+            limit,
+            total: total,
+            pages: Math.ceil(total / limit),
+        },
+    };
+}
+
+export async function deleteDraft(id: string) {
+    try {
+        const session = await auth();
+        if (!session?.user?.id) {
+            throw new Error("Unauthorized");
+        }
+
+        const user = await findUser(session.user.id);
+        if (!isAdmin(user?.userRole)) {
+            throw new Error("Forbidden");
+        }
+
+        await deleteDraftById(id);
+
+        revalidatePath('/admin');
+        revalidatePath('/admin/drafts');
+
+    } catch (error: any) {
+        console.error("Error deleting draft:", error);
+        throw new Error("Error deleting draft: " + error?.message);
+    }
+}
+
+export async function deleteOldDrafts() {
+    try {
+        const session = await auth();
+        if (!session?.user?.id) {
+            throw new Error("Unauthorized");
+        }
+
+        const user = await findUser(session.user.id);
+        if (!isAdmin(user?.userRole)) {
+            throw new Error("Forbidden");
+        }
+
+        await deleteAllOldDrafts();
+
+        revalidatePath('/admin');
+        revalidatePath('/admin/drafts');
+
+    } catch (error: any) {
+        console.error("Error deleting drafts:", error);
+        throw new Error("Error deleting drafts: " + error?.message);
+    }
 }

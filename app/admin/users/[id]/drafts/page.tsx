@@ -1,8 +1,8 @@
 import { Params, SearchParams } from "@/types/utils";
 
 import BackButton from "@/components/common/back-button";
-import DraftSelectionListSkeleton from "@/components/app/draft-selections/draft-selections-list/index-skeleton";
-import DraftSelectionsList from "@/components/app/draft-selections/draft-selections-list";
+import DraftSelectionListSkeleton from "@/components/app/admin/drafts/draft-selections-list/index-skeleton";
+import DraftSelectionsList from "@/components/app/admin/drafts/draft-selections-list";
 import SearchBar from "@/components/common/search-bar";
 import { Suspense } from "react";
 
@@ -33,7 +33,12 @@ export default async function UserDraftsPage(props: {
       </div>
 
       <Suspense fallback={<DraftSelectionListSkeleton />} key={searchKey}>
-        <DraftSelectionsList userId={userId} query={query} page={page} />
+        <DraftSelectionsList
+          userId={userId}
+          query={query}
+          page={page}
+          saveFilter={false}
+        />
       </Suspense>
     </div>
   );
