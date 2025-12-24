@@ -79,7 +79,8 @@ export async function getSelections({
     season,
     year,
     sortBy = SortBy.DATE,
-    sortOrder = SortOrder.DESC
+    sortOrder = SortOrder.DESC,
+    isPublic
 }: MassSelectionFilter) {
     try {
         const { selections, total } = await findAllSelections({
@@ -89,7 +90,8 @@ export async function getSelections({
             season,
             sortBy,
             sortOrder,
-            year
+            year,
+            isPublic
         });
 
         return {
@@ -115,7 +117,8 @@ export async function getUserSelections({
     season,
     year,
     sortBy = SortBy.DATE,
-    sortOrder = SortOrder.DESC
+    sortOrder = SortOrder.DESC,
+    isPublic
 }: MassSelectionFilter) {
     try {
         const session = await auth();
@@ -130,7 +133,8 @@ export async function getUserSelections({
             season,
             sortBy,
             sortOrder,
-            year
+            year,
+            isPublic
         }, session.user.id);
 
         return {
