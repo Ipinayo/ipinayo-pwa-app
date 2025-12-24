@@ -1,6 +1,7 @@
 import { LiturgicalSeason, LiturgicalYear } from "@/types/models";
 import { SearchParams, SortBy, SortOrder } from "@/types/utils";
-import { liturgicalSeasonItems, liturgicalYearItems } from "@/lib/constants";
+import { getEnumByValue, stringToBoolean } from "@/lib/utils";
+import { seasonsFilter, typesFilter, yearsFilter } from "@/lib/constants";
 
 import MassSelectionList from "@/components/app/mass-selections/mass-selection-list";
 import MassSelectionListSkeleton from "@/components/app/mass-selections/mass-selection-list/index-skeleton";
@@ -10,15 +11,7 @@ import SelectionsStats from "@/components/app/admin/selections/selections-stats"
 import SortFilter from "@/components/app/mass-selections/sort-filter";
 import { Suspense } from "react";
 import UsersStatsSkeleton from "@/components/app/admin/users/users-stats/index-skeleton";
-import { getEnumByValue } from "@/lib/utils";
 import { getFilterPreferences } from "@/lib/actions/filter";
-
-const seasons = [
-  { label: "All Seasons", value: "all" },
-  ...liturgicalSeasonItems,
-];
-
-const years = [{ label: "All Years", value: "all" }, ...liturgicalYearItems];
 
 export default async function SelectionsManagement(
   props: Readonly<{
@@ -46,6 +39,7 @@ export default async function SelectionsManagement(
     getEnumByValue(SortOrder, filters["order"] || "") ||
     getEnumByValue(SortOrder, savedPreferences.order || "") ||
     SortOrder.DESC;
+  const isPublic = filters["public"] || savedPreferences.public;
 
   const searchKey = [page, query, season, year].join("-");
 
@@ -75,15 +69,21 @@ export default async function SelectionsManagement(
         <div className="flex gap-2">
           <QueryFilter
             filterType="admin_selections"
+            selected={isPublic ?? "all"}
+            queryName={"public"}
+            items={typesFilter}
+          />
+          <QueryFilter
+            filterType="admin_selections"
             selected={season ?? "all"}
             queryName={"season"}
-            items={seasons}
+            items={seasonsFilter}
           />
           <QueryFilter
             filterType="admin_selections"
             selected={year ?? "all"}
             queryName={"year"}
-            items={years}
+            items={yearsFilter}
           />
           <SortFilter
             filterType="admin_selections"
@@ -102,6 +102,7 @@ export default async function SelectionsManagement(
           page={page}
           sortBy={sort_by}
           sortOrder={order}
+          isPublic={stringToBoolean(isPublic)}
         />
       </Suspense>
     </div>

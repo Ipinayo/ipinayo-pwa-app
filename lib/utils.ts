@@ -168,7 +168,7 @@ export function convertToLowerCase(str: string[]): string[] {
 
 export function getFieldError(err: any): string {
   if (!Array.isArray(err)) return err?.message ?? '';
-  const first = err.find(item => item && item.message);
+  const first = err.find(item => item?.message);
   return first?.message ?? '';
 }
 
@@ -210,4 +210,14 @@ export function normalizeDate(date: Date | null | undefined) {
 
 export function isAdmin(userRole: UserRole | null | undefined): boolean {
   return userRole === UserRole.ADMIN || userRole === UserRole.SUPERADMIN;
+}
+
+export function stringToBoolean(str: string | undefined | null): boolean | undefined {
+
+  const value = str?.toLowerCase();
+
+  if (value === "true") return true;
+  if (value === "false") return false;
+
+  return undefined;
 }

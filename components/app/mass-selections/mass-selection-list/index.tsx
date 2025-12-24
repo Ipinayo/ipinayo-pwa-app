@@ -40,7 +40,8 @@ export default async function MassSelectionList({
     filter.page === 1 &&
     !filter.query?.trim() &&
     !filter.season &&
-    !filter.year;
+    !filter.year &&
+    filter.isPublic === undefined;
 
   return selections.length === 0 ? (
     <Card className="text-center">

@@ -14,7 +14,7 @@ export default function QueryFilter({
   selected,
 }: Readonly<{
   filterType?: "selections" | "dashboard" | "admin_users" | "admin_selections";
-  queryName: "season" | "year" | "role";
+  queryName: "season" | "year" | "role" | "public";
   items: { label: string; value: string }[] | string[];
   selected?: string;
 }>) {

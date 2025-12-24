@@ -48,7 +48,7 @@ export async function saveSortPreferences(
 
 export async function saveQueryFilterPreferences(
     filterType: keyof typeof FILTER_CONFIGS,
-    queryName: "season" | "year" | "query" | "page" | "role",
+    queryName: "season" | "year" | "query" | "page" | "role" | "public",
     value: string
 ) {
     const config = FILTER_CONFIGS[filterType];
@@ -69,6 +69,9 @@ export async function saveQueryFilterPreferences(
         case "role":
             await setCookie(`${config.storageKey}_r`, value, config.path);
             break;
+        case "public":
+            await setCookie(`${config.storageKey}_p`, value, config.path);
+            break;
         default:
             break;
     }
@@ -86,5 +89,6 @@ export async function getFilterPreferences(filterType: keyof typeof FILTER_CONFI
         query: cookieStore.get(`${config.storageKey}_q`)?.value,
         season: cookieStore.get(`${config.storageKey}_ss`)?.value,
         role: cookieStore.get(`${config.storageKey}_r`)?.value,
+        public: cookieStore.get(`${config.storageKey}_p`)?.value,
     };
 }

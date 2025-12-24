@@ -29,6 +29,7 @@ export interface MassSelectionFilter {
     year?: LiturgicalYear,
     sortBy?: SortBy,
     sortOrder?: SortOrder
+    isPublic?: boolean
 }
 
 export interface UpdateUserProfile {

@@ -57,14 +57,15 @@ export async function findAllSelections({
     season,
     year,
     sortBy = SortBy.UPDATED_AT,
-    sortOrder = SortOrder.DESC
+    sortOrder = SortOrder.DESC,
+    isPublic
 }: MassSelectionFilter) {
 
     const skip = (page - 1) * limit
 
     // Build where clause with search and filter conditions
     const whereClause: Prisma.MassSelectionWhereInput = {
-        isPublic: true, // Base condition - only public selections
+        isPublic
     }
 
     // Build AND conditions array
@@ -144,7 +145,8 @@ export async function findAllUserSelections({
     season,
     year,
     sortBy = SortBy.UPDATED_AT,
-    sortOrder = SortOrder.DESC
+    sortOrder = SortOrder.DESC,
+    isPublic
 }: MassSelectionFilter, userId: string) {
 
     const skip = (page - 1) * limit
@@ -152,6 +154,7 @@ export async function findAllUserSelections({
     // Build where clause with search and filter conditions
     const whereClause: Prisma.MassSelectionWhereInput = {
         createdById: userId, // Base condition - only user selections
+        isPublic,
     }
 
     // Build AND conditions array

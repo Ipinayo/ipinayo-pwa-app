@@ -1,6 +1,6 @@
 import { LiturgicalSeason, LiturgicalYear } from "@/lib/generated/prisma/index";
 import { Params, SearchParams, SortBy, SortOrder } from "@/types/utils";
-import { liturgicalSeasonItems, liturgicalYearItems } from "@/lib/constants";
+import { seasonsFilter, typesFilter, yearsFilter } from "@/lib/constants";
 
 import BackButton from "@/components/common/back-button";
 import MassSelectionList from "@/components/app/mass-selections/mass-selection-list";
@@ -10,12 +10,7 @@ import Search from "@/components/app/mass-selections/search";
 import SortFilter from "@/components/app/mass-selections/sort-filter";
 import { Suspense } from "react";
 import { getEnumByValue } from "@/lib/utils";
-
-const seasons = [
-  { label: "All Seasons", value: "all" },
-  ...liturgicalSeasonItems,
-];
-const years = [{ label: "All Years", value: "all" }, ...liturgicalYearItems];
+import { stringToBoolean } from "../../../../../lib/utils";
 
 export default async function UserSelectionsPage(props: {
   params: Params;
@@ -34,6 +29,7 @@ export default async function UserSelectionsPage(props: {
     getEnumByValue(SortBy, filters["sort_by"] || "") || SortBy.UPDATED_AT;
   const order =
     getEnumByValue(SortOrder, filters["order"] || "") || SortOrder.DESC;
+  const isPublic = filters["public"];
 
   const searchKey = [page, query, season, year].join("-");
 
@@ -51,14 +47,19 @@ export default async function UserSelectionsPage(props: {
         <Search query={query} placeholder="Search user selections..." />
         <div className="flex gap-2">
           <QueryFilter
+            selected={isPublic ?? "all"}
+            queryName={"public"}
+            items={typesFilter}
+          />
+          <QueryFilter
             selected={season ?? "all"}
             queryName={"season"}
-            items={seasons}
+            items={seasonsFilter}
           />
           <QueryFilter
             selected={year ?? "all"}
             queryName={"year"}
-            items={years}
+            items={yearsFilter}
           />
           <SortFilter sortBy={sort_by} order={order} />
         </div>
@@ -74,6 +75,7 @@ export default async function UserSelectionsPage(props: {
           sortOrder={order}
           userOnly={true}
           userId={userId}
+          isPublic={stringToBoolean(isPublic)}
         />
       </Suspense>
     </div>
