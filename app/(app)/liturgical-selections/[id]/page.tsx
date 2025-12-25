@@ -29,6 +29,7 @@ export default async function ViewPage(props: { params: Params }) {
 
   const selection = await getSelectionById(params.id);
 
+  // TODO: Implement admin override with collaboration
   if (!selection.isPublic) {
     if (!session?.user?.id || selection.createdById !== session.user.id) {
       throw new Error("Unauthorized");
@@ -121,19 +122,17 @@ export default async function ViewPage(props: { params: Params }) {
             </CardHeader>
             <CardContent className="space-y-2">
               <div className="flex items-center justify-between text-sm gap-5">
-                <label className="text-muted-foreground font-medium">
-                  Choir Name
-                </label>
+                <p className="text-muted-foreground font-medium">Choir Name</p>
                 <p className="mt-1 text-sm text-right">
                   {selection.choirName || "Unnamed Choir"}
                 </p>
               </div>
               <div className="flex items-center justify-between text-sm gap-5">
-                <label className="text-muted-foreground font-medium">
+                <p className="text-muted-foreground font-medium">
                   {selection.parishName && selection.parishLocation
                     ? "Parish: "
                     : "Parish In: "}
-                </label>
+                </p>
                 <p className="mt-1 text-sm text-right">
                   {formatParishInfo(
                     selection.parishLocation,
@@ -150,9 +149,9 @@ export default async function ViewPage(props: { params: Params }) {
             </CardHeader>
             <CardContent className="space-y-2">
               <div className="flex items-center justify-between text-sm gap-5">
-                <label className="text-muted-foreground font-medium">
+                <p className="text-muted-foreground font-medium">
                   Liturgical Year
-                </label>
+                </p>
                 <div className="mt-1 text-right">
                   {selection.liturgicalYear ? (
                     <Badge>Year {selection.liturgicalYear}</Badge>
@@ -163,9 +162,7 @@ export default async function ViewPage(props: { params: Params }) {
               </div>
 
               <div className="flex items-center justify-between text-sm gap-5">
-                <label className="text-muted-foreground font-medium">
-                  Season
-                </label>
+                <p className="text-muted-foreground font-medium">Season</p>
                 <div className="mt-1 text-right">
                   {getLabelForValue(
                     liturgicalSeasonItems,
@@ -175,9 +172,7 @@ export default async function ViewPage(props: { params: Params }) {
               </div>
 
               <div className="flex items-center gap-5 text-sm justify-between ">
-                <label className="text-muted-foreground  font-medium">
-                  Themes
-                </label>
+                <p className="text-muted-foreground  font-medium">Themes</p>
                 <p className="mt-1 capitalize text-right">
                   {selection.themes.map((theme) => theme.name).join(", ") ||
                     "-"}
@@ -185,18 +180,16 @@ export default async function ViewPage(props: { params: Params }) {
               </div>
 
               <div className="flex items-center justify-between text-sm gap-5">
-                <label className="text-muted-foreground font-medium">
+                <p className="text-muted-foreground font-medium">
                   Pastoral Focus
-                </label>
+                </p>
                 <p className="mt-1 text-sm text-right">
                   {selection.pastoralFocus || "-"}
                 </p>
               </div>
 
               <div className="flex items-center justify-between text-sm gap-5">
-                <label className="text-muted-foreground font-medium">
-                  Liturgy
-                </label>
+                <p className="text-muted-foreground font-medium">Liturgy</p>
                 <p className="mt-1 text-sm text-right">
                   {selection.liturgy || "-"}
                 </p>
@@ -210,25 +203,21 @@ export default async function ViewPage(props: { params: Params }) {
             </CardHeader>
             <CardContent className="space-y-2">
               <div className="flex items-center justify-between text-sm gap-5">
-                <label className="text-muted-foreground font-medium">
-                  Created
-                </label>
+                <p className="text-muted-foreground font-medium">Created</p>
                 <p className="mt-1 text-sm text-right">
                   {formatDate(selection.createdAt)}
                 </p>
               </div>
               <div className="flex items-center justify-between text-sm gap-5">
-                <label className="text-muted-foreground font-medium">
+                <p className="text-muted-foreground font-medium">
                   Last updated
-                </label>
+                </p>
                 <p className="mt-1 text-sm text-right">
                   {formatDate(selection.updatedAt)}
                 </p>
               </div>
               <div className="flex items-center justify-between text-sm gap-5">
-                <label className="text-muted-foreground font-medium">
-                  Created By
-                </label>
+                <p className="text-muted-foreground font-medium">Created By</p>
                 <p className="mt-1 text-sm text-right">
                   {selection.createdBy.name || selection.createdBy.email}
                 </p>

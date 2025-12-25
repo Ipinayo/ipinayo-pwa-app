@@ -8,15 +8,17 @@ export default function Search({
   filterType,
   query,
   placeholder,
-}: {
-  filterType: "selections" | "dashboard";
+}: Readonly<{
+  filterType?: "selections" | "dashboard" | "admin_selections";
   query?: string;
   placeholder?: string;
-}) {
+}>) {
+  // Save search query to cookies once on mount
   useEffect(() => {
     // Save current search query to cookies on mount
     const saveSearchQuery = async () => {
-      if (query) await saveQueryFilterPreferences(filterType, "query", query);
+      if (query && filterType)
+        await saveQueryFilterPreferences(filterType, "query", query);
     };
     saveSearchQuery();
   }, []);
@@ -25,9 +27,10 @@ export default function Search({
     <SearchBar
       query={query}
       placeholder={placeholder}
-      onSearch={async (term) =>
-        await saveQueryFilterPreferences(filterType, "query", term)
-      }
+      onSearch={async (term) => {
+        if (filterType)
+          await saveQueryFilterPreferences(filterType, "query", term);
+      }}
     />
   );
 }

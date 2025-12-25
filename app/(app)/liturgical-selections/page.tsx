@@ -3,7 +3,7 @@ import {
   LiturgicalYear,
 } from "../../../lib/generated/prisma/index";
 import { SearchParams, SortBy, SortOrder } from "@/types/utils";
-import { liturgicalSeasonItems, liturgicalYearItems } from "@/lib/constants";
+import { seasonsFilter, yearsFilter } from "@/lib/constants";
 
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -16,12 +16,6 @@ import SortFilter from "@/components/app/mass-selections/sort-filter";
 import { Suspense } from "react";
 import { getEnumByValue } from "@/lib/utils";
 import { getFilterPreferences } from "@/lib/actions/filter";
-
-const seasons = [
-  { label: "All Seasons", value: "all" },
-  ...liturgicalSeasonItems,
-];
-const years = [{ label: "All Years", value: "all" }, ...liturgicalYearItems];
 
 export default async function MassSelectionsPage(props: {
   searchParams: SearchParams;
@@ -81,13 +75,13 @@ export default async function MassSelectionsPage(props: {
             filterType="selections"
             selected={season ?? "all"}
             queryName={"season"}
-            items={seasons}
+            items={seasonsFilter}
           />
           <QueryFilter
             filterType="selections"
             selected={year ?? "all"}
             queryName={"year"}
-            items={years}
+            items={yearsFilter}
           />
           <SortFilter filterType="selections" sortBy={sort_by} order={order} />
         </div>
@@ -102,6 +96,7 @@ export default async function MassSelectionsPage(props: {
           page={page}
           sortBy={sort_by}
           sortOrder={order}
+          isPublic={true}
         />
       </Suspense>
     </div>

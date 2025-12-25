@@ -1,4 +1,3 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Card,
   CardContent,
@@ -11,6 +10,7 @@ import { Edit, Heart, MapPin, Music } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import UserAvatar from "@/components/common/user-avatar";
 import { auth } from "@/auth";
 import { getUserProfile } from "@/lib/actions/user";
 import { redirect } from "next/navigation";
@@ -40,19 +40,7 @@ export default async function ProfilePage() {
           <Card>
             <CardHeader>
               <div className="flex flex-col sm:flex-row items-center gap-6">
-                <Avatar className="h-24 w-24">
-                  <AvatarImage
-                    src={userProfile.user.image || undefined}
-                    alt="User Avatar"
-                  />
-                  <AvatarFallback>
-                    {(userProfile.user.name || userProfile.user.email)
-                      .split(" ")
-                      .map((n) => n[0])
-                      .join("")
-                      .toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
+                <UserAvatar user={userProfile.user} className="h-24 w-24" />
                 <div className="flex-1">
                   <CardTitle className="text-2xl">
                     {userProfile.user.name}

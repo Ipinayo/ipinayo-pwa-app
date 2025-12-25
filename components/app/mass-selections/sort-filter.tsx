@@ -21,11 +21,11 @@ export default function SortFilter({
   filterType,
   sortBy = SortBy.DATE,
   order = SortOrder.DESC,
-}: {
-  filterType: "selections" | "dashboard";
+}: Readonly<{
+  filterType?: "selections" | "dashboard" | "admin_selections";
   sortBy?: SortBy;
   order?: SortOrder;
-}) {
+}>) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -35,7 +35,7 @@ export default function SortFilter({
       const [sort_by, order] = value.split("-");
 
       // Save to cookies via server action
-      await saveSortPreferences(filterType, sort_by, order);
+      if (filterType) await saveSortPreferences(filterType, sort_by, order);
 
       router.push(
         `${pathname}?${createQueryString(

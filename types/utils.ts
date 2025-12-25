@@ -1,4 +1,4 @@
-import { LiturgicalSeason, LiturgicalYear, NewLocation } from "./models";
+import { LiturgicalSeason, LiturgicalYear, NewLocation, UserRole } from "./models";
 
 export type SearchParams = Promise<{ [key: string]: string | undefined }>;
 
@@ -15,6 +15,17 @@ export enum SortBy {
     DATE = 'date'
 }
 
+export enum SortUsersBy {
+    CREATED_AT = 'createdAt',
+    NAME = 'name',
+    EMAIL = 'email'
+}
+
+export enum SortDraftsBy {
+    UPDATED_AT = 'updatedAt',
+    TITLE = 'title',
+}
+
 export interface MassSelectionFilter {
     page?: number,
     limit?: number,
@@ -23,6 +34,7 @@ export interface MassSelectionFilter {
     year?: LiturgicalYear,
     sortBy?: SortBy,
     sortOrder?: SortOrder
+    isPublic?: boolean
 }
 
 export interface UpdateUserProfile {
@@ -41,4 +53,15 @@ export interface DraftSelectionFilter {
     page?: number,
     limit?: number,
     query?: string,
+    sortBy?: SortDraftsBy,
+    sortOrder?: SortOrder
+}
+
+export interface UsersFilter {
+    page?: number,
+    limit?: number,
+    query?: string,
+    userRole?: UserRole
+    sortBy?: SortUsersBy,
+    sortOrder?: SortOrder
 }

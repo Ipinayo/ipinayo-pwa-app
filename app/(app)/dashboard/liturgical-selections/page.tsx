@@ -1,6 +1,13 @@
 import { LiturgicalSeason, LiturgicalYear } from "@/lib/generated/prisma/index";
 import { SearchParams, SortBy, SortOrder } from "@/types/utils";
-import { liturgicalSeasonItems, liturgicalYearItems } from "@/lib/constants";
+import { getEnumByValue, stringToBoolean } from "@/lib/utils";
+import {
+  liturgicalSeasonItems,
+  liturgicalYearItems,
+  seasonsFilter,
+  typesFilter,
+  yearsFilter,
+} from "@/lib/constants";
 
 import BackButton from "@/components/common/back-button";
 import { Button } from "@/components/ui/button";
@@ -13,7 +20,6 @@ import Search from "@/components/app/mass-selections/search";
 import SortFilter from "@/components/app/mass-selections/sort-filter";
 import { Suspense } from "react";
 import { auth } from "@/auth";
-import { getEnumByValue } from "@/lib/utils";
 import { getFilterPreferences } from "@/lib/actions/filter";
 import { redirect } from "next/navigation";
 
@@ -51,6 +57,7 @@ export default async function MassSelectionsPage(props: {
     getEnumByValue(SortOrder, filters["order"] || "") ||
     getEnumByValue(SortOrder, savedPreferences.order || "") ||
     SortOrder.DESC;
+  const isPublic = filters["public"] || savedPreferences.public;
 
   const searchKey = [page, query, season, year].join("-");
 
@@ -81,15 +88,21 @@ export default async function MassSelectionsPage(props: {
         <div className="flex gap-2">
           <QueryFilter
             filterType="dashboard"
+            selected={isPublic ?? "all"}
+            queryName={"public"}
+            items={typesFilter}
+          />
+          <QueryFilter
+            filterType="dashboard"
             selected={season ?? "all"}
             queryName={"season"}
-            items={seasons}
+            items={seasonsFilter}
           />
           <QueryFilter
             filterType="dashboard"
             selected={year ?? "all"}
             queryName={"year"}
-            items={years}
+            items={yearsFilter}
           />
           <SortFilter filterType="dashboard" sortBy={sort_by} order={order} />
         </div>
@@ -105,6 +118,7 @@ export default async function MassSelectionsPage(props: {
           sortBy={sort_by}
           sortOrder={order}
           userOnly={true}
+          isPublic={stringToBoolean(isPublic)}
         />
       </Suspense>
     </div>

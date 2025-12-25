@@ -13,7 +13,7 @@ import { Menu } from "lucide-react";
 import SideNav from "./SideNav";
 import { useState } from "react";
 
-export default function MobileMenuTrigger() {
+export default function MobileMenuTrigger({ adminNav}: { adminNav: boolean }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
@@ -31,7 +31,7 @@ export default function MobileMenuTrigger() {
       >
         <SheetTitle className="sr-only">Side Navigation</SheetTitle>
         <SheetDescription className="sr-only">Side Navigation</SheetDescription>
-        <SideNav isMobileMenuOpen={mobileMenuOpen} />
+        <SideNav isMobileMenuOpen={mobileMenuOpen} adminNav={adminNav} />
       </SheetContent>
     </Sheet>
   );
