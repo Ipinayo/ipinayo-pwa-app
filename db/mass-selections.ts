@@ -64,9 +64,9 @@ export async function findAllSelections({
     const skip = (page - 1) * limit
 
     // Build where clause with search and filter conditions
-    const whereClause: Prisma.MassSelectionWhereInput = {
-        isPublic
-    }
+    const whereClause: Prisma.MassSelectionWhereInput = {}
+
+    if (isPublic !== undefined) { whereClause.isPublic = isPublic }
 
     // Build AND conditions array
     const andConditions: Prisma.MassSelectionWhereInput[] = []
@@ -154,8 +154,9 @@ export async function findAllUserSelections({
     // Build where clause with search and filter conditions
     const whereClause: Prisma.MassSelectionWhereInput = {
         createdById: userId, // Base condition - only user selections
-        isPublic,
     }
+
+    if (isPublic !== undefined) { whereClause.isPublic = isPublic; }
 
     // Build AND conditions array
     const andConditions: Prisma.MassSelectionWhereInput[] = []
