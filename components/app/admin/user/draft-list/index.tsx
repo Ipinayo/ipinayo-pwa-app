@@ -2,7 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 
 import { Box } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import DraftCard from "@/components/app/draft-selections/draft-card";
+import DraftCard from "../../drafts/draft-card";
 import Link from "next/link";
 import { getUserDrafts } from "@/lib/actions/admin";
 
@@ -37,7 +37,7 @@ export default async function DraftList({
         ) : (
           <div className="grid gap-4 xs:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {drafts.map((draft) => (
-              <DraftCard key={draft.id} draft={draft} canEdit={false} />
+              <DraftCard key={draft.id} draft={draft} />
             ))}
           </div>
         )}
