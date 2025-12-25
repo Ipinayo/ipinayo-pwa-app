@@ -21,6 +21,11 @@ export enum SortUsersBy {
     EMAIL = 'email'
 }
 
+export enum SortDraftsBy {
+    UPDATED_AT = 'updatedAt',
+    TITLE = 'title',
+}
+
 export interface MassSelectionFilter {
     page?: number,
     limit?: number,
@@ -48,6 +53,8 @@ export interface DraftSelectionFilter {
     page?: number,
     limit?: number,
     query?: string,
+    sortBy?: SortDraftsBy,
+    sortOrder?: SortOrder
 }
 
 export interface UsersFilter {

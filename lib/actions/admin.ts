@@ -254,7 +254,7 @@ export async function getDraftsStats() {
 
 export async function getAllDrafts({ page = 1,
     limit = 12,
-    query = '', }: DraftSelectionFilter) {
+    query = '', sortBy, sortOrder }: DraftSelectionFilter) {
     const session = await auth();
     if (!session?.user) {
         throw new Error("Unauthorized");
@@ -265,7 +265,7 @@ export async function getAllDrafts({ page = 1,
         throw new Error("Forbidden");
     }
 
-    const { drafts, total } = await findAllDrafts({ page, limit, query });
+    const { drafts, total } = await findAllDrafts({ page, limit, query, sortBy, sortOrder });
     return {
         drafts: drafts,
         pagination: {

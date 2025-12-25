@@ -1,6 +1,6 @@
 import { AdminDashboardStats, DraftStats, SelectionsStats, UserRole, UsersStats } from "@/types/models";
+import { DraftSelectionFilter, SortDraftsBy, SortOrder } from "@/types/utils";
 
-import { DraftSelectionFilter } from "@/types/utils";
 import { Prisma } from "@/lib/generated/prisma";
 import prisma from "@/lib/prisma";
 
@@ -176,6 +176,8 @@ export default async function findAllDrafts({
     page = 1,
     limit = 12,
     query = '',
+    sortBy = SortDraftsBy.UPDATED_AT,
+    sortOrder = SortOrder.DESC,
 }: DraftSelectionFilter) {
     const skip = (page - 1) * limit
 
@@ -205,6 +207,11 @@ export default async function findAllDrafts({
         whereClause.AND = andConditions
     }
 
+    // Build order by clause
+    const orderBy = {
+        [sortBy]: sortOrder
+    }
+
     // Get drafts with pagination
     const drafts = await prisma.massSelectionDraft.findMany({
         where: whereClause,
@@ -217,7 +224,7 @@ export default async function findAllDrafts({
                 }
             }
         },
-        orderBy: { 'updatedAt': 'desc' },
+        orderBy,
         skip,
         take: limit,
     })
