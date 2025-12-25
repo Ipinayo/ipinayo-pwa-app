@@ -195,6 +195,10 @@ export default async function findAllDrafts({
                 {
                     createdBy: {
                         name: { contains: query, mode: "insensitive" },
+                    }
+                },
+                {
+                    createdBy: {
                         email: { contains: query, mode: "insensitive" }
                     }
                 },

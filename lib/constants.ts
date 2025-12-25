@@ -409,6 +409,6 @@ export const yearsFilter = [{ label: "All Years", value: "all" }, ...liturgicalY
 
 export const typesFilter = [
     { label: "All", value: "all" },
-    { label: "Public", value: "true " },
+    { label: "Public", value: "true" },
     { label: "Private", value: "false" },
 ];

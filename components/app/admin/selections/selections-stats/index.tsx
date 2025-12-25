@@ -29,7 +29,7 @@ export default async function SelectionsStats() {
     },
     {
       title: "New Selections This Week",
-      value: stats.newSelectionsThisMonth,
+      value: stats.newSelectionsThisWeek,
       icon: TrendingUp,
     },
   ];
