@@ -1,4 +1,4 @@
-import { KeySignature, LiturgicalSeason, LiturgicalYear, Prisma } from "@/lib/generated/prisma";
+import { KeySignature, LiturgicalSeason, LiturgicalYear, Prisma, UserRole } from "@/lib/generated/prisma";
 
 export type GenerateMassSelection = Prisma.MassSelectionGetPayload<{
     include: {
@@ -75,6 +75,8 @@ export type UserProfile = Prisma.UserProfileGetPayload<{
                 name: true;
                 email: true;
                 image: true;
+                userRole: true;
+                createdAt: true;
             }
         },
         parishLocation: true
@@ -86,6 +88,7 @@ export type AppUser = Prisma.UserGetPayload<{
         name: true,
         email: true,
         image: true,
+        userRole: true,
         profile: {
             select: {
                 id: true,
@@ -95,6 +98,59 @@ export type AppUser = Prisma.UserGetPayload<{
     }
 }>;
 
+export type User = Prisma.UserGetPayload<{
+    include: {
+        _count: {
+            select: {
+                selections: true,
+                massSelectionDrafts: true
+            },
+        },
+    },
+}>;
+
 export type MassSelectionDraft = Prisma.MassSelectionDraftGetPayload<{}>;
 
-export { KeySignature, LiturgicalSeason, LiturgicalYear }
+export type AdminMassSelectionDraft = Prisma.MassSelectionDraftGetPayload<{
+    include: {
+        createdBy: {
+            select: {
+                id: true,
+                name: true,
+                email: true,
+            }
+        }
+    },
+}>;
+
+export interface AdminDashboardStats {
+    totalSelections: number
+    totalDrafts: number
+    totalUsers: number
+    newUsersThisWeek: number
+    notificationsSent: number
+}
+
+export interface UsersStats {
+    totalUsers: number
+    totalAdmins: number
+    newUsersThisWeek: number
+    newUsersThisMonth: number
+}
+
+export interface SelectionsStats {
+    totalSelections: number
+    totalPublicSelections: number
+    totalPrivateSelections: number
+    newSelectionsThisMonth: number
+    newSelectionsThisWeek: number
+}
+
+export interface DraftStats {
+    totalDrafts: number
+    newDraftsThisMonth: number,
+    newDraftsThisWeek: number,
+    oldDrafts: number
+}
+
+export { KeySignature, LiturgicalSeason, LiturgicalYear, UserRole }

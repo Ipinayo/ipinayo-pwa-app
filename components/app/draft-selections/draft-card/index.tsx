@@ -1,3 +1,4 @@
+import { AlertCircle, Edit2 } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -6,18 +7,23 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import DeleteButton from "@/components/app/draft-selections/delete-button";
-import { Edit2 } from "lucide-react";
 import Link from "next/link";
 import { MassSelectionDraft } from "@/types/models";
+import { differenceInDays } from "date-fns";
 import { formatDate } from "@/lib/utils";
 
-export default function DraftCard({ draft }: { draft: MassSelectionDraft }) {
+export default function DraftCard({
+  draft,
+}: Readonly<{ draft: MassSelectionDraft }>) {
+  const age = differenceInDays(new Date(), new Date(draft.updatedAt));
+
   return (
     <Card className="cursor-pointer transition-all hover:shadow-lg hover:scale-[1.02] border-2 hover:border-amber-400 bg-amber-50/50 dark:bg-amber-950/10">
       <CardHeader>
-        <div className="flex items-start justify-between mb-2">
+        <div className="flex items-start justify-between mb-2 gap-2">
           <div className="flex-1">
             <CardTitle className="text-base line-clamp-2">
               {draft.title || "Untitled Draft"}
@@ -26,6 +32,14 @@ export default function DraftCard({ draft }: { draft: MassSelectionDraft }) {
               Last updated: {formatDate(draft.updatedAt)}
             </CardDescription>
           </div>
+
+          {age >= 10 && (
+            <Badge variant={"outline"} className="gap-1 text-destructive">
+              <AlertCircle className="h-3 w-3" />
+              {age} days old
+            </Badge>
+          )}
+
           <DeleteButton
             draftId={draft.id}
             variant="ghost"

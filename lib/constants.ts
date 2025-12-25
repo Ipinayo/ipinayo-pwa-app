@@ -399,3 +399,16 @@ export const genreOptions = [
     "Gregorian Chant",
     "Classical"
 ]
+
+export const seasonsFilter = [
+    { label: "All Seasons", value: "all" },
+    ...liturgicalSeasonItems,
+];
+
+export const yearsFilter = [{ label: "All Years", value: "all" }, ...liturgicalYearItems];
+
+export const typesFilter = [
+    { label: "All", value: "all" },
+    { label: "Public", value: "true" },
+    { label: "Private", value: "false" },
+];

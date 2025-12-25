@@ -15,7 +15,8 @@ export default auth((req) => {
         pathname.startsWith("/dashboard") ||
         pathname.startsWith("/profile") ||
         pathname.startsWith("/settings") ||
-        pathname.startsWith("/liturgical-selections/new");
+        pathname.startsWith("/liturgical-selections/new") ||
+        pathname.startsWith("/admin");
 
     const isAuthPage =
         pathname.startsWith("/signin") ||
@@ -47,5 +48,6 @@ export const config = {
         "/liturgical-selections/:path*",
         "/signin/:path*",
         "/verify-request/:path*",
+        "/admin/:path*"
     ],
 };

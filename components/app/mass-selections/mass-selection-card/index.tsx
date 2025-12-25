@@ -34,10 +34,10 @@ import { liturgicalSeasonItems } from "@/lib/constants";
 export default function MassSelectionCard({
   selection,
   publicView = true,
-}: {
+}: Readonly<{
   selection: MassSelection;
   publicView?: boolean;
-}) {
+}>) {
   return (
     <Card className="transition-shadow hover:shadow-lg">
       <CardHeader>
