@@ -44,6 +44,8 @@ import {
   useSensor,
   useSensors,
   type DragEndEvent,
+  MouseSensor,
+  TouchSensor,
 } from "@dnd-kit/core";
 import {
   SortableContext,
@@ -91,7 +93,7 @@ const getDefaultValues = (props: CreateFormProps): DraftMassSelection => {
               console.error(
                 "Invalid part data:",
                 result.error,
-                "Using default values."
+                "Using default values.",
               );
               return {
                 id: `temp-${Date.now()}-${index}`,
@@ -130,7 +132,7 @@ const getDefaultValues = (props: CreateFormProps): DraftMassSelection => {
 
   let initialParishLocation;
   const result = draftMassSelectionSchema.shape.parishLocation.safeParse(
-    props.draftSelection.parishLocation
+    props.draftSelection.parishLocation,
   );
   if (result.success) {
     initialParishLocation = result.data;
@@ -145,7 +147,7 @@ const getDefaultValues = (props: CreateFormProps): DraftMassSelection => {
   };
 };
 
-export default function CreateForm(props: CreateFormProps) {
+export default function CreateForm(props: Readonly<CreateFormProps>) {
   const { replacePath, handleBack } = useAppNavigation();
 
   const sensors = useSensors(
@@ -156,7 +158,18 @@ export default function CreateForm(props: CreateFormProps) {
     }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    })
+    }),
+    useSensor(MouseSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 250,
+        tolerance: 5,
+      },
+    }),
   );
 
   const form = useForm<DraftMassSelection>({
@@ -206,7 +219,7 @@ export default function CreateForm(props: CreateFormProps) {
 
   const addPart = (afterIndex?: number) => {
     const insertIndex =
-      afterIndex !== undefined ? afterIndex + 1 : fields.length;
+      afterIndex === undefined ? fields.length : afterIndex + 1;
 
     const newPart = {
       id: `temp-${Date.now()}`,
@@ -218,10 +231,10 @@ export default function CreateForm(props: CreateFormProps) {
     };
 
     // Use insert if adding at a specific position, append if adding at the end
-    if (afterIndex !== undefined) {
-      insert(insertIndex, newPart);
-    } else {
+    if (afterIndex === undefined) {
       append(newPart);
+    } else {
+      insert(insertIndex, newPart);
     }
   };
 
@@ -397,7 +410,7 @@ export default function CreateForm(props: CreateFormProps) {
                         field.onChange(
                           value === "none"
                             ? null
-                            : getEnum(LiturgicalYear, value) ?? null
+                            : (getEnum(LiturgicalYear, value) ?? null),
                         )
                       }
                     >
@@ -434,7 +447,7 @@ export default function CreateForm(props: CreateFormProps) {
                         field.onChange(
                           value === "none"
                             ? null
-                            : getEnum(LiturgicalSeason, value) ?? null
+                            : (getEnum(LiturgicalSeason, value) ?? null),
                         )
                       }
                     >

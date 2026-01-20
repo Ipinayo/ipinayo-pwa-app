@@ -26,7 +26,7 @@ export default function MassPartRow({
   partNames,
   onRemove,
   onInsertPart,
-}: MassPartRowProps) {
+}: Readonly<MassPartRowProps>) {
   const {
     attributes,
     listeners,
@@ -43,7 +43,7 @@ export default function MassPartRow({
   };
 
   return (
-    <div ref={setNodeRef} style={style} className="space-y-1">
+    <div ref={setNodeRef} style={style} className="space-y-1 touch-none">
       <div className="flex gap-3 flex-col sm:flex-row">
         {/* Grip Handle */}
         <div
