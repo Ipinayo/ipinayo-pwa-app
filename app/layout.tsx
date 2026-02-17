@@ -7,6 +7,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { AppNavigationProvider } from "@/contexts/AppNavigationContext";
 import { OfflineIndicator } from "@/components/offline-indicator";
 import { PWAInstallPrompt } from "@/components/pwa-install-prompt";
+import { SerwistProvider } from "./serwist";
 import { SessionProvider } from "next-auth/react";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
@@ -470,28 +471,30 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className={`antialiased`}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <SessionProvider>
-            <AppNavigationProvider>
-              {children}
-              <Toaster
-                duration={5000}
-                richColors
-                closeButton
-                expand
-                position="top-right"
-              />
-              <PWAInstallPrompt />
-              <OfflineIndicator />
-            </AppNavigationProvider>
-          </SessionProvider>
-        </ThemeProvider>
-        <Analytics />
+        <SerwistProvider swUrl="/serwist/sw.js">
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <SessionProvider>
+              <AppNavigationProvider>
+                {children}
+                <Toaster
+                  duration={5000}
+                  richColors
+                  closeButton
+                  expand
+                  position="top-right"
+                />
+                <PWAInstallPrompt />
+                <OfflineIndicator />
+              </AppNavigationProvider>
+            </SessionProvider>
+          </ThemeProvider>
+          <Analytics />
+        </SerwistProvider>
       </body>
     </html>
   );

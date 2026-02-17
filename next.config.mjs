@@ -35,7 +35,7 @@ export default withSerwist({
         ],
       },
       {
-        source: '/sw.js',
+        source: '/serwist/sw.js',
         headers: [
           {
             key: 'Content-Type',
