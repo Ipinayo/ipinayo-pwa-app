@@ -1,18 +1,18 @@
-import withSerwistInit from "@serwist/next";
+import { withSerwist } from "@serwist/turbopack";
 
-const withSerwist = withSerwistInit({
-  swSrc: "app/sw.ts",
-  swDest: "public/sw.js",
-  cacheOnNavigation: true,
-  reloadOnOnline: true,
-  register: true,
-  scope: "/",
-  additionalPrecacheEntries: [
-    { url: "/offline", revision: "1" },
-    { url: "/images/logo.png", revision: "1" },
-  ],
-  disable: process.env.NODE_ENV === "development"
-});
+// const withSerwistConfig = withSerwist({
+//   swSrc: "app/sw.ts",
+//   swDest: "public/sw.js",
+//   cacheOnNavigation: true,
+//   reloadOnOnline: true,
+//   register: true,
+//   scope: "/",
+//   additionalPrecacheEntries: [
+//     { url: "/offline", revision: "1" },
+//     { url: "/images/logo.png", revision: "1" },
+//   ],
+//   disable: process.env.NODE_ENV === "development"
+// });
 
 export default withSerwist({
   async headers() {
@@ -66,7 +66,7 @@ export default withSerwist({
       },
     ]
   },
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
+  // eslint: {
+  //   ignoreDuringBuilds: true,
+  // },
 });
