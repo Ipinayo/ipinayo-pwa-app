@@ -11,14 +11,26 @@ export async function findAdminDashboardStats(): Promise<AdminDashboardStats> {
 
     const [
         totalSelections,
+        newSelectionsThisWeek,
         totalDrafts,
+        newDraftsThisWeek,
         totalUsers,
         newUsersThisWeek,
         notificationsSent
     ] = await Promise.all([
         prisma.massSelection.count(),
+        prisma.massSelection.count({
+            where: {
+                createdAt: { gte: startOfWeek }
+            }
+        }),
 
         prisma.massSelectionDraft.count(),
+        prisma.massSelectionDraft.count({
+            where: {
+                createdAt: { gte: startOfWeek }
+            }
+        }),
         prisma.user.count(),
 
         prisma.user.count({
@@ -31,7 +43,9 @@ export async function findAdminDashboardStats(): Promise<AdminDashboardStats> {
 
     return {
         totalSelections,
+        newSelectionsThisWeek,
         totalDrafts,
+        newDraftsThisWeek,
         totalUsers,
         newUsersThisWeek,
         notificationsSent

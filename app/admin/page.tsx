@@ -19,7 +19,7 @@ export default async function AdminDashboard() {
     {
       title: "Total Selections",
       value: stats.totalSelections,
-      description: "Across all users",
+      description: `${stats.newSelectionsThisWeek} new this week`,
       icon: BookOpen,
       href: "/admin/selections",
       color: "text-muted-foreground",
@@ -27,7 +27,7 @@ export default async function AdminDashboard() {
     {
       title: "Total Drafts",
       value: stats.totalDrafts,
-      description: "Across all users",
+      description: `${stats.newDraftsThisWeek} new this week`,
       icon: BookOpen,
       href: "/admin/drafts",
       color: "text-amber-500",

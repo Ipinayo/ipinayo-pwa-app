@@ -1,4 +1,4 @@
-import { KeySignature, LiturgicalSeason, LiturgicalYear, Prisma, UserRole } from "@/lib/generated/prisma";
+import { Prisma, } from "@/lib/generated/prisma";
 
 export type GenerateMassSelection = Prisma.MassSelectionGetPayload<{
     include: {
@@ -125,7 +125,9 @@ export type AdminMassSelectionDraft = Prisma.MassSelectionDraftGetPayload<{
 
 export interface AdminDashboardStats {
     totalSelections: number
+    newSelectionsThisWeek: number
     totalDrafts: number
+    newDraftsThisWeek: number
     totalUsers: number
     newUsersThisWeek: number
     notificationsSent: number
@@ -153,4 +155,4 @@ export interface DraftStats {
     oldDrafts: number
 }
 
-export { KeySignature, LiturgicalSeason, LiturgicalYear, UserRole }
+export { KeySignature, LiturgicalSeason, LiturgicalYear, UserRole } from "@/lib/generated/prisma";
