@@ -175,6 +175,30 @@ model MassSelectionDraft {
   @@index([createdById])
 }
 
+model Activity {
+  id          String   @id @default(cuid())
+  event       String
+  entityType  String
+  entityId    String
+  actorId     String
+  targetUsers String[]
+  metadata    Json
+  createdAt   DateTime @default(now())
+}
+
+model Notification {
+  id         String             @id @default(cuid())
+  activityId String
+  userId     String
+  type       NotificationType
+  status     NotificationStatus
+  title      String
+  message    String
+  actionUrl  String?
+  createdAt  DateTime           @default(now())
+  readAt     DateTime?
+}
+
 enum KeySignature {
   C_MAJOR
   G_MAJOR
@@ -229,4 +253,16 @@ enum UserRole {
   USER
   ADMIN
   SUPERADMIN
+}
+
+enum NotificationType {
+  IN_APP
+  PUSH
+  EMAIL
+}
+
+enum NotificationStatus {
+  UNREAD
+  READ
+  ARCHIVED
 }
