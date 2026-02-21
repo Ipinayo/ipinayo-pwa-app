@@ -1,7 +1,10 @@
-import type { PrecacheEntry, SerwistGlobalConfig } from "serwist";
+/// <reference no-default-lib="true" />
+/// <reference lib="esnext" />
+/// <reference lib="webworker" />
 
+import { defaultCache } from "@serwist/turbopack/worker";
+import type { PrecacheEntry, SerwistGlobalConfig } from "serwist";
 import { Serwist } from "serwist";
-import { defaultCache } from "@serwist/next/worker";
 
 // This declares the value of `injectionPoint` to TypeScript.
 // `injectionPoint` is the string that will be replaced by the
@@ -24,13 +27,13 @@ const serwist = new Serwist({
   fallbacks: {
     entries: [
       {
-        url: "/offline",
+        url: "/~offline",
         matcher({ request }) {
           return request.destination === "document";
         },
       },
     ],
-  }
+  },
 });
 
 const urlsToCache = ["/", "/liturgical-selections", "/~offline"] as const
@@ -38,16 +41,10 @@ const urlsToCache = ["/", "/liturgical-selections", "/~offline"] as const
 // cache on install
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    Promise.all(
-      urlsToCache.map((entry) => {
-        const request = serwist.handleRequest({
-          request: new Request(entry),
-          event,
-        })
-        return request
-      }),
-    ),
-  )
-})
+    caches.open("v1").then((cache) => {
+      return cache.addAll(Array.from(urlsToCache));
+    }),
+  );
+});
 
 serwist.addEventListeners()

@@ -11,7 +11,7 @@
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "incremental": true,
     "plugins": [
       {
@@ -20,12 +20,19 @@
     ],
     "paths": {
       "@/*": ["./*"]
-    },
-    "types": [
-      // This allows Serwist to type `window.serwist`.
-      "@serwist/next/typings"
-    ]
+    }
+    // "types": [
+    //   // This allows Serwist to type `window.serwist`.
+    //   "@serwist/next/typings"
+    // ]
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts",
+    "next.config.mjs"
+  ],
   "exclude": ["node_modules", "public/sw.js"]
 }
