@@ -221,3 +221,17 @@ export function stringToBoolean(str: string | undefined | null): boolean | undef
 
   return undefined;
 }
+
+export function getCallbackUrl(path: string, filters: {
+  [key: string]: string | undefined;
+}): string {
+  const searchParams = new URLSearchParams(
+    Object.fromEntries(
+      Object.entries(filters).filter(
+        ([, value]) => value !== undefined && value !== null && value !== ""
+      )
+    ) as Record<string, string>
+  );
+
+  return path + (searchParams.toString() ? `?${searchParams.toString()}` : "");
+}

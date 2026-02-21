@@ -1,13 +1,7 @@
 import { LiturgicalSeason, LiturgicalYear } from "@/lib/generated/prisma/index";
 import { SearchParams, SortBy, SortOrder } from "@/types/utils";
-import { getEnumByValue, stringToBoolean } from "@/lib/utils";
-import {
-  liturgicalSeasonItems,
-  liturgicalYearItems,
-  seasonsFilter,
-  typesFilter,
-  yearsFilter,
-} from "@/lib/constants";
+import { getCallbackUrl, getEnumByValue, stringToBoolean } from "@/lib/utils";
+import { seasonsFilter, typesFilter, yearsFilter } from "@/lib/constants";
 
 import BackButton from "@/components/common/back-button";
 import { Button } from "@/components/ui/button";
@@ -22,22 +16,14 @@ import { Suspense } from "react";
 import { getFilterPreferences } from "@/lib/actions/filter";
 import { requireAuth } from "@/lib/auth";
 
-const seasons = [
-  { label: "All Seasons", value: "all" },
-  ...liturgicalSeasonItems,
-];
-const years = [{ label: "All Years", value: "all" }, ...liturgicalYearItems];
-
 export default async function MassSelectionsPage(props: {
   searchParams: SearchParams;
 }) {
-  const queryString = new URLSearchParams(props.searchParams as any).toString();
-  const callbackUrl = queryString
-    ? `/dashboard/liturgical-selections?${queryString}`
-    : `/dashboard/liturgical-selections`;
-  await requireAuth(callbackUrl);
-
   const filters = await props.searchParams;
+
+  await requireAuth(
+    getCallbackUrl("/dashboard/liturgical-selections", filters),
+  );
 
   // Get saved preferences from cookies
   const savedPreferences = await getFilterPreferences("dashboard");

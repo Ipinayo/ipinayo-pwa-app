@@ -7,6 +7,7 @@ import { Plus } from "lucide-react";
 import SearchBar from "@/components/common/search-bar";
 import { SearchParams } from "@/types/utils";
 import { Suspense } from "react";
+import { getCallbackUrl } from "@/lib/utils";
 import { requireAuth } from "@/lib/auth";
 
 export default async function DraftsPage(props: {
@@ -14,19 +15,7 @@ export default async function DraftsPage(props: {
 }) {
   const filters = await props.searchParams;
 
-  const searchParams = new URLSearchParams(
-    Object.fromEntries(
-      Object.entries(filters).filter(
-        ([, value]) => value !== undefined && value !== null && value !== ""
-      )
-    ) as Record<string, string>
-  );
-
-  const callbackUrl =
-    "/dashboard/drafts" +
-    (searchParams.toString() ? `?${searchParams.toString()}` : "");
-
-  await requireAuth(callbackUrl);
+  await requireAuth(getCallbackUrl("/dashboard/drafts", filters));
   const page = Number(filters["page"]) || 1;
   const query = filters["query"] || "";
 
