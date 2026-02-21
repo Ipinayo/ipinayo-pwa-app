@@ -9,3 +9,8 @@ export async function requireAuth(callbackPath?: string) {
     }
     return session;
 }
+
+export async function requireNoAuth() {
+    const session = await auth();
+    if (session) redirect("/");
+}

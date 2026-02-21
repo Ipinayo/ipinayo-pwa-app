@@ -11,14 +11,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import UserAvatar from "@/components/common/user-avatar";
-import { auth } from "@/auth";
 import { getUserProfile } from "@/lib/actions/user";
-import { redirect } from "next/navigation";
+import { requireAuth } from "@/lib/auth";
 
 export default async function ProfilePage() {
-  const session = await auth();
-
-  if (!session?.user) redirect("/signin");
+  await requireAuth(`/profile`);
 
   const userProfile = await getUserProfile();
 

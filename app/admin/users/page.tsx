@@ -19,9 +19,11 @@ const roles = [
   { label: "Super Admins", value: UserRole.SUPERADMIN },
 ];
 
-export default async function UsersManagementPage(props: {
-  searchParams: SearchParams;
-}) {
+export default async function UsersManagementPage(
+  props: Readonly<{
+    searchParams: SearchParams;
+  }>,
+) {
   const filters = await props.searchParams;
 
   // Get saved preferences from cookies

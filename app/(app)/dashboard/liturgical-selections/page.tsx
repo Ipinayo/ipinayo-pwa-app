@@ -19,9 +19,8 @@ import QueryFilter from "@/components/common/query-filter";
 import Search from "@/components/app/mass-selections/search";
 import SortFilter from "@/components/app/mass-selections/sort-filter";
 import { Suspense } from "react";
-import { auth } from "@/auth";
 import { getFilterPreferences } from "@/lib/actions/filter";
-import { redirect } from "next/navigation";
+import { requireAuth } from "@/lib/auth";
 
 const seasons = [
   { label: "All Seasons", value: "all" },
@@ -32,9 +31,7 @@ const years = [{ label: "All Years", value: "all" }, ...liturgicalYearItems];
 export default async function MassSelectionsPage(props: {
   searchParams: SearchParams;
 }) {
-  const session = await auth();
-
-  if (!session?.user) redirect("/signin");
+  await requireAuth(`/dashboard/liturgical-selections`);
 
   const filters = await props.searchParams;
 

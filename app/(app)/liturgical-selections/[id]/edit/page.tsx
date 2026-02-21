@@ -7,16 +7,12 @@ import {
 import BackButton from "@/components/common/back-button";
 import EditForm from "@/components/app/mass-selections/edit-selection";
 import { Params } from "@/types/utils";
-import { auth } from "@/auth";
-import { redirect } from "next/navigation";
+import { requireAuth } from "@/lib/auth";
 
 export default async function EditPage(props: { params: Params }) {
   const params = await props.params;
-  const session = await auth();
 
-  if (!session?.user?.id) {
-    redirect("/signin");
-  }
+  const session = await requireAuth(`/liturgical-selections/${params.id}/edit`);
 
   const selection = await getSelectionById(params.id);
 
