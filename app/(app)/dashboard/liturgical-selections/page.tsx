@@ -31,7 +31,11 @@ const years = [{ label: "All Years", value: "all" }, ...liturgicalYearItems];
 export default async function MassSelectionsPage(props: {
   searchParams: SearchParams;
 }) {
-  await requireAuth(`/dashboard/liturgical-selections`);
+  const queryString = new URLSearchParams(props.searchParams as any).toString();
+  const callbackUrl = queryString
+    ? `/dashboard/liturgical-selections?${queryString}`
+    : `/dashboard/liturgical-selections`;
+  await requireAuth(callbackUrl);
 
   const filters = await props.searchParams;
 
