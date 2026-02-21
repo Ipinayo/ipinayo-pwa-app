@@ -5,6 +5,7 @@ import {
   createContext,
   useContext,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
@@ -31,7 +32,9 @@ const AppNavigationContext = createContext<
   AppNavigationContextType | undefined
 >(undefined);
 
-export function AppNavigationProvider({ children }: { children: ReactNode }) {
+export function AppNavigationProvider({
+  children,
+}: Readonly<{ children: ReactNode }>) {
   const router = useRouter();
   const pathname = usePathname();
   const [history, setHistory] = useState<NavigationEntry[]>([]);
@@ -137,17 +140,30 @@ export function AppNavigationProvider({ children }: { children: ReactNode }) {
     router.replace(path, { scroll: true });
   };
 
-  const value: AppNavigationContextType = {
-    canGoBack,
-    canGoForward,
-    handleBack,
-    handleForward,
-    handleRefresh,
-    navigateTo,
-    replacePath,
-    currentPath: pathname,
-    history,
-  };
+  const value: AppNavigationContextType = useMemo(
+    () => ({
+      canGoBack,
+      canGoForward,
+      handleBack,
+      handleForward,
+      handleRefresh,
+      navigateTo,
+      replacePath,
+      currentPath: pathname,
+      history,
+    }),
+    [
+      canGoBack,
+      canGoForward,
+      handleBack,
+      handleForward,
+      handleRefresh,
+      navigateTo,
+      replacePath,
+      pathname,
+      history,
+    ],
+  );
 
   return (
     <AppNavigationContext.Provider value={value}>
@@ -161,7 +177,7 @@ export function useAppNavigation() {
   const context = useContext(AppNavigationContext);
   if (context === undefined) {
     throw new Error(
-      "useAppNavigation must be used within an AppNavigationProvider"
+      "useAppNavigation must be used within an AppNavigationProvider",
     );
   }
   return context;
