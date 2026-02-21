@@ -12,10 +12,21 @@ import { requireAuth } from "@/lib/auth";
 export default async function DraftsPage(props: {
   searchParams: SearchParams;
 }) {
-  await requireAuth(`/dashboard/drafts`);
-
   const filters = await props.searchParams;
 
+  const searchParams = new URLSearchParams(
+    Object.fromEntries(
+      Object.entries(filters).filter(
+        ([, value]) => value !== undefined && value !== null && value !== ""
+      )
+    ) as Record<string, string>
+  );
+
+  const callbackUrl =
+    "/dashboard/drafts" +
+    (searchParams.toString() ? `?${searchParams.toString()}` : "");
+
+  await requireAuth(callbackUrl);
   const page = Number(filters["page"]) || 1;
   const query = filters["query"] || "";
 
