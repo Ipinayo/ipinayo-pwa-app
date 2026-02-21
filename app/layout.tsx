@@ -471,7 +471,13 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className={`antialiased`}>
-        <SerwistProvider swUrl="/serwist/sw.js">
+        <SerwistProvider
+          swUrl="/serwist/sw.js"
+          disable={process.env.NODE_ENV === "development"}
+          cacheOnNavigation
+          reloadOnOnline
+          register
+        >
           <ThemeProvider
             attribute="class"
             defaultTheme="system"
