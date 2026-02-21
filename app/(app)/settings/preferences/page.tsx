@@ -1,14 +1,9 @@
 import BackButton from "@/components/common/back-button";
 import { PreferencesForm } from "@/components/app/settings/preferences-form";
-import { auth } from "@/auth";
-import { redirect } from "next/navigation";
+import { requireAuth } from "@/lib/auth";
 
 export default async function EditPreferences() {
-  const session = await auth();
-
-  if (!session?.user) {
-    redirect("/signin");
-  }
+  await requireAuth(`/settings/preferences`);
 
   return (
     <div className="w-full">

@@ -12,15 +12,12 @@ import { Button } from "@/components/ui/button";
 import DraftCard from "@/components/app/draft-selections/draft-card";
 import Link from "next/link";
 import SelectTemplateButton from "@/components/app/draft-selections/select-template-button";
-import { auth } from "@/auth";
 import { getAllDrafts } from "@/lib/actions/draft";
 import { liturgyTemplates } from "@/lib/constants";
-import { redirect } from "next/navigation";
+import { requireAuth } from "@/lib/auth";
 
 export default async function SelectLiturgyTemplatePage() {
-  const session = await auth();
-
-  if (!session?.user) redirect("/signin");
+  await requireAuth(`/liturgical-selections/new`);
 
   const draftsResponse = await getAllDrafts({ limit: 6 });
 

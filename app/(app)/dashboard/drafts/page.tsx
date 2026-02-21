@@ -7,18 +7,15 @@ import { Plus } from "lucide-react";
 import SearchBar from "@/components/common/search-bar";
 import { SearchParams } from "@/types/utils";
 import { Suspense } from "react";
-import { auth } from "@/auth";
-import { redirect } from "next/navigation";
+import { getCallbackUrl } from "@/lib/utils";
+import { requireAuth } from "@/lib/auth";
 
 export default async function DraftsPage(props: {
   searchParams: SearchParams;
 }) {
-  const session = await auth();
-
-  if (!session?.user) redirect("/signin");
-
   const filters = await props.searchParams;
 
+  await requireAuth(getCallbackUrl("/dashboard/drafts", filters));
   const page = Number(filters["page"]) || 1;
   const query = filters["query"] || "";
 

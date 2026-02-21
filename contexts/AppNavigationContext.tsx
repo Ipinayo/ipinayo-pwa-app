@@ -3,8 +3,10 @@
 import {
   ReactNode,
   createContext,
+  useCallback,
   useContext,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
@@ -31,7 +33,9 @@ const AppNavigationContext = createContext<
   AppNavigationContextType | undefined
 >(undefined);
 
-export function AppNavigationProvider({ children }: { children: ReactNode }) {
+export function AppNavigationProvider({
+  children,
+}: Readonly<{ children: ReactNode }>) {
   const router = useRouter();
   const pathname = usePathname();
   const [history, setHistory] = useState<NavigationEntry[]>([]);
@@ -98,56 +102,78 @@ export function AppNavigationProvider({ children }: { children: ReactNode }) {
   const canGoBack = currentIndex > 0;
   const canGoForward = currentIndex < history.length - 1;
 
-  const handleBack = (path?: string) => {
-    if (canGoBack) {
-      isNavigatingRef.current = true;
-      const newIndex = currentIndex - 1;
-      setCurrentIndex(newIndex);
-      router.push(history[newIndex].path);
-    } else if (path) {
-      router.push(path);
-    }
-  };
+  const handleBack = useCallback(
+    (path?: string) => {
+      if (canGoBack) {
+        isNavigatingRef.current = true;
+        const newIndex = currentIndex - 1;
+        setCurrentIndex(newIndex);
+        router.push(history[newIndex].path);
+      } else if (path) {
+        router.push(path);
+      }
+    },
+    [canGoBack, currentIndex, history, router],
+  );
 
-  const handleForward = () => {
+  const handleForward = useCallback(() => {
     if (canGoForward) {
       isNavigatingRef.current = true;
       const newIndex = currentIndex + 1;
       setCurrentIndex(newIndex);
       router.push(history[newIndex].path);
     }
-  };
+  }, [canGoForward, currentIndex, history, router]);
 
-  const handleRefresh = () => {
+  const handleRefresh = useCallback(() => {
     router.refresh();
-  };
+  }, [router]);
 
-  const navigateTo = (path: string) => {
-    router.push(path);
-  };
+  const navigateTo = useCallback(
+    (path: string) => {
+      router.push(path);
+    },
+    [router],
+  );
 
-  const replacePath = (path: string) => {
-    isNavigatingRef.current = true;
-    setHistory((prev) => {
-      // Replace the entry at currentIndex
-      const newHistory = [...prev];
-      newHistory[currentIndex] = { path, timestamp: Date.now() };
-      return newHistory;
-    });
-    router.replace(path, { scroll: true });
-  };
+  const replacePath = useCallback(
+    (path: string) => {
+      isNavigatingRef.current = true;
+      setHistory((prev) => {
+        // Replace the entry at currentIndex
+        const newHistory = [...prev];
+        newHistory[currentIndex] = { path, timestamp: Date.now() };
+        return newHistory;
+      });
+      router.replace(path, { scroll: true });
+    },
+    [currentIndex, router],
+  );
 
-  const value: AppNavigationContextType = {
-    canGoBack,
-    canGoForward,
-    handleBack,
-    handleForward,
-    handleRefresh,
-    navigateTo,
-    replacePath,
-    currentPath: pathname,
-    history,
-  };
+  const value: AppNavigationContextType = useMemo(
+    () => ({
+      canGoBack,
+      canGoForward,
+      handleBack,
+      handleForward,
+      handleRefresh,
+      navigateTo,
+      replacePath,
+      currentPath: pathname,
+      history,
+    }),
+    [
+      canGoBack,
+      canGoForward,
+      handleBack,
+      handleForward,
+      handleRefresh,
+      navigateTo,
+      replacePath,
+      pathname,
+      history,
+    ],
+  );
 
   return (
     <AppNavigationContext.Provider value={value}>
@@ -161,7 +187,7 @@ export function useAppNavigation() {
   const context = useContext(AppNavigationContext);
   if (context === undefined) {
     throw new Error(
-      "useAppNavigation must be used within an AppNavigationProvider"
+      "useAppNavigation must be used within an AppNavigationProvider",
     );
   }
   return context;
