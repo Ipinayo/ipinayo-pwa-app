@@ -1,7 +1,7 @@
 import { SaveFormSkeleton } from "@/components/app/mass-selections/edit-selection/index-skeleton";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export default function Loading() {
+export default function EditLoading() {
   return (
     <div className="mx-auto max-w-4xl w-full">
       <div className="mb-8 flex items-center gap-4">

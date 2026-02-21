@@ -1,155 +1,122 @@
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 
-export default function Loading() {
+export default function ProfileLoading() {
   return (
     <div className="w-full">
       <div className="mx-auto max-w-4xl">
-        <div className="flex items-center gap-4 justify-between mb-8">
-          <div className="h-10 w-20 bg-muted "></div>
-          <div className="h-8 w-64 bg-muted "></div>
+        <div className="flex items-center justify-between mb-8">
+          <Skeleton className="h-9 w-36" />
+          <Skeleton className="h-10 w-32" />
         </div>
 
-        {/* Profile Header Loading */}
-        <Card>
-          <CardHeader>
+        <div className="space-y-6">
+          {/* Profile Header */}
+          <div className="rounded-lg border p-6">
             <div className="flex flex-col sm:flex-row items-center gap-6">
-              <div className="h-24 w-24 bg-muted rounded-full"></div>
+              <Skeleton className="h-24 w-24 rounded-full" />
               <div className="flex-1 space-y-2">
-                <div className="h-8 w-48 bg-muted rounded"></div>
-                <div className="h-4 w-64 bg-muted rounded"></div>
-                <div className="h-4 w-56 bg-muted rounded"></div>
+                <Skeleton className="h-7 w-48" />
+                <Skeleton className="h-4 w-64" />
+                <Skeleton className="h-4 w-40" />
               </div>
             </div>
-          </CardHeader>
-        </Card>
+          </div>
 
-        {/* Basic Information Loading */}
-        <Card>
-          <CardHeader>
-            <div className="h-6 w-40 bg-muted rounded"></div>
-            <div className="h-4 w-64 bg-muted rounded"></div>
-          </CardHeader>
-          <CardContent className="space-y-4">
+          {/* Basic Information */}
+          <div className="rounded-lg border p-6 space-y-4">
+            <div className="space-y-1">
+              <Skeleton className="h-6 w-40" />
+              <Skeleton className="h-4 w-64" />
+            </div>
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
-                <div className="h-4 w-16 bg-muted rounded"></div>
-                <div className="h-5 w-32 bg-muted rounded"></div>
+                <Skeleton className="h-4 w-20" />
+                <Skeleton className="h-5 w-36" />
               </div>
               <div className="space-y-2">
-                <div className="h-4 w-12 bg-muted rounded"></div>
-                <div className="h-5 w-48 bg-muted rounded"></div>
+                <Skeleton className="h-4 w-20" />
+                <Skeleton className="h-5 w-48" />
               </div>
             </div>
             <div className="space-y-2">
-              <div className="h-4 w-24 bg-muted rounded"></div>
-              <div className="h-5 w-40 bg-muted rounded"></div>
+              <Skeleton className="h-4 w-28" />
+              <Skeleton className="h-5 w-72" />
             </div>
-          </CardContent>
-        </Card>
+          </div>
 
-        {/* Bio Loading */}
-        <Card>
-          <CardHeader>
-            <div className="h-6 w-12 bg-muted rounded"></div>
-            <div className="h-4 w-20 bg-muted rounded"></div>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <div className="h-4 w-full bg-muted rounded"></div>
-              <div className="h-4 w-3/4 bg-muted rounded"></div>
-              <div className="h-4 w-1/2 bg-muted rounded"></div>
+          {/* Bio */}
+          <div className="rounded-lg border p-6 space-y-4">
+            <div className="space-y-1">
+              <Skeleton className="h-6 w-16" />
+              <Skeleton className="h-4 w-24" />
             </div>
-          </CardContent>
-        </Card>
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-3/4" />
+            </div>
+          </div>
 
-        {/* Musical Profile Loading */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <div className="h-5 w-5 bg-muted rounded"></div>
-              <div className="h-6 w-32 bg-muted rounded"></div>
+          {/* Location & Parish */}
+          <div className="rounded-lg border p-6 space-y-4">
+            <div className="space-y-1">
+              <Skeleton className="h-6 w-56" />
+              <Skeleton className="h-4 w-72" />
             </div>
-            <div className="h-4 w-56 bg-muted rounded"></div>
-          </CardHeader>
-          <CardContent className="space-y-6">
             <div className="space-y-2">
-              <div className="h-4 w-20 bg-muted rounded"></div>
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-5 w-48" />
+            </div>
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-5 w-40" />
+              </div>
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-20" />
+                <Skeleton className="h-5 w-32" />
+              </div>
+            </div>
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-28" />
+                <Skeleton className="h-5 w-36" />
+              </div>
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-16" />
+                <Skeleton className="h-5 w-32" />
+              </div>
+            </div>
+          </div>
+
+          {/* Musical Profile */}
+          <div className="rounded-lg border p-6 space-y-6">
+            <div className="space-y-1">
+              <Skeleton className="h-6 w-40" />
+              <Skeleton className="h-4 w-56" />
+            </div>
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-24" />
               <div className="flex flex-wrap gap-2">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="h-6 w-16 bg-muted rounded-full"></div>
-                ))}
+                <Skeleton className="h-6 w-20" />
+                <Skeleton className="h-6 w-24" />
+                <Skeleton className="h-6 w-16" />
               </div>
             </div>
             <div className="space-y-2">
-              <div className="h-4 w-20 bg-muted rounded"></div>
-              <div className="h-5 w-32 bg-muted rounded"></div>
+              <Skeleton className="h-4 w-20" />
+              <Skeleton className="h-5 w-32" />
             </div>
             <div className="space-y-2">
-              <div className="h-4 w-28 bg-muted rounded"></div>
+              <Skeleton className="h-4 w-28" />
               <div className="flex flex-wrap gap-2">
-                {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="h-6 w-20 bg-muted rounded-full"></div>
-                ))}
+                <Skeleton className="h-6 w-24" />
+                <Skeleton className="h-6 w-20" />
+                <Skeleton className="h-6 w-28" />
               </div>
             </div>
-          </CardContent>
-        </Card>
-
-        {/* Location & Parish Loading */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <div className="h-5 w-5 bg-muted rounded"></div>
-              <div className="h-6 w-48 bg-muted rounded"></div>
-            </div>
-            <div className="h-4 w-72 bg-muted rounded"></div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <div className="h-4 w-24 bg-muted rounded"></div>
-              <div className="h-5 w-40 bg-muted rounded"></div>
-            </div>
-            <div className="grid gap-4 md:grid-cols-2">
-              <div className="space-y-2">
-                <div className="h-4 w-24 bg-muted rounded"></div>
-                <div className="h-5 w-36 bg-muted rounded"></div>
-              </div>
-              <div className="space-y-2">
-                <div className="h-4 w-16 bg-muted rounded"></div>
-                <div className="h-5 w-28 bg-muted rounded"></div>
-              </div>
-            </div>
-            <div className="grid gap-4 md:grid-cols-2">
-              <div className="space-y-2">
-                <div className="h-4 w-28 bg-muted rounded"></div>
-                <div className="h-5 w-32 bg-muted rounded"></div>
-              </div>
-              <div className="space-y-2">
-                <div className="h-4 w-12 bg-muted rounded"></div>
-                <div className="h-5 w-24 bg-muted rounded"></div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <div className="h-8 w-48 bg-muted rounded"></div>
-            <div className="h-4 w-32 bg-muted rounded"></div>
-          </CardHeader>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <div className="h-6 w-32 bg-muted rounded"></div>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {[1, 2, 3, 4, 5].map((i) => (
-                <div key={i} className="h-12 w-full bg-muted rounded"></div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     </div>
   );

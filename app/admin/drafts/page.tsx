@@ -11,10 +11,10 @@ import { Suspense } from "react";
 import { getEnumByValue } from "@/lib/utils";
 import { getFilterPreferences } from "@/lib/actions/filter";
 
-export default async function DraftsManagement(
+export default async function DraftsManagementPage(
   props: Readonly<{
     searchParams: SearchParams;
-  }>
+  }>,
 ) {
   const filters = await props.searchParams;
 

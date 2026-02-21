@@ -4,18 +4,17 @@ import HeaderSkeleton from "@/components/app/layout/HeaderSkeleton";
 import type React from "react";
 import SideNav from "@/components/app/layout/SideNav";
 import { Suspense } from "react";
-import { auth } from "@/auth";
 import { getUser } from "@/lib/actions/user";
 import { isAdmin } from "@/lib/utils";
 import { redirect } from "next/navigation";
+import { requireAuth } from "@/lib/auth";
 
 export default async function AdminLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await auth();
-  if (!session?.user) redirect("/signin");
+  await requireAuth("/admin");
 
   const user = await getUser();
   if (!isAdmin(user?.userRole)) redirect("/");

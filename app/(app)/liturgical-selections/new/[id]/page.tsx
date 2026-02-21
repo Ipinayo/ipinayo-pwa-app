@@ -3,18 +3,16 @@ import { getAllPartNames, getThemes } from "@/lib/actions/mass-selections";
 import BackButton from "@/components/common/back-button";
 import CreateForm from "@/components/app/draft-selections/create-form";
 import { Params } from "@/types/utils";
-import { auth } from "@/auth";
 import { getDraftById } from "@/lib/actions/draft";
-import { redirect } from "next/navigation";
+import { requireAuth } from "@/lib/auth";
 
 export default async function CreateMassSelectionPage(props: {
   params: Params;
 }) {
-  const session = await auth();
-
-  if (!session?.user) redirect("/signin");
-
   const params = await props.params;
+
+  await requireAuth(`/liturgical-selections/new/${params.id}`);
+
   const draft = await getDraftById(params.id);
 
   const [themes, partNames] = await Promise.all([

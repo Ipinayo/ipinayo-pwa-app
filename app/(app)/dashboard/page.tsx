@@ -17,13 +17,10 @@ import SelectionsListSkeleton from "@/components/app/dashboard/selections-list/i
 import Statistics from "@/components/app/dashboard/statistics";
 import StatisticsSkeleton from "@/components/app/dashboard/statistics/index-skeleton";
 import { Suspense } from "react";
-import { auth } from "@/auth";
-import { redirect } from "next/navigation";
+import { requireAuth } from "@/lib/auth";
 
 export default async function DashboardPage() {
-  const session = await auth();
-
-  if (!session?.user) redirect("/signin");
+  await requireAuth(`/dashboard`);
 
   return (
     <div className="max-w-full w-full">
