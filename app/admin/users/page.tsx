@@ -19,7 +19,7 @@ const roles = [
   { label: "Super Admins", value: UserRole.SUPERADMIN },
 ];
 
-export default async function UsersManagement(props: {
+export default async function UsersManagementPage(props: {
   searchParams: SearchParams;
 }) {
   const filters = await props.searchParams;

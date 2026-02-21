@@ -2,7 +2,7 @@
 
 import ErrorPage from "@/components/common/error-page";
 
-export default function Error({
+export default function GeneralErrorPage({
   error,
   reset,
 }: {

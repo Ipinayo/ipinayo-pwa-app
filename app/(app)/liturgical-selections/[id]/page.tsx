@@ -23,7 +23,9 @@ import { Params } from "@/types/utils";
 import { auth } from "@/auth";
 import { getSelectionById } from "@/lib/actions/mass-selections";
 
-export default async function ViewPage(props: { params: Params }) {
+export default async function LiturgicalSelectionPage(props: {
+  params: Params;
+}) {
   const params = await props.params;
   const session = await auth();
 
@@ -99,7 +101,7 @@ export default async function ViewPage(props: { params: Params }) {
                           <Badge variant="outline">
                             {getLabelForValue(
                               keySignatureItems,
-                              part.keySignature
+                              part.keySignature,
                             )}
                           </Badge>
                         )}
@@ -136,7 +138,7 @@ export default async function ViewPage(props: { params: Params }) {
                 <p className="mt-1 text-sm text-right">
                   {formatParishInfo(
                     selection.parishLocation,
-                    selection.parishName
+                    selection.parishName,
                   )}
                 </p>
               </div>
@@ -166,7 +168,7 @@ export default async function ViewPage(props: { params: Params }) {
                 <div className="mt-1 text-right">
                   {getLabelForValue(
                     liturgicalSeasonItems,
-                    selection.liturgicalSeason || ""
+                    selection.liturgicalSeason || "",
                   ) || "-"}
                 </div>
               </div>

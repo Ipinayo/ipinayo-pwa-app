@@ -13,10 +13,10 @@ import SortFilter from "@/components/app/mass-selections/sort-filter";
 import { Suspense } from "react";
 import { getFilterPreferences } from "@/lib/actions/filter";
 
-export default async function SelectionsManagement(
+export default async function SelectionsManagementPage(
   props: Readonly<{
     searchParams: SearchParams;
-  }>
+  }>,
 ) {
   const filters = await props.searchParams;
 
