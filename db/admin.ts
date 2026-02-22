@@ -265,11 +265,19 @@ export async function deleteAllOldDrafts() {
     const fifteenDaysAgo = new Date();
     fifteenDaysAgo.setDate(fifteenDaysAgo.getDate() - 15); // 15 days ago
 
-    return await prisma.massSelectionDraft.deleteMany({
-        where: {
-            updatedAt: {
-                lt: fifteenDaysAgo
-            }
-        },
+    const where = {
+        updatedAt: {
+            lt: fifteenDaysAgo
+        }
+    };
+
+    const oldDrafts = await prisma.massSelectionDraft.findMany({
+        where
+    });
+
+    await prisma.massSelectionDraft.deleteMany({
+        where
     })
+
+    return oldDrafts;
 }

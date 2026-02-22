@@ -118,9 +118,7 @@ export type ActivityEventMap = {
 
     "user.updated": {
         entityType: "user";
-        metadata: {
-            name: string;
-        };
+        metadata: {};
     };
 
     "draft.created_by_self": {

@@ -5,8 +5,16 @@ import { capitalize } from "@/lib/utils";
 import prisma from "@/lib/prisma";
 
 export async function createUserProfile(userId: string) {
-    await prisma.userProfile.create({
+    return await prisma.userProfile.create({
         data: { userId, bio: "" },
+        include: {
+            user: {
+                select: {
+                    email: true,
+                    name: true,
+                }
+            },
+        }
     })
 }
 

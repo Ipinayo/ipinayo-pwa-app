@@ -7,6 +7,7 @@ import { findAllUserSelections, findMassSelectionStats } from "@/db/mass-selecti
 import findAllUsers, { findUser, findUserProfile } from "@/db/user";
 
 import { auth } from "@/auth";
+import { createActivity } from "./actvity";
 import { findAllActivities } from "@/db/activity";
 import findDraftsByUserId from "@/db/draft";
 import { isAdmin } from "../utils";
@@ -290,7 +291,18 @@ export async function deleteDraft(id: string) {
             throw new Error("Forbidden");
         }
 
-        await deleteDraftById(id);
+        const deletedDraft = await deleteDraftById(id);
+
+        createActivity({
+            targetUsers: [deletedDraft.createdById],
+            event: "draft.deleted_by_other",
+            entityId: deletedDraft.id,
+            metadata: {
+                title: deletedDraft.title || "Untitled Draft",
+                actorName: user?.name || user?.email || "Unknown User",
+                expired: true
+            },
+        });
 
         revalidatePath('/admin');
         revalidatePath('/admin/drafts');
@@ -313,7 +325,20 @@ export async function deleteOldDrafts() {
             throw new Error("Forbidden");
         }
 
-        await deleteAllOldDrafts();
+        const deletedDrafts = await deleteAllOldDrafts();
+
+        deletedDrafts.forEach(deletedDraft => {
+            createActivity({
+                targetUsers: [deletedDraft.createdById],
+                event: "draft.deleted_by_other",
+                entityId: deletedDraft.id,
+                metadata: {
+                    title: deletedDraft.title || "Untitled Draft",
+                    actorName: user?.name || user?.email || "Unknown User",
+                    expired: true
+                },
+            });
+        });
 
         revalidatePath('/admin');
         revalidatePath('/admin/drafts');

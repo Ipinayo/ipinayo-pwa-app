@@ -50,7 +50,6 @@ export async function createActivity<E extends keyof ActivityEventMap>({ targetU
         return activity;
     } catch (error: any) {
         console.error("Error creating activity:", error);
-        throw new Error("Error creating activity: " + error?.message);
     }
 }
 
@@ -328,25 +327,31 @@ function sendNotification(
     metadata: ActivityEventMap[typeof event]["metadata"]
 ) {
 
-    const title = getTitle(event)
-    const message = getMessage(event, metadata)
+    try {
 
-    // Mock delivery
-    if (channel === NotificationChannel.EMAIL) {
-        console.log(`[Mock Email] To: ${userId} | Subject: ${title} | Message: ${message}`)
-    } else if (channel === NotificationChannel.PUSH) {
-        console.log(`[Mock Push] To: ${userId} | ${title}: ${message}`)
-    }
-    else {
-        const notification: CreateNotification = {
-            activityId,
-            userId,
-            status: NotificationStatus.UNREAD,
-            title,
-            message,
-            actionUrl: getActionURL(event, entityId),
+        const title = getTitle(event)
+        const message = getMessage(event, metadata)
+
+        // Mock delivery
+        if (channel === NotificationChannel.EMAIL) {
+            console.log(`[Mock Email] To: ${userId} | Subject: ${title} | Message: ${message}`)
+        } else if (channel === NotificationChannel.PUSH) {
+            console.log(`[Mock Push] To: ${userId} | ${title}: ${message}`)
         }
-        createNotification(notification)
+        else {
+            const notification: CreateNotification = {
+                activityId,
+                userId,
+                status: NotificationStatus.UNREAD,
+                title,
+                message,
+                actionUrl: getActionURL(event, entityId),
+            }
+            createNotification(notification)
+        }
+
+    } catch (error: any) {
+        console.error("Error sending notification:", error);
     }
 
 }
