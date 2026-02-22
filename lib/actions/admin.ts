@@ -7,6 +7,7 @@ import { findAllUserSelections, findMassSelectionStats } from "@/db/mass-selecti
 import findAllUsers, { findUser, findUserProfile } from "@/db/user";
 
 import { auth } from "@/auth";
+import { findAllActivities } from "@/db/activity";
 import findDraftsByUserId from "@/db/draft";
 import { isAdmin } from "../utils";
 import { revalidatePath } from "next/cache";
@@ -320,5 +321,46 @@ export async function deleteOldDrafts() {
     } catch (error: any) {
         console.error("Error deleting drafts:", error);
         throw new Error("Error deleting drafts: " + error?.message);
+    }
+}
+
+export async function getAllActivities({
+    page = 1,
+    limit = 20,
+    actorId,
+    entityType,
+    event,
+}: {
+    page?: number;
+    limit?: number;
+    actorId?: string;
+    entityType?: string;
+    event?: string;
+} = {}) {
+    try {
+        const session = await auth();
+        if (!session?.user?.id) {
+            throw new Error("Unauthorized");
+        }
+
+        const user = await findUser(session.user.id);
+        if (!isAdmin(user?.userRole)) {
+            throw new Error("Forbidden");
+        }
+
+        const { activities, total } = await findAllActivities({ page, limit, actorId, entityType, event });
+
+        return {
+            activities,
+            pagination: {
+                page,
+                limit,
+                total,
+                pages: Math.ceil(total / limit),
+            },
+        };
+    } catch (error: any) {
+        console.error("Error fetching activities:", error);
+        throw new Error("Error fetching activities: " + error?.message);
     }
 }

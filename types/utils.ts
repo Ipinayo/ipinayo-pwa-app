@@ -65,3 +65,89 @@ export interface UsersFilter {
     sortBy?: SortUsersBy,
     sortOrder?: SortOrder
 }
+
+export type ActivityEventMap = {
+    "selection.created": {
+        entityType: "selection";
+        metadata: {
+            title: string;
+        };
+    };
+
+    "selection.cloned": {
+        entityType: "selection";
+        metadata: {
+            title: string;
+            clonedByName: string;
+        };
+    };
+
+    "selection.updated": {
+        entityType: "selection";
+        metadata: {
+            title: string;
+        };
+    };
+
+    "selection.deleted": {
+        entityType: "selection";
+        metadata: {
+            title: string;
+        };
+    };
+
+    "user.registered": {
+        entityType: "user";
+        metadata: {
+            name: string;
+        };
+    };
+
+    "user.updated": {
+        entityType: "user";
+        metadata: {
+            name: string;
+        };
+    };
+
+    "draft.created": {
+        entityType: "draft";
+        metadata: {};
+    };
+
+    "draft.updated": {
+        entityType: "draft";
+        metadata: {
+            title: string;
+        };
+    };
+
+    "draft.expiring": {
+        entityType: "draft";
+        metadata: {
+            title: string;
+        };
+    };
+
+    "draft.expired": {
+        entityType: "draft";
+        metadata: {
+            title: string;
+        };
+    };
+
+    "draft.deleted": {
+        entityType: "draft";
+        metadata: {
+            title: string;
+        };
+    };
+
+    "system.announcement": {
+        entityType: "system";
+        metadata: {
+            title: string;
+            message: string;
+        };
+    };
+}
