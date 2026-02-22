@@ -152,7 +152,65 @@ export interface DraftStats {
     totalDrafts: number
     newDraftsThisMonth: number,
     newDraftsThisWeek: number,
+
     oldDrafts: number
 }
 
-export { KeySignature, LiturgicalSeason, LiturgicalYear, UserRole } from "@/lib/generated/prisma";
+export type CreateActivity = Prisma.ActivityCreateInput;
+
+export type UserActivity = Prisma.ActivityGetPayload<{}>;
+
+export type Activity = Prisma.ActivityGetPayload<{
+    include: {
+        actor: {
+            select: {
+                id: true,
+                name: true,
+                email: true,
+            }
+        },
+        targetUsers: {
+            select: {
+                id: true,
+                name: true,
+                email: true,
+            }
+        }
+    }
+}>;
+
+export type UserNotification = Prisma.NotificationGetPayload<{}>;
+
+export type CreateNotification = Prisma.NotificationCreateInput;
+
+export type Notification = Prisma.NotificationGetPayload<{
+    include: {
+        user: {
+            select: {
+                id: true,
+                name: true,
+                email: true,
+            }
+        },
+        activity: {
+            include: {
+                actor: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                    }
+                },
+                targetUsers: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                    }
+                }
+            }
+        }
+    }
+}>;
+
+export { KeySignature, LiturgicalSeason, LiturgicalYear, UserRole, NotificationStatus } from "@/lib/generated/prisma";
