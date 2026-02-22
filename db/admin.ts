@@ -260,6 +260,19 @@ export async function deleteDraftById(draftId: string) {
     })
 }
 
+export async function findDraftsExpiringSoon() {
+    const twelveDaysAgo = new Date();
+    twelveDaysAgo.setDate(twelveDaysAgo.getDate() - 12); // 12 days ago
+
+    return await prisma.massSelectionDraft.findMany({
+        where: {
+            updatedAt: {
+                lt: twelveDaysAgo,
+            },
+        }
+    });
+}
+
 export async function deleteAllOldDrafts() {
 
     const fifteenDaysAgo = new Date();

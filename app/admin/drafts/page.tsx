@@ -5,6 +5,7 @@ import DraftSelectionListSkeleton from "@/components/app/admin/drafts/draft-sele
 import DraftSelectionsList from "@/components/app/admin/drafts/draft-selections-list";
 import DraftsStats from "@/components/app/admin/drafts/drafts-stats";
 import DraftsStatsSkeleton from "@/components/app/admin/drafts/drafts-stats/index-skeleton";
+import NotifyExpiringDrafts from "@/components/app/admin/drafts/notify-expiring-drafts";
 import Search from "@/components/app/admin/drafts/search";
 import SortFilter from "@/components/app/admin/drafts/sort-filter";
 import { Suspense } from "react";
@@ -41,7 +42,10 @@ export default async function DraftsManagementPage(
           <h2 className="text-3xl font-display text-foreground">
             Drafts Management
           </h2>
-          <DeleteOldDrafts />
+          <div className="flex items-center gap-4">
+            <NotifyExpiringDrafts />
+            <DeleteOldDrafts />
+          </div>
         </div>
         <p className="text-muted-foreground mt-2">View and manage all drafts</p>
       </div>

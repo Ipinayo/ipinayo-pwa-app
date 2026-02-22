@@ -2,7 +2,7 @@
 
 import { AppUser, UserProfile } from "@/types/models";
 import { DraftSelectionFilter, MassSelectionFilter, SortBy, SortOrder, SortUsersBy, UsersFilter } from "@/types/utils";
-import findAllDrafts, { deleteAllOldDrafts, deleteDraftById, findAdminDashboardStats, findDraftsStats, findSelectionsStats, findUsersStats, updateUserAdminStatus } from "@/db/admin";
+import findAllDrafts, { deleteAllOldDrafts, deleteDraftById, findAdminDashboardStats, findDraftsExpiringSoon, findDraftsStats, findSelectionsStats, findUsersStats, updateUserAdminStatus } from "@/db/admin";
 import { findAllUserSelections, findMassSelectionStats } from "@/db/mass-selections";
 import findAllUsers, { findUser, findUserProfile } from "@/db/user";
 
@@ -310,6 +310,36 @@ export async function deleteDraft(id: string) {
     } catch (error: any) {
         console.error("Error deleting draft:", error);
         throw new Error("Error deleting draft: " + error?.message);
+    }
+}
+
+export async function notifyDraftsExpiringSoon() {
+    try {
+        const session = await auth();
+        if (!session?.user?.id) {
+            throw new Error("Unauthorized");
+        }
+
+        const user = await findUser(session.user.id);
+        if (!isAdmin(user?.userRole)) {
+            throw new Error("Forbidden");
+        }
+
+        const expiringDrafts = await findDraftsExpiringSoon();
+
+        expiringDrafts.forEach(expiringDraft => {
+            createActivity({
+                targetUsers: [expiringDraft.createdById],
+                event: "draft.expiring",
+                entityId: expiringDraft.id,
+                metadata: {
+                    title: expiringDraft.title || "Untitled Draft",
+                },
+            });
+        });
+
+    } catch (error: any) {
+        console.error("Error notifying about expiring drafts:", error);
     }
 }
 
