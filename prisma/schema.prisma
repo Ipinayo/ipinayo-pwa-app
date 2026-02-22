@@ -16,22 +16,23 @@ datasource db {
 }
 
 model User {
-  id                  String               @id @default(cuid())
-  name                String?
-  email               String               @unique
-  emailVerified       DateTime?
-  image               String?
-  userRole            UserRole             @default(USER)
-  accounts            Account[]
-  sessions            Session[]
-  createdAt           DateTime             @default(now())
-  updatedAt           DateTime             @updatedAt
-  profile             UserProfile?
-  selections          MassSelection[]
-  massSelectionDrafts MassSelectionDraft[]
-  notifications       Notification[]
-  activities          Activity[]           @relation("ActivityActor")
-  activitiesTargeted  Activity[]           @relation("ActivityTargets")
+  id                      String                   @id @default(cuid())
+  name                    String?
+  email                   String                   @unique
+  emailVerified           DateTime?
+  image                   String?
+  userRole                UserRole                 @default(USER)
+  accounts                Account[]
+  sessions                Session[]
+  createdAt               DateTime                 @default(now())
+  updatedAt               DateTime                 @updatedAt
+  profile                 UserProfile?
+  selections              MassSelection[]
+  massSelectionDrafts     MassSelectionDraft[]
+  notifications           Notification[]
+  activities              Activity[]               @relation("ActivityActor")
+  activitiesTargeted      Activity[]               @relation("ActivityTargets")
+  notificationPreferences NotificationPreference[]
 }
 
 model Account {
@@ -203,6 +204,19 @@ model Notification {
   actionUrl  String?
   createdAt  DateTime           @default(now())
   readAt     DateTime?
+}
+
+model NotificationPreference {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event     String
+  inApp     Boolean
+  email     Boolean
+  push      Boolean
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, event])
 }
 
 enum KeySignature {
