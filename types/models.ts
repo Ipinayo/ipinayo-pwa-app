@@ -156,7 +156,10 @@ export interface DraftStats {
     oldDrafts: number
 }
 
-export type CreateActivity = Prisma.ActivityCreateInput;
+export type CreateActivity = Omit<Prisma.ActivityCreateInput, 'id' | 'createdAt' | 'actor' | 'targetUsers'> & {
+    actorId: string;
+    targetUsers: string[]; // Array of user IDs
+};
 
 export type UserActivity = Prisma.ActivityGetPayload<{}>;
 
@@ -181,7 +184,10 @@ export type Activity = Prisma.ActivityGetPayload<{
 
 export type UserNotification = Prisma.NotificationGetPayload<{}>;
 
-export type CreateNotification = Prisma.NotificationCreateInput;
+export type CreateNotification = Omit<Prisma.NotificationCreateInput, 'activity' | 'user' | 'id' | 'createdAt'> & {
+    activityId: string;
+    userId: string;
+};
 
 export type Notification = Prisma.NotificationGetPayload<{
     include: {

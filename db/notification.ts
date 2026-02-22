@@ -7,7 +7,7 @@ export async function createNotification(data: CreateNotification) {
     return await prisma.notification.create({ data });
 }
 
-export async function createManyNotifications(data: Prisma.NotificationCreateManyInput[]) {
+export async function createManyNotifications(data: CreateNotification[]) {
     return await prisma.notification.createMany({ data, skipDuplicates: true });
 }
 

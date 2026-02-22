@@ -26,6 +26,12 @@ export enum SortDraftsBy {
     TITLE = 'title',
 }
 
+export enum NotificationChannel {
+    IN_APP = 'inApp',
+    EMAIL = 'email',
+    PUSH = 'push'
+}
+
 export interface MassSelectionFilter {
     page?: number,
     limit?: number,
@@ -67,29 +73,36 @@ export interface UsersFilter {
 }
 
 export type ActivityEventMap = {
-    "selection.created": {
+    "selection.created_by_self": {
         entityType: "selection";
         metadata: {
             title: string;
         };
     };
 
-    "selection.cloned": {
-        entityType: "selection";
-        metadata: {
-            title: string;
-            clonedByName: string;
-        };
-    };
-
-    "selection.updated": {
+    "selection.cloned_by_self": {
         entityType: "selection";
         metadata: {
             title: string;
         };
     };
 
-    "selection.deleted": {
+    "selection.cloned_by_other": {
+        entityType: "selection";
+        metadata: {
+            title: string;
+            actorName: string;
+        };
+    };
+
+    "selection.updated_by_self": {
+        entityType: "selection";
+        metadata: {
+            title: string;
+        };
+    };
+
+    "selection.deleted_by_self": {
         entityType: "selection";
         metadata: {
             title: string;
@@ -110,12 +123,12 @@ export type ActivityEventMap = {
         };
     };
 
-    "draft.created": {
+    "draft.created_by_self": {
         entityType: "draft";
         metadata: {};
     };
 
-    "draft.updated": {
+    "draft.updated_by_self": {
         entityType: "draft";
         metadata: {
             title: string;
@@ -136,10 +149,20 @@ export type ActivityEventMap = {
         };
     };
 
-    "draft.deleted": {
+    "draft.deleted_by_self": {
         entityType: "draft";
         metadata: {
             title: string;
+        };
+    };
+
+    "draft.deleted_by_other": {
+        entityType: "draft";
+        metadata: {
+            title: string;
+            actorName: string;
+            expired: boolean;
+            reason?: string;
         };
     };
 

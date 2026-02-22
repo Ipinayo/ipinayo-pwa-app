@@ -1,9 +1,15 @@
+import { CreateActivity } from "@/types/models";
 import { Prisma } from "@/lib/generated/prisma";
 import prisma from "@/lib/prisma";
 
-export async function createUserActivity(data: Prisma.ActivityCreateInput) {
+export async function createUserActivity(data: CreateActivity) {
     return await prisma.activity.create({
-        data
+        data: {
+            ...data,
+            targetUsers: {
+                connect: data.targetUsers.map((userId) => ({ id: userId })),
+            },
+        },
     });
 }
 
