@@ -1,17 +1,13 @@
-import { BookOpen, FileText, Plus, Sparkles } from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Activity, BookOpen, Plus } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { Button } from "@/components/ui/button";
 import DraftList from "@/components/app/dashboard/draft-list";
 import DraftListSkeleton from "@/components/app/dashboard/draft-list/index-skeleton";
 import Link from "next/link";
+import RecentActivities from "@/components/app/dashboard/recent-activities";
+import RecentActivitiesSkeleton from "@/components/app/dashboard/recent-activities/index-skeleton";
 import SelectionsList from "@/components/app/dashboard/selections-list";
 import SelectionsListSkeleton from "@/components/app/dashboard/selections-list/index-skeleton";
 import Statistics from "@/components/app/dashboard/statistics";
@@ -72,50 +68,17 @@ export default async function DashboardPage() {
           </TabsContent>
         </Tabs>
 
-        <Card className="lg:col-span-1 border-2 border-dashed border-primary/20 bg-linear-to-br from-primary/5 to-transparent h-fit">
+        <Card className="lg:col-span-1 h-fit">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-primary" />
-              My Templates
+              <Activity className="h-5 w-5" />
+              Recent Activity
             </CardTitle>
-            <CardDescription>Reusable mass selection templates</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {/* Coming Soon Message */}
-            <div className="rounded-lg border-2 border-dashed border-muted-foreground/25 bg-muted/30 p-6 text-center">
-              <FileText className="mx-auto h-12 w-12 text-muted-foreground/50 mb-3" />
-              <h4 className="font-semibold text-sm mb-2">Coming Soon</h4>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                Save your favorite mass selections as reusable templates.
-                Perfect for recurring liturgies and your preferred musical
-                styles.
-              </p>
-            </div>
-
-            {/* Feature Preview */}
-            <div className="space-y-2">
-              <p className="text-xs font-medium text-muted-foreground">
-                Upcoming features:
-              </p>
-              <ul className="text-xs text-muted-foreground space-y-1 pl-4">
-                <li className="flex items-start gap-2">
-                  <span className="text-primary mt-0.5">•</span>
-                  <span>Create templates from existing selections</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-primary mt-0.5">•</span>
-                  <span>Share templates with other users</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-primary mt-0.5">•</span>
-                  <span>Quick-start new selections from templates</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-primary mt-0.5">•</span>
-                  <span>Template library with community contributions</span>
-                </li>
-              </ul>
-            </div>
+            <Suspense fallback={<RecentActivitiesSkeleton />}>
+              <RecentActivities />
+            </Suspense>
           </CardContent>
         </Card>
       </div>

@@ -5,6 +5,9 @@ import { enGB } from "date-fns/locale";
 import { formatInTimeZone } from 'date-fns-tz';
 import { Location, UserRole } from "@/types/models";
 import { SelectOption } from "@/types/components/select";
+import { formatDistanceToNow } from "date-fns";
+import { JsonValue } from "@prisma/client/runtime/library";
+import { ActivityEventMap } from "@/types/utils";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -208,6 +211,12 @@ export function normalizeDate(date: Date | null | undefined) {
   return new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
 }
 
+export function formatDateFromNow(date: string | Date): string {
+  if (!date) return '';
+
+  return formatDistanceToNow(date, { addSuffix: true, locale: enGB });
+}
+
 export function isAdmin(userRole: UserRole | null | undefined): boolean {
   return userRole === UserRole.ADMIN || userRole === UserRole.SUPERADMIN;
 }
@@ -234,4 +243,109 @@ export function getCallbackUrl(path: string, filters: {
   );
 
   return path + (searchParams.toString() ? `?${searchParams.toString()}` : "");
+}
+
+export function getActivityEntity(
+  event: string,
+  metadata: JsonValue
+) {
+  switch (event) {
+    case "selection.created_by_self":
+      {
+        const data = metadata as ActivityEventMap["selection.created_by_self"]["metadata"];
+        return `${data.title}`;
+      }
+    case "selection.cloned_by_self":
+      {
+        const data = metadata as ActivityEventMap["selection.cloned_by_self"]["metadata"];
+        return `${data.title}`;
+      }
+    case "selection.cloned_by_other":
+      {
+        const data = metadata as ActivityEventMap["selection.cloned_by_other"]["metadata"];
+        return `${data.title}`;
+      }
+    case "selection.updated_by_self":
+      {
+        const data = metadata as ActivityEventMap["selection.updated_by_self"]["metadata"];
+        return `${data.title}`;
+      }
+    case "selection.deleted_by_self":
+      {
+        const data = metadata as ActivityEventMap["selection.deleted_by_self"]["metadata"];
+        return `${data.title}`;
+      }
+    case "user.registered":
+      {
+        const data = metadata as ActivityEventMap["user.registered"]["metadata"];
+        return `${data.name}`;
+      }
+    case "user.updated":
+      return `Your profile`;
+    case "draft.created_by_self":
+      return `New Draft`;
+    case "draft.updated_by_self":
+      {
+        const data = metadata as ActivityEventMap["draft.updated_by_self"]["metadata"];
+        return `${data.title}`;
+      }
+    case "draft.deleted_by_self":
+      {
+        const data = metadata as ActivityEventMap["draft.deleted_by_self"]["metadata"];
+        return `${data.title}`;
+      }
+    case "draft.deleted_by_other":
+      {
+        const data = metadata as ActivityEventMap["draft.deleted_by_other"]["metadata"];
+        return `${data.title}`;
+      }
+    case "draft.expired":
+      {
+        const data = metadata as ActivityEventMap["draft.expired"]["metadata"];
+        return `${data.title}`;
+      }
+    case "draft.expiring":
+      {
+        const data = metadata as ActivityEventMap["draft.expiring"]["metadata"];
+        return `${data.title}`;
+      }
+
+    default:
+      return "";
+  }
+}
+
+export function getActivityEvent(event: string) {
+  switch (event) {
+    case "selection.created_by_self":
+      return `New selection`;
+    case "selection.cloned_by_self":
+      return `Selection cloned`;
+    case "selection.cloned_by_other":
+      return `Your selection was cloned`;
+    case "selection.updated_by_self":
+      return `Selection updated`;
+    case "selection.deleted_by_self":
+      return `Selection deleted`;
+    case "user.registered":
+      return `Profile created`;
+    case "user.updated":
+      return `Profile updated`;
+    case "draft.created_by_self":
+      return `New draft created`;
+    case "draft.updated_by_self":
+      return `Draft updated`;
+    case "draft.deleted_by_other":
+      return `Your draft was deleted`;
+    case "draft.deleted_by_self":
+      return `Draft deleted`;
+    case "draft.expired":
+      return `Draft expired`;
+    case "draft.expiring":
+      return `Draft expiring soon`;
+    case "system.announcement":
+      return `Announcement`;
+    default:
+      return "New activity";
+  }
 }
