@@ -5,7 +5,7 @@ import findDraftsByUserId, { createDraft, deleteDraftById, findDraftById, update
 import { DraftMassSelection } from "@/types/schemas/mass-selections";
 import { DraftSelectionFilter } from "@/types/utils";
 import { auth } from "@/auth";
-import { createActivity } from "./actvity";
+import { createActivity } from "./activity";
 import { findUserParishAndChoirInfo } from "@/db/user";
 import { liturgyTemplates } from "../constants";
 import { revalidatePath } from "next/cache";

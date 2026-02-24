@@ -5,7 +5,7 @@ import { createUserProfile, findUser, findUserParishAndChoirInfo, findUserProfil
 
 import { UpdateUserProfile } from "@/types/utils";
 import { auth } from "@/auth";
-import { createActivity } from "./actvity";
+import { createActivity } from "./activity";
 import { revalidatePath } from "next/cache";
 import { updateUserProfileSchema } from "@/types/schemas/user";
 

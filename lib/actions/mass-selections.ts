@@ -18,12 +18,12 @@ import {
 
 import { NewMassSelection } from "@/types/models";
 import { auth } from "@/auth";
+import { createActivity } from "./activity";
 import { createDraft } from "@/db/draft";
 import { findUserParishAndChoirInfo } from "@/db/user";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { createActivity } from "./actvity";
 
 // Get all selections (public)
 export async function getSelections({

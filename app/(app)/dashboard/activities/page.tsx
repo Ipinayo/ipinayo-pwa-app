@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { SearchParams } from "@/types/utils";
 import { UrlPagination } from "@/components/common/url-pagination";
-import { getAllMyRelatedActivities } from "@/lib/actions/actvity";
+import { getAllMyRelatedActivities } from "@/lib/actions/activity";
 import { requireAuth } from "@/lib/auth";
 
 export default async function ActivitiesPage(props: {

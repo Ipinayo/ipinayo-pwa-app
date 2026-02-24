@@ -7,7 +7,7 @@ import { findAllUserSelections, findMassSelectionStats } from "@/db/mass-selecti
 import findAllUsers, { findUser, findUserProfile } from "@/db/user";
 
 import { auth } from "@/auth";
-import { createActivity } from "./actvity";
+import { createActivity } from "./activity";
 import { findAllActivities } from "@/db/activity";
 import findDraftsByUserId from "@/db/draft";
 import { isAdmin } from "../utils";
