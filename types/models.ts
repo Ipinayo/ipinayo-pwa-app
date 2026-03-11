@@ -235,4 +235,12 @@ export type AdminNotification = Prisma.NotificationGetPayload<{
     }
 }>;
 
+export type Announcement = Prisma.AnnouncementGetPayload<{
+    include: {
+        createdBy: {
+            select: { id: true; name: true; email: true }
+        }
+    }
+}>;
+
 export { KeySignature, LiturgicalSeason, LiturgicalYear, UserRole, NotificationStatus } from "@/lib/generated/prisma";

@@ -1,12 +1,13 @@
 'use server'
 
 import { AppUser, UserProfile } from "@/types/models";
-import { DraftSelectionFilter, MassSelectionFilter, SortBy, SortOrder, SortUsersBy, UsersFilter } from "@/types/utils";
-import findAllDrafts, { deleteAllOldDrafts, deleteDraftById, findAdminDashboardStats, findDraftsExpiringSoon, findDraftsStats, findSelectionsStats, findUsersStats, updateUserAdminStatus } from "@/db/admin";
+import { DraftSelectionFilter, MassSelectionFilter, NotificationChannel, SortBy, SortOrder, SortUsersBy, UsersFilter } from "@/types/utils";
+import findAllDrafts, { deleteAllOldDrafts, deleteDraftById, findAdminDashboardStats, findAllAdminUserIds, findAllUserIds, findAllUsersForSelect, findDraftsExpiringSoon, findDraftsStats, findSelectionsStats, findUsersStats, updateUserAdminStatus } from "@/db/admin";
 import { findAllUserSelections, findMassSelectionStats } from "@/db/mass-selections";
 import findAllUsers, { findUser, findUserProfile } from "@/db/user";
 
 import { auth } from "@/auth";
+import { countAnnouncementStats, createAnnouncement, findAllAnnouncements } from "@/db/announcement";
 import { createActivity } from "./activity";
 import { findAllActivities } from "@/db/activity";
 import findDraftsByUserId from "@/db/draft";
@@ -417,5 +418,131 @@ export async function getAllActivities({
     } catch (error: any) {
         console.error("Error fetching activities:", error);
         throw new Error("Error fetching activities: " + error?.message);
+    }
+}
+
+export async function getAllUsersForSelect() {
+    const session = await auth();
+    if (!session?.user?.id) throw new Error("Unauthorized");
+
+    const user = await findUser(session.user.id);
+    if (!isAdmin(user?.userRole)) throw new Error("Forbidden");
+
+    return findAllUsersForSelect();
+}
+
+export async function createAnnouncementAction({
+    title,
+    message,
+    type,
+    targetUsers,
+    selectedUserIds,
+    inApp,
+    email,
+    push,
+}: {
+    title: string;
+    message: string;
+    type: string;
+    targetUsers: "all" | "admins" | "specific";
+    selectedUserIds?: string[];
+    inApp: boolean;
+    email: boolean;
+    push: boolean;
+}) {
+    try {
+        const session = await auth();
+        if (!session?.user?.id) throw new Error("Unauthorized");
+
+        const user = await findUser(session.user.id);
+        if (!isAdmin(user?.userRole)) throw new Error("Forbidden");
+
+        // Resolve target user IDs
+        let recipientIds: string[];
+        if (targetUsers === "all") {
+            recipientIds = await findAllUserIds();
+        } else if (targetUsers === "admins") {
+            recipientIds = await findAllAdminUserIds();
+        } else {
+            if (!selectedUserIds?.length) throw new Error("No users selected");
+            recipientIds = selectedUserIds;
+        }
+
+        // Create the announcement record
+        const announcement = await createAnnouncement({
+            title,
+            message,
+            type,
+            targetUsers,
+            inApp,
+            email,
+            push,
+            recipientCount: recipientIds.length,
+            createdBy: { connect: { id: session.user.id } },
+        });
+
+        // Build channels array from boolean flags
+        const channels: NotificationChannel[] = [];
+        if (inApp) channels.push(NotificationChannel.IN_APP);
+        if (email) channels.push(NotificationChannel.EMAIL);
+        if (push) channels.push(NotificationChannel.PUSH);
+
+        // Dispatch activity + notifications
+        await createActivity({
+            targetUsers: recipientIds,
+            event: "system.announcement",
+            entityId: announcement.id,
+            metadata: { title, message },
+            channels,
+        });
+
+        revalidatePath("/admin/notifications");
+        return announcement;
+    } catch (error: any) {
+        console.error("Error creating announcement:", error);
+        throw new Error("Error creating announcement: " + error?.message);
+    }
+}
+
+export async function getAnnouncementsAction({
+    page = 1,
+    type,
+}: { page?: number; type?: string } = {}) {
+    try {
+        const session = await auth();
+        if (!session?.user?.id) throw new Error("Unauthorized");
+
+        const user = await findUser(session.user.id);
+        if (!isAdmin(user?.userRole)) throw new Error("Forbidden");
+
+        const { announcements, total } = await findAllAnnouncements({ page, type });
+
+        return {
+            announcements,
+            pagination: {
+                page,
+                limit: 20,
+                total,
+                pages: Math.ceil(total / 20),
+            },
+        };
+    } catch (error: any) {
+        console.error("Error fetching announcements:", error);
+        throw new Error("Error fetching announcements: " + error?.message);
+    }
+}
+
+export async function getAnnouncementsStatsAction() {
+    try {
+        const session = await auth();
+        if (!session?.user?.id) throw new Error("Unauthorized");
+
+        const user = await findUser(session.user.id);
+        if (!isAdmin(user?.userRole)) throw new Error("Forbidden");
+
+        return countAnnouncementStats();
+    } catch (error: any) {
+        console.error("Error fetching announcement stats:", error);
+        throw new Error("Error fetching announcement stats: " + error?.message);
     }
 }

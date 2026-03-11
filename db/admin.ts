@@ -294,3 +294,23 @@ export async function deleteAllOldDrafts() {
 
     return oldDrafts;
 }
+
+export async function findAllUserIds(): Promise<string[]> {
+    const users = await prisma.user.findMany({ select: { id: true } });
+    return users.map((u) => u.id);
+}
+
+export async function findAllAdminUserIds(): Promise<string[]> {
+    const users = await prisma.user.findMany({
+        where: { userRole: { in: [UserRole.ADMIN, UserRole.SUPERADMIN] } },
+        select: { id: true },
+    });
+    return users.map((u) => u.id);
+}
+
+export async function findAllUsersForSelect() {
+    return await prisma.user.findMany({
+        select: { id: true, name: true, email: true },
+        orderBy: { name: "asc" },
+    });
+}

@@ -14,11 +14,12 @@ import { createNotification } from "@/db/notification";
 import { findNotificationPreference } from "@/db/notification-preference";
 import { userNotificationEvents } from "../constants";
 
-export async function createActivity<E extends keyof ActivityEventMap>({ targetUsers, event, entityId, metadata }: {
+export async function createActivity<E extends keyof ActivityEventMap>({ targetUsers, event, entityId, metadata, channels }: {
     targetUsers: string[];
     event: E;
     entityId: string;
     metadata: ActivityEventMap[E]["metadata"];
+    channels?: NotificationChannel[];
 }) {
     try {
 
@@ -40,7 +41,8 @@ export async function createActivity<E extends keyof ActivityEventMap>({ targetU
         });
 
         targetUsers.forEach(async (userId) => {
-            (await resolveChannel(userId, event)).forEach((channel) => {
+            const resolvedChannels = channels ?? await resolveChannel(userId, event);
+            resolvedChannels.forEach((channel) => {
                 sendNotification(activity.id, entityId, userId, channel, event, metadata)
             })
         })
@@ -136,6 +138,7 @@ const resolveChannel = async <E extends keyof ActivityEventMap>(userId: string, 
 
 function getTitle<K extends keyof ActivityEventMap>(
     event: K,
+    metadata: ActivityEventMap[K]["metadata"],
 ) {
     switch (event) {
         case "selection.created_by_self":
@@ -162,6 +165,10 @@ function getTitle<K extends keyof ActivityEventMap>(
             return `Draft expired`;
         case "draft.expiring":
             return `Draft expiring soon`;
+        case "system.announcement": {
+            const data = metadata as ActivityEventMap["system.announcement"]["metadata"];
+            return data.title;
+        }
         default:
             return "You have a new notification";
     }
@@ -229,7 +236,10 @@ function getMessage<K extends keyof ActivityEventMap>(
                 const data = metadata as ActivityEventMap["draft.expiring"]["metadata"];
                 return `Your draft "${data.title}" is expiring soon. Please take necessary action to avoid deletion.`;
             }
-
+        case "system.announcement": {
+            const data = metadata as ActivityEventMap["system.announcement"]["metadata"];
+            return data.message;
+        }
         default:
             return "You have a new notification";
     }
@@ -264,7 +274,7 @@ function sendNotification(
 
     try {
 
-        const title = getTitle(event)
+        const title = getTitle(event, metadata)
         const message = getMessage(event, metadata)
 
         // Mock delivery
