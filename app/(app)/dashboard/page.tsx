@@ -43,7 +43,10 @@ export default async function DashboardPage() {
       </Suspense>
 
       <div className="grid gap-6 lg:grid-cols-3 mb-8">
-        <Tabs defaultValue="selections" className="lg:col-span-2 space-y-6">
+        <Tabs
+          defaultValue="selections"
+          className="lg:col-span-2 space-y-6 min-w-0"
+        >
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="selections" className="gap-2">
               <BookOpen className="h-4 w-4" />
@@ -68,7 +71,7 @@ export default async function DashboardPage() {
           </TabsContent>
         </Tabs>
 
-        <Card className="lg:col-span-1 h-fit">
+        <Card className="lg:col-span-1 h-fit min-w-0">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Activity className="h-5 w-5" />
