@@ -6,8 +6,6 @@ import {
     createUserActivity,
     findActivitiesTargetingUser,
     findActivity,
-    findAllUserRelatedActivities,
-    findUserActivities,
     findUserActivityById,
 } from "@/db/activity";
 
@@ -101,61 +99,7 @@ export async function getMyActivities({
             throw new Error("Unauthorized");
         }
 
-        const { activities, total } = await findUserActivities(session.user.id, { page, limit });
-
-        return {
-            activities,
-            pagination: {
-                page,
-                limit,
-                total,
-                pages: Math.ceil(total / limit),
-            },
-        };
-    } catch (error: any) {
-        console.error("Error fetching user activities:", error);
-        throw new Error("Error fetching user activities: " + error?.message);
-    }
-}
-
-export async function getActivitiesTargetingMe({
-    page = 1,
-    limit = 20,
-}: { page?: number; limit?: number } = {}) {
-    try {
-        const session = await auth();
-        if (!session?.user?.id) {
-            throw new Error("Unauthorized");
-        }
-
         const { activities, total } = await findActivitiesTargetingUser(session.user.id, { page, limit });
-
-        return {
-            activities,
-            pagination: {
-                page,
-                limit,
-                total,
-                pages: Math.ceil(total / limit),
-            },
-        };
-    } catch (error: any) {
-        console.error("Error fetching activities targeting user:", error);
-        throw new Error("Error fetching activities targeting user: " + error?.message);
-    }
-}
-
-export async function getAllMyRelatedActivities({
-    page = 1,
-    limit = 20,
-}: { page?: number; limit?: number } = {}) {
-    try {
-        const session = await auth();
-        if (!session?.user?.id) {
-            throw new Error("Unauthorized");
-        }
-
-        const { activities, total } = await findAllUserRelatedActivities(session.user.id, { page, limit });
 
         return {
             activities,
@@ -296,21 +240,12 @@ function getActionURL<K extends keyof ActivityEventMap>(
     entityId: string,
 ) {
     switch (event) {
-        case "selection.created_by_self":
-        case "selection.updated_by_self":
-            return `/liturgical-selections/${entityId}`;
-
-        case "draft.created_by_self":
-        case "draft.updated_by_self":
-            return `/liturgical-selections/new/${entityId}`;
 
         case "draft.expiring":
-            return `/liturgical-selections/new/${entityId}`;
+            return `/liturgical-selections/new`;
 
         case "draft.expired":
         case "draft.deleted_by_other":
-        case "draft.deleted_by_self":
-        case "selection.deleted_by_self":
             return `/dashboard`;
 
         default:

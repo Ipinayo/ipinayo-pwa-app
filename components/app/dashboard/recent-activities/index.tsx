@@ -8,10 +8,10 @@ import { Activity } from "lucide-react";
 import ActivityIcon from "@/components/common/activity-icon";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { getAllMyRelatedActivities } from "@/lib/actions/activity";
+import { getMyActivities } from "@/lib/actions/activity";
 
 export default async function RecentActivities() {
-  const recentActivities = await getAllMyRelatedActivities({
+  const recentActivities = await getMyActivities({
     page: 1,
     limit: 5,
   });

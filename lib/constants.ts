@@ -449,7 +449,7 @@ export const userNotificationEvents: Partial<Record<keyof ActivityEventMap, { la
     "draft.updated_by_self": {
         label: "Draft Updated",
         description: "These are notifications for when you update a draft",
-        default: { inApp: true, email: false, push: false },
+        default: { inApp: false, email: false, push: false },
     },
     "draft.expiring": {
         label: "Draft Expiring",

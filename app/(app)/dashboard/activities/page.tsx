@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { SearchParams } from "@/types/utils";
 import { UrlPagination } from "@/components/common/url-pagination";
-import { getAllMyRelatedActivities } from "@/lib/actions/activity";
+import { getMyActivities } from "@/lib/actions/activity";
 import { requireAuth } from "@/lib/auth";
 
 export default async function ActivitiesPage(props: {
@@ -26,7 +26,7 @@ export default async function ActivitiesPage(props: {
 
   const page = Number(filters["page"]) || 1;
 
-  const activitiesRes = await getAllMyRelatedActivities({ page });
+  const activitiesRes = await getMyActivities({ page });
   const activities = activitiesRes.activities;
   const pagination = activitiesRes.pagination;
 

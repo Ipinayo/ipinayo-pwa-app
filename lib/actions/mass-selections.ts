@@ -259,19 +259,29 @@ export async function cloneSelection(selectionId: string) {
             parishName: parishAndChoirInfo?.parishName || null,
         }, session.user.id);
 
-        createActivity({
-            targetUsers: [session.user.id],
-            event: "selection.cloned_by_self",
-            entityId: result.id,
-            metadata: { title: result.title },
-        });
+        // Create activities for both self and original creator (if different)
+        if (session.user.id === originalSelection.createdById)
+            createActivity({
+                targetUsers: [session.user.id],
+                event: "selection.cloned_by_self",
+                entityId: result.id,
+                metadata: { title: result.title },
+            });
+        else {
+            createActivity({
+                targetUsers: [session.user.id],
+                event: "selection.cloned_by_self",
+                entityId: result.id,
+                metadata: { title: result.title },
+            });
 
-        createActivity({
-            targetUsers: [originalSelection.createdById],
-            event: "selection.cloned_by_other",
-            entityId: result.id,
-            metadata: { title: result.title, actorName: session.user.name || session.user.email || "Unknown User" },
-        });
+            createActivity({
+                targetUsers: [originalSelection.createdById],
+                event: "selection.cloned_by_other",
+                entityId: result.id,
+                metadata: { title: result.title, actorName: session.user.name || session.user.email || "Unknown User" },
+            });
+        }
 
         revalidatePath('/liturgical-selections/new');
         revalidatePath('/dashboard');
