@@ -159,3 +159,28 @@ export async function deleteAllDismissedNotifications(userId: string) {
         where: { userId, status: NotificationStatus.DISMISSED },
     });
 }
+
+export async function findNotificationsByUserIdCursor(
+    userId: string,
+    { cursor, limit = 20 }: { cursor?: string; limit?: number }
+) {
+    const notifications = await prisma.notification.findMany({
+        where: { userId },
+        orderBy: { createdAt: "desc" },
+        take: limit + 1,
+        ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
+        include: {
+            activity: {
+                include: {
+                    actor: { select: { id: true, name: true, email: true } },
+                },
+            },
+        },
+    });
+
+    const hasMore = notifications.length > limit;
+    const items = hasMore ? notifications.slice(0, -1) : notifications;
+    const nextCursor = hasMore ? items[items.length - 1].id : null;
+
+    return { notifications: items, nextCursor, hasMore };
+}

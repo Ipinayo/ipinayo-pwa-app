@@ -191,6 +191,22 @@ export type CreateNotification = Omit<Prisma.NotificationCreateInput, 'activity'
 
 export type Notification = Prisma.NotificationGetPayload<{
     include: {
+        activity: {
+            include: {
+                actor: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                    }
+                }
+            }
+        }
+    }
+}>;
+
+export type AdminNotification = Prisma.NotificationGetPayload<{
+    include: {
         user: {
             select: {
                 id: true,

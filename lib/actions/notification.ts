@@ -10,6 +10,7 @@ import {
     findNotificationById,
     findNotificationsByActivityId,
     findNotificationsByUserId,
+    findNotificationsByUserIdCursor,
     findUnreadNotificationsByUserId,
     markAllNotificationsAsDismissed,
     markAllNotificationsAsRead,
@@ -237,5 +238,22 @@ export async function deleteAllDismissedNotificationsAction() {
     } catch (error: any) {
         console.error("Error deleting dismissed notifications:", error);
         throw new Error("Error deleting dismissed notifications: " + error?.message);
+    }
+}
+
+export async function getMyNotificationsFeed({
+    cursor,
+    limit = 20,
+}: { cursor?: string; limit?: number } = {}) {
+    try {
+        const session = await auth();
+        if (!session?.user?.id) {
+            throw new Error("Unauthorized");
+        }
+
+        return await findNotificationsByUserIdCursor(session.user.id, { cursor, limit });
+    } catch (error: any) {
+        console.error("Error fetching notifications feed:", error);
+        throw new Error("Error fetching notifications feed: " + error?.message);
     }
 }
