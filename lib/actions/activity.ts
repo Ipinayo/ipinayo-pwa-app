@@ -42,9 +42,7 @@ export async function createActivity<E extends keyof ActivityEventMap>({ targetU
 
         targetUsers.forEach(async (userId) => {
             const resolvedChannels = channels ?? await resolveChannel(userId, event);
-            resolvedChannels.forEach((channel) => {
-                sendNotification(activity.id, entityId, userId, channel, event, metadata)
-            })
+            sendNotification(activity.id, entityId, userId, resolvedChannels, event, metadata)
         })
 
         return activity;
@@ -267,7 +265,7 @@ function sendNotification(
     activityId: string,
     entityId: string,
     userId: string,
-    channel: NotificationChannel,
+    channels: NotificationChannel[],
     event: keyof ActivityEventMap,
     metadata: ActivityEventMap[typeof event]["metadata"]
 ) {
@@ -278,12 +276,12 @@ function sendNotification(
         const message = getMessage(event, metadata)
 
         // Mock delivery
-        if (channel === NotificationChannel.EMAIL) {
+        if (channels.includes(NotificationChannel.EMAIL)) {
             console.log(`[Mock Email] To: ${userId} | Subject: ${title} | Message: ${message}`)
-        } else if (channel === NotificationChannel.PUSH) {
+        } else if (channels.includes(NotificationChannel.PUSH)) {
             console.log(`[Mock Push] To: ${userId} | ${title}: ${message}`)
         }
-        else {
+        else if (channels.includes(NotificationChannel.IN_APP)) {
             const notification: CreateNotification = {
                 activityId,
                 userId,
