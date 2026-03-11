@@ -12,6 +12,7 @@ import BackButton from "@/components/common/back-button";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { PushNotificationPrompt } from "@/components/push-notification-prompt";
 import { SearchParams } from "@/types/utils";
 import { UrlPagination } from "@/components/common/url-pagination";
 import { getMyActivities } from "@/lib/actions/activity";
@@ -125,6 +126,8 @@ export default async function ActivitiesPage(props: {
           totalPages={pagination.pages}
         />
       </div>
+
+      <PushNotificationPrompt />
     </div>
   );
 }

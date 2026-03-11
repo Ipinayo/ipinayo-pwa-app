@@ -8,11 +8,24 @@ import {
     findActivity,
     findUserActivityById,
 } from "@/db/activity";
+import {
+    deletePushSubscriptionByEndpoint,
+    findPushSubscriptionsByUserId,
+} from "@/db/push-subscription";
 
 import { auth } from "@/auth";
 import { createNotification } from "@/db/notification";
 import { findNotificationPreference } from "@/db/notification-preference";
 import { userNotificationEvents } from "../constants";
+import webpush from "web-push";
+
+if (process.env.VAPID_PRIVATE_KEY && process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY) {
+    webpush.setVapidDetails(
+        `mailto:${process.env.ADMIN_MAIL ?? "admin@ipinayo.com"}`,
+        process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
+        process.env.VAPID_PRIVATE_KEY
+    );
+}
 
 export async function createActivity<E extends keyof ActivityEventMap>({ targetUsers, event, entityId, metadata, channels }: {
     targetUsers: string[];
@@ -243,6 +256,7 @@ function getMessage<K extends keyof ActivityEventMap>(
     }
 }
 
+//TODO: Add getPushActionURL
 function getActionURL<K extends keyof ActivityEventMap>(
     event: K,
     entityId: string,
@@ -261,6 +275,43 @@ function getActionURL<K extends keyof ActivityEventMap>(
     }
 }
 
+async function sendPushNotifications(
+    userId: string,
+    title: string,
+    message: string,
+    actionUrl: string | undefined,
+) {
+    const subscriptions = await findPushSubscriptionsByUserId(userId);
+    if (subscriptions.length === 0) return;
+
+    const payload = JSON.stringify({
+        title,
+        body: message,
+        url: actionUrl ?? "/",
+    });
+
+    await Promise.all(
+        subscriptions.map(async (sub) => {
+            try {
+                await webpush.sendNotification(
+                    {
+                        endpoint: sub.endpoint,
+                        keys: { p256dh: sub.p256dh, auth: sub.auth },
+                    },
+                    payload
+                );
+            } catch (error: any) {
+                // 410 Gone or 404 Not Found means the subscription is no longer valid
+                if (error?.statusCode === 410 || error?.statusCode === 404) {
+                    await deletePushSubscriptionByEndpoint(sub.endpoint);
+                } else {
+                    console.error(`Push delivery failed for ${sub.endpoint}:`, error);
+                }
+            }
+        })
+    );
+}
+
 function sendNotification(
     activityId: string,
     entityId: string,
@@ -274,21 +325,24 @@ function sendNotification(
 
         const title = getTitle(event, metadata)
         const message = getMessage(event, metadata)
+        const actionUrl = getActionURL(event, entityId)
 
-        // Mock delivery
         if (channels.includes(NotificationChannel.EMAIL)) {
             console.log(`[Mock Email] To: ${userId} | Subject: ${title} | Message: ${message}`)
-        } else if (channels.includes(NotificationChannel.PUSH)) {
-            console.log(`[Mock Push] To: ${userId} | ${title}: ${message}`)
         }
-        else if (channels.includes(NotificationChannel.IN_APP)) {
+
+        if (channels.includes(NotificationChannel.PUSH)) {
+            sendPushNotifications(userId, title, message, actionUrl);
+        }
+
+        if (channels.includes(NotificationChannel.IN_APP)) {
             const notification: CreateNotification = {
                 activityId,
                 userId,
                 status: NotificationStatus.UNREAD,
                 title,
                 message,
-                actionUrl: getActionURL(event, entityId),
+                actionUrl,
             }
             createNotification(notification)
         }

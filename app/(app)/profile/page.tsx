@@ -10,6 +10,7 @@ import { Edit, Heart, MapPin, Music } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { PushNotificationPrompt } from "@/components/push-notification-prompt";
 import UserAvatar from "@/components/common/user-avatar";
 import { getUserProfile } from "@/lib/actions/user";
 import { requireAuth } from "@/lib/auth";
@@ -227,6 +228,8 @@ export default async function ProfilePage() {
           </Card>
         </div>
       </div>
+
+      <PushNotificationPrompt />
     </div>
   );
 }
