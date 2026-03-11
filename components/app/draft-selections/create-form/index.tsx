@@ -81,10 +81,13 @@ type CreateFormProps = {
 const getDefaultValues = (props: CreateFormProps): DraftMassSelection => {
   let formattedParts;
 
-  if (props.draftSelection.parts) {
+  const { createdAt, updatedAt, parts, parishLocation, ...selection } =
+    props.draftSelection;
+
+  if (parts) {
     try {
-      formattedParts = Array.isArray(props.draftSelection.parts)
-        ? props.draftSelection.parts.map((part, index) => {
+      formattedParts = Array.isArray(parts)
+        ? parts.map((part, index) => {
             const result =
               draftMassSelectionSchema.shape.parts.element.safeParse(part);
             if (result.success) {
@@ -131,9 +134,8 @@ const getDefaultValues = (props: CreateFormProps): DraftMassSelection => {
   }
 
   let initialParishLocation;
-  const result = draftMassSelectionSchema.shape.parishLocation.safeParse(
-    props.draftSelection.parishLocation,
-  );
+  const result =
+    draftMassSelectionSchema.shape.parishLocation.safeParse(parishLocation);
   if (result.success) {
     initialParishLocation = result.data;
   } else {
@@ -141,7 +143,7 @@ const getDefaultValues = (props: CreateFormProps): DraftMassSelection => {
   }
 
   return {
-    ...props.draftSelection,
+    ...selection,
     parishLocation: initialParishLocation || null,
     parts: formattedParts || [],
   };
