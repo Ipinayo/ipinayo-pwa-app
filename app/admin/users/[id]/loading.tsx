@@ -4,7 +4,7 @@ import { BookOpen } from "lucide-react";
 import DraftListSkeleton from "@/components/app/admin/user/draft-list/index-skeleton";
 import SelectionsListSkeleton from "@/components/app/admin/user/selections-list/index-skeleton";
 import { Skeleton } from "@/components/ui/skeleton";
-import UserDetailsSkeleton from "@/components/app/admin/user/user-details.tsx/index-skeleton";
+import UserDetailsSkeleton from "@/components/app/admin/user/user-details/index-skeleton";
 import UserRoleDisplaySkeleton from "@/components/app/admin/user/user-role-display/index-skeleton";
 
 export default function UserLoading() {
