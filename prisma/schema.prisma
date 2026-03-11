@@ -34,6 +34,7 @@ model User {
   activitiesTargeted      Activity[]               @relation("ActivityTargets")
   notificationPreferences NotificationPreference[]
   announcements           Announcement[]           @relation("AnnouncementCreator")
+  pushSubscriptions       PushSubscription[]
 }
 
 model Account {
@@ -218,6 +219,21 @@ model NotificationPreference {
   updatedAt DateTime @updatedAt
 
   @@unique([userId, event])
+}
+
+model PushSubscription {
+  id         String    @id @default(cuid())
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  endpoint   String    @unique
+  p256dh     String
+  auth       String
+  userAgent  String?
+  lastUsedAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@index([userId])
 }
 
 model Announcement {
