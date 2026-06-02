@@ -383,40 +383,34 @@ export function CreateAnnouncement({ users }: { users: UserOption[] }) {
       </div>
 
       {/* Actions */}
-      <Card>
-        <CardContent className="flex justify-end gap-2 pt-6">
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button disabled={!canSend || isSending}>
-                <Send className="mr-2 h-4 w-4" />
-                Send Announcement
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Confirm Announcement</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This announcement will be sent immediately to{" "}
-                  <span className="font-medium">
-                    {targetMode === "all"
-                      ? "all users"
-                      : targetMode === "admins"
-                        ? "administrators"
-                        : `${selectedUsers.length} selected user(s)`}
-                  </span>
-                  {". This action cannot be undone."}
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={handleSend}>
-                  Send Now
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        </CardContent>
-      </Card>
+      <AlertDialog>
+        <AlertDialogTrigger asChild>
+          <Button disabled={!canSend || isSending}>
+            <Send className="mr-2 h-4 w-4" />
+            Send Announcement
+          </Button>
+        </AlertDialogTrigger>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirm Announcement</AlertDialogTitle>
+            <AlertDialogDescription>
+              This announcement will be sent immediately to{" "}
+              <span className="font-medium">
+                {targetMode === "all"
+                  ? "all users"
+                  : targetMode === "admins"
+                    ? "administrators"
+                    : `${selectedUsers.length} selected user(s)`}
+              </span>
+              {". This action cannot be undone."}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleSend}>Send Now</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
