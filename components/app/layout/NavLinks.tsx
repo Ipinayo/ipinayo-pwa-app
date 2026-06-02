@@ -28,6 +28,7 @@ interface Route {
   label: string;
   icon: React.ElementType;
   active?: boolean;
+  activeClassName?: string; // Optional classes for active state
   children?: Route[]; // For collapsible items like settings
 }
 
@@ -40,6 +41,35 @@ interface NavLinksProps {
   collapsibleChevronClassName?: string;
   collapsibleContentClassName?: string;
 }
+
+const RouteLink = ({
+  route,
+  itemClassName,
+  iconClassName,
+  labelClassName,
+}: {
+  route: Route;
+  itemClassName?: string;
+  iconClassName?: string;
+  labelClassName?: string;
+}) => {
+  return (
+    <Link
+      key={route.href}
+      href={route.href}
+      className={cn(
+        "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium",
+        route.active
+          ? route.activeClassName || "primary-gradient"
+          : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
+        itemClassName,
+      )}
+    >
+      <route.icon className={cn("h-4 w-4", iconClassName)} />
+      <span className={cn("truncate", labelClassName)}>{route.label}</span>
+    </Link>
+  );
+};
 
 export default function NavLinks({
   adminNav,
@@ -132,38 +162,23 @@ export default function NavLinks({
               href: "/settings/profile",
               label: "Profile",
               icon: User,
+              active: pathname.startsWith("/settings/profile"),
+              activeClassName: "font-semibold",
             },
             {
               href: "/settings/notifications",
               label: "Notifications",
               icon: Bell,
+              active: pathname.startsWith("/settings/notifications"),
+              activeClassName: "font-semibold",
             },
           ],
         },
       ];
 
-  const RouteLink = ({ route }: { route: Route }) => {
-    return (
-      <Link
-        key={route.href}
-        href={route.href}
-        className={cn(
-          "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium",
-          route.active
-            ? "primary-gradient"
-            : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
-          itemClassName
-        )}
-      >
-        <route.icon className={cn("h-4 w-4", iconClassName)} />
-        <span className={cn("truncate", labelClassName)}>{route.label}</span>
-      </Link>
-    );
-  };
-
   return (
     <div className="px-3 py-2">
-      <div className={cn("space-y-1.5", className)}>
+      <div className={cn("space-y-1.5 ", className)}>
         {routes.map((route) =>
           route.children ? (
             <Collapsible key={route.href} className="w-full">
@@ -171,9 +186,9 @@ export default function NavLinks({
                 className={cn(
                   "flex w-full items-center justify-between gap-3 rounded-md px-3 py-2 text-sm font-medium",
                   route.active
-                    ? "primary-gradient"
+                    ? route.activeClassName || "primary-gradient"
                     : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
-                  itemClassName
+                  itemClassName,
                 )}
               >
                 <div className="flex items-center gap-3">
@@ -185,25 +200,37 @@ export default function NavLinks({
                 <ChevronRight
                   className={cn(
                     "h-4 w-4 transition-transform",
-                    collapsibleChevronClassName
+                    collapsibleChevronClassName,
                   )}
                 />
               </CollapsibleTrigger>
               <CollapsibleContent
                 className={cn(
                   "space-y-1 pl-5 pt-1",
-                  collapsibleContentClassName
+                  collapsibleContentClassName,
                 )}
                 aria-describedby="navigation links"
               >
                 {route.children.map((child) => (
-                  <RouteLink key={child.href} route={child} />
+                  <RouteLink
+                    key={child.href}
+                    route={child}
+                    labelClassName={labelClassName}
+                    itemClassName={itemClassName}
+                    iconClassName={iconClassName}
+                  />
                 ))}
               </CollapsibleContent>
             </Collapsible>
           ) : (
-            <RouteLink key={route.href} route={route} />
-          )
+            <RouteLink
+              key={route.href}
+              route={route}
+              labelClassName={labelClassName}
+              itemClassName={itemClassName}
+              iconClassName={iconClassName}
+            />
+          ),
         )}
       </div>
     </div>
