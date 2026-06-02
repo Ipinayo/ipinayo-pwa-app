@@ -256,7 +256,6 @@ function getMessage<K extends keyof ActivityEventMap>(
     }
 }
 
-//TODO: Add getPushActionURL
 function getActionURL<K extends keyof ActivityEventMap>(
     event: K,
     entityId: string,
@@ -275,11 +274,26 @@ function getActionURL<K extends keyof ActivityEventMap>(
     }
 }
 
+/**
+ * Absolute, always-defined variant of getActionURL for push payloads. Push is
+ * handled in the service worker (no page context), so the payload needs a full
+ * URL rather than an app-relative path. Falls back to the app root.
+ */
+function getPushActionURL<K extends keyof ActivityEventMap>(
+    event: K,
+    entityId: string,
+) {
+    const path = getActionURL(event, entityId) ?? "/";
+    const baseUrl = process.env.AUTH_URL ?? "http://localhost:3000";
+
+    return new URL(path, baseUrl).toString();
+}
+
 async function sendPushNotifications(
     userId: string,
     title: string,
     message: string,
-    actionUrl: string | undefined,
+    pushUrl: string,
 ) {
     const subscriptions = await findPushSubscriptionsByUserId(userId);
     if (subscriptions.length === 0) return;
@@ -287,7 +301,7 @@ async function sendPushNotifications(
     const payload = JSON.stringify({
         title,
         body: message,
-        url: actionUrl ?? "/",
+        url: pushUrl,
     });
 
     await Promise.all(
@@ -332,7 +346,8 @@ function sendNotification(
         }
 
         if (channels.includes(NotificationChannel.PUSH)) {
-            sendPushNotifications(userId, title, message, actionUrl);
+            const pushUrl = getPushActionURL(event, entityId)
+            sendPushNotifications(userId, title, message, pushUrl);
         }
 
         if (channels.includes(NotificationChannel.IN_APP)) {
