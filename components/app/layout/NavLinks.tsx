@@ -133,6 +133,11 @@ export default function NavLinks({
               label: "Profile",
               icon: User,
             },
+            {
+              href: "/settings/notifications",
+              label: "Notifications",
+              icon: Bell,
+            },
           ],
         },
       ];

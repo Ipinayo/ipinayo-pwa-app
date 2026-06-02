@@ -467,7 +467,7 @@ export const userNotificationEvents: Partial<Record<keyof ActivityEventMap, { la
         default: { inApp: false, email: false, push: false },
     },
     "draft.deleted_by_other": {
-        label: "Draft Deleted",
+        label: "My Draft Deleted",
         description: "These are notifications for when someone else deletes your draft",
         default: { inApp: true, email: false, push: true },
     }
