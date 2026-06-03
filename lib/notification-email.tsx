@@ -183,7 +183,7 @@ export async function sendNotificationEmail<K extends keyof ActivityEventMap>(
       heading={subject}
       message="You have a new notification."
       actionUrl={actionUrl ?? process.env.AUTH_URL}
-      actionLabel={actionUrl ?? "Open Ìpínayò"}
+      actionLabel="Open Ìpínayò"
     />
   );
 

@@ -1,9 +1,9 @@
 'use server'
 
 import { AppUser, UserProfile } from "@/types/models";
+import { NotificationChannel, UpdateUserProfile } from "@/types/utils";
 import { createUserProfile, findUser, findUserParishAndChoirInfo, findUserProfile, updateUserProfile } from "@/db/user";
 
-import { UpdateUserProfile } from "@/types/utils";
 import { auth } from "@/auth";
 import { createActivity } from "./activity";
 import { revalidatePath } from "next/cache";
@@ -17,6 +17,7 @@ export async function createUserProfileAction(userId: string) {
         event: "user.registered",
         entityId: userId,
         metadata: { name: userProfile.user.name || userProfile.user.email },
+        channels: [NotificationChannel.EMAIL, NotificationChannel.IN_APP],
     })
 }
 
