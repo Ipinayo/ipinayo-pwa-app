@@ -16,12 +16,14 @@ import {
 import { auth } from "@/auth";
 import { createNotification } from "@/db/notification";
 import { findNotificationPreference } from "@/db/notification-preference";
+import { findUser } from "@/db/user";
+import { sendNotificationEmail } from "@/lib/notification-email";
 import { userNotificationEvents } from "../constants";
 import webpush from "web-push";
 
 if (process.env.VAPID_PRIVATE_KEY && process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY) {
     webpush.setVapidDetails(
-        `mailto:${process.env.ADMIN_MAIL ?? "admin@ipinayo.com"}`,
+        `mailto:${process.env.ADMIN_MAIL ?? "noreply@ipinayo.com"}`,
         process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
         process.env.VAPID_PRIVATE_KEY
     );
@@ -53,10 +55,12 @@ export async function createActivity<E extends keyof ActivityEventMap>({ targetU
             metadata,
         });
 
-        targetUsers.forEach(async (userId) => {
-            const resolvedChannels = channels ?? await resolveChannel(userId, event);
-            sendNotification(activity.id, entityId, userId, resolvedChannels, event, metadata)
-        })
+        await Promise.all(
+            targetUsers.map(async (userId) => {
+                const resolvedChannels = channels ?? await resolveChannel(userId, event);
+                await sendNotification(activity.id, entityId, userId, resolvedChannels, event, metadata);
+            })
+        );
 
         return activity;
     } catch (error: any) {
@@ -274,16 +278,61 @@ function getActionURL<K extends keyof ActivityEventMap>(
     }
 }
 
-/**
- * Absolute, always-defined variant of getActionURL for push payloads. Push is
- * handled in the service worker (no page context), so the payload needs a full
- * URL rather than an app-relative path. Falls back to the app root.
- */
-function getPushActionURL<K extends keyof ActivityEventMap>(
+function getPath<K extends keyof ActivityEventMap>(
     event: K,
     entityId: string,
 ) {
-    const path = getActionURL(event, entityId) ?? "/";
+    switch (event) {
+
+        case "draft.expiring":
+            return `/liturgical-selections/new`;
+
+        case "draft.expired":
+        case "draft.deleted_by_other":
+            return `/dashboard`;
+
+        case "selection.created_by_self":
+        case "selection.cloned_by_self":
+        case "selection.updated_by_self":
+            return `/selections/${entityId}`;
+
+        case "selection.cloned_by_other":
+            return `/selections/${entityId}`;
+
+        case "selection.deleted_by_self":
+            return `/dashboard`;
+
+        case "draft.created_by_self":
+        case "draft.updated_by_self":
+            return `/drafts/${entityId}`;
+
+        case "draft.deleted_by_self":
+            return `/dashboard`;
+
+        case "user.updated":
+            return `/profile`;
+
+        case "user.registered":
+            return `/dashboard`;
+
+        case "system.announcement":
+            return `/`;
+
+        default:
+            return undefined;
+    }
+}
+
+/**
+ * Absolute, always-defined variant of getActionURL. Push runs in the service
+ * worker and email links are opened from an external client — both need a full
+ * URL rather than an app-relative path. Falls back to the app root.
+ */
+function getAbsoluteActionURL<K extends keyof ActivityEventMap>(
+    event: K,
+    entityId: string,
+) {
+    const path = getPath(event, entityId) ?? "/";
     const baseUrl = process.env.AUTH_URL ?? "http://localhost:3000";
 
     return new URL(path, baseUrl).toString();
@@ -326,7 +375,7 @@ async function sendPushNotifications(
     );
 }
 
-function sendNotification(
+async function sendNotification(
     activityId: string,
     entityId: string,
     userId: string,
@@ -334,36 +383,47 @@ function sendNotification(
     event: keyof ActivityEventMap,
     metadata: ActivityEventMap[typeof event]["metadata"]
 ) {
+    const title = getTitle(event, metadata)
+    const message = getMessage(event, metadata)
+    const actionUrl = getActionURL(event, entityId)
+    const absoluteUrl = getAbsoluteActionURL(event, entityId)
 
-    try {
+    // Each channel is isolated so one channel's failure (e.g. a dead SMTP
+    // server) can't suppress the others, and one recipient can't abort the rest.
+    const deliveries: Promise<unknown>[] = []
 
-        const title = getTitle(event, metadata)
-        const message = getMessage(event, metadata)
-        const actionUrl = getActionURL(event, entityId)
+    if (channels.includes(NotificationChannel.EMAIL)) {
+        deliveries.push(
+            (async () => {
+                const user = await findUser(userId)
+                if (user?.email) {
+                    await sendNotificationEmail(user.email, event, metadata, absoluteUrl)
+                }
+            })()
+        )
+    }
 
-        if (channels.includes(NotificationChannel.EMAIL)) {
-            console.log(`[Mock Email] To: ${userId} | Subject: ${title} | Message: ${message}`)
+    if (channels.includes(NotificationChannel.PUSH)) {
+        deliveries.push(sendPushNotifications(userId, title, message, absoluteUrl))
+    }
+
+    if (channels.includes(NotificationChannel.IN_APP)) {
+        const notification: CreateNotification = {
+            activityId,
+            userId,
+            status: NotificationStatus.UNREAD,
+            title,
+            message,
+            actionUrl,
         }
+        deliveries.push(createNotification(notification))
+    }
 
-        if (channels.includes(NotificationChannel.PUSH)) {
-            const pushUrl = getPushActionURL(event, entityId)
-            sendPushNotifications(userId, title, message, pushUrl);
+    const results = await Promise.allSettled(deliveries)
+    for (const result of results) {
+        if (result.status === "rejected") {
+            console.error("Error sending notification:", result.reason)
         }
-
-        if (channels.includes(NotificationChannel.IN_APP)) {
-            const notification: CreateNotification = {
-                activityId,
-                userId,
-                status: NotificationStatus.UNREAD,
-                title,
-                message,
-                actionUrl,
-            }
-            createNotification(notification)
-        }
-
-    } catch (error: any) {
-        console.error("Error sending notification:", error);
     }
 
 }

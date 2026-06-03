@@ -2,12 +2,12 @@
 
 import { AppUser, UserProfile } from "@/types/models";
 import { DraftSelectionFilter, MassSelectionFilter, NotificationChannel, SortBy, SortOrder, SortUsersBy, UsersFilter } from "@/types/utils";
+import { countAnnouncementStats, createAnnouncement, findAllAnnouncements } from "@/db/announcement";
 import findAllDrafts, { deleteAllOldDrafts, deleteDraftById, findAdminDashboardStats, findAllAdminUserIds, findAllUserIds, findAllUsersForSelect, findDraftsExpiringSoon, findDraftsStats, findSelectionsStats, findUsersStats, updateUserAdminStatus } from "@/db/admin";
 import { findAllUserSelections, findMassSelectionStats } from "@/db/mass-selections";
 import findAllUsers, { findUser, findUserProfile } from "@/db/user";
 
 import { auth } from "@/auth";
-import { countAnnouncementStats, createAnnouncement, findAllAnnouncements } from "@/db/announcement";
 import { createActivity } from "./activity";
 import { findAllActivities } from "@/db/activity";
 import findDraftsByUserId from "@/db/draft";
@@ -488,7 +488,7 @@ export async function createAnnouncementAction({
         if (push) channels.push(NotificationChannel.PUSH);
 
         // Dispatch activity + notifications
-        await createActivity({
+        createActivity({
             targetUsers: recipientIds,
             event: "system.announcement",
             entityId: announcement.id,
