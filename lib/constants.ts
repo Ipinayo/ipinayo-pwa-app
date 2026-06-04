@@ -429,7 +429,7 @@ export const userNotificationEvents: Partial<Record<keyof ActivityEventMap, { la
     "selection.cloned_by_other": {
         label: "Your Selection Cloned",
         description: "These are notifications for when someone clones your selection",
-        default: { inApp: true, email: false, push: true },
+        default: { inApp: true, email: true, push: true },
     },
     "selection.updated_by_self": {
         label: "Selection Updated",
@@ -439,7 +439,7 @@ export const userNotificationEvents: Partial<Record<keyof ActivityEventMap, { la
     "selection.deleted_by_self": {
         label: "Selection Deleted",
         description: "These are notifications for when you delete a selection",
-        default: { inApp: false, email: false, push: false },
+        default: { inApp: true, email: false, push: false },
     },
     "draft.created_by_self": {
         label: "Draft Created",
@@ -464,12 +464,12 @@ export const userNotificationEvents: Partial<Record<keyof ActivityEventMap, { la
     "draft.deleted_by_self": {
         label: "Draft Deleted",
         description: "These are notifications for when you delete a draft",
-        default: { inApp: false, email: false, push: false },
+        default: { inApp: true, email: false, push: false },
     },
     "draft.deleted_by_other": {
         label: "My Draft Deleted",
         description: "These are notifications for when someone else deletes your draft",
-        default: { inApp: true, email: false, push: true },
+        default: { inApp: true, email: true, push: true },
     },
     "system.announcement": {
         label: "System Announcements",

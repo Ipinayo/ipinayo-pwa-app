@@ -43,7 +43,7 @@ type EmailEntry<K extends keyof ActivityEventMap> = {
   subject: (metadata: ActivityEventMap[K]["metadata"]) => string;
   render: (
     metadata: ActivityEventMap[K]["metadata"],
-    actionUrl?: string
+    actionUrl?: string,
   ) => React.ReactElement;
 };
 
@@ -83,81 +83,125 @@ const notificationEmails: {
   // Low-signal "by self" confirmations — generic template, no CTA.
   "selection.created_by_self": {
     subject: () => "Selection created",
-    render: (m) => (
+    render: (m, url) => (
       <GenericNotificationEmail
         preview="Selection created"
         heading="Selection created"
-        message={`Your selection "${m.title}" has been created successfully.`}
+        message={
+          <span>
+            Your selection <strong>{m.title}</strong> has been created
+            successfully.
+          </span>
+        }
+        actionUrl={url}
+        actionLabel={url ? "View Selection" : undefined}
       />
     ),
   },
   "selection.cloned_by_self": {
     subject: () => "Selection cloned",
-    render: (m) => (
+    render: (m, url) => (
       <GenericNotificationEmail
         preview="Selection cloned"
         heading="Selection cloned"
-        message={`Your selection "${m.title}" has been cloned successfully.`}
+        message={
+          <span>
+            Your selection <strong>{m.title}</strong> has been cloned
+            successfully.
+          </span>
+        }
+        actionUrl={url}
+        actionLabel={url ? "View Selection" : undefined}
       />
     ),
   },
   "selection.updated_by_self": {
     subject: () => "Selection updated",
-    render: (m) => (
+    render: (m, url) => (
       <GenericNotificationEmail
         preview="Selection updated"
         heading="Selection updated"
-        message={`Your selection "${m.title}" has been updated successfully.`}
+        message={
+          <span>
+            Your selection <strong>{m.title}</strong> has been updated
+            successfully.
+          </span>
+        }
+        actionUrl={url}
+        actionLabel={url ? "View Selection" : undefined}
       />
     ),
   },
   "selection.deleted_by_self": {
     subject: () => "Selection deleted",
-    render: (m) => (
+    render: (m, url) => (
       <GenericNotificationEmail
         preview="Selection deleted"
         heading="Selection deleted"
-        message={`Your selection "${m.title}" has been deleted successfully.`}
+        message={
+          <span>
+            Your selection <strong>{m.title}</strong> has been deleted
+            successfully.
+          </span>
+        }
+        actionUrl={url}
+        actionLabel={url ? "Open Ìpínayò" : undefined}
       />
     ),
   },
   "draft.created_by_self": {
     subject: () => "Draft created",
-    render: () => (
+    render: (_, url) => (
       <GenericNotificationEmail
         preview="Draft created"
         heading="Draft created"
-        message="Your draft has been created successfully."
+        message={<span>Your draft has been created successfully.</span>}
+        actionUrl={url}
+        actionLabel={url ? "Open Ìpínayò" : undefined}
       />
     ),
   },
   "draft.updated_by_self": {
     subject: () => "Draft updated",
-    render: (m) => (
+    render: (m, url) => (
       <GenericNotificationEmail
         preview="Draft updated"
         heading="Draft updated"
-        message={`Your draft "${m.title}" has been updated successfully.`}
+        message={
+          <span>
+            Your draft <strong>{m.title}</strong> has been updated successfully.
+          </span>
+        }
+        actionUrl={url}
+        actionLabel={url ? "View Draft" : undefined}
       />
     ),
   },
   "draft.deleted_by_self": {
     subject: () => "Draft deleted",
-    render: (m) => (
+    render: (m, url) => (
       <GenericNotificationEmail
         preview="Draft deleted"
         heading="Draft deleted"
-        message={`Your draft "${m.title}" has been deleted successfully.`}
+        message={
+          <span>
+            Your draft <strong>{m.title}</strong> has been deleted successfully.
+          </span>
+        }
+        actionUrl={url}
+        actionLabel={url ? "Open Ìpínayò" : undefined}
       />
     ),
   },
   "user.updated": {
     subject: () => "Your profile was updated",
-    render: () => (
+    render: (m, url) => (
       <GenericNotificationEmail
         preview="Profile updated"
         heading="Profile updated"
-        message="Your Ìpínayò profile has been updated."
+        message={<span>Your Ìpínayò profile has been updated.</span>}
+        actionUrl={url}
+        actionLabel={url ? "View Profile" : undefined}
       />
     ),
   },
@@ -167,7 +211,7 @@ export async function sendNotificationEmail<K extends keyof ActivityEventMap>(
   to: string,
   event: K,
   metadata: ActivityEventMap[K]["metadata"],
-  actionUrl?: string
+  actionUrl?: string,
 ) {
   const entry = notificationEmails[event] as EmailEntry<K> | undefined;
 
@@ -202,7 +246,7 @@ export async function sendNotificationEmail<K extends keyof ActivityEventMap>(
 
   if (result.rejected.length) {
     throw new Error(
-      `Notification email rejected for: ${result.rejected.join(", ")}`
+      `Notification email rejected for: ${result.rejected.join(", ")}`,
     );
   }
 }

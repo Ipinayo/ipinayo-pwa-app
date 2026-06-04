@@ -5,7 +5,7 @@ import { Text } from "@react-email/components";
 export interface GenericNotificationEmailProps {
   preview: string;
   heading: string;
-  message: string;
+  message: React.ReactNode;
   actionUrl?: string;
   actionLabel?: string;
 }
@@ -39,7 +39,12 @@ export default function Preview() {
     <GenericNotificationEmail
       preview="You have a new notification"
       heading="Selection updated"
-      message='Your selection "Easter Vigil 2026" has been updated successfully.'
+      message={
+        <span>
+          Your selection <strong>Easter Vigil 2026</strong> has been updated
+          successfully.
+        </span>
+      }
     />
   );
 }

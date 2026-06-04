@@ -267,24 +267,24 @@ export async function cloneSelection(selectionId: string) {
             createActivity({
                 targetUsers: [session.user.id],
                 event: "selection.cloned_by_self",
-                entityId: result.id,
-                metadata: { title: result.title },
+                entityId: originalSelection.id,
+                metadata: { title: originalSelection.title },
                 actorId: session.user.id,
             });
         else {
             createActivity({
                 targetUsers: [session.user.id],
                 event: "selection.cloned_by_self",
-                entityId: result.id,
-                metadata: { title: result.title },
+                entityId: originalSelection.id,
+                metadata: { title: originalSelection.title },
                 actorId: session.user.id,
             });
 
             createActivity({
                 targetUsers: [originalSelection.createdById],
                 event: "selection.cloned_by_other",
-                entityId: result.id,
-                metadata: { title: result.title, actorName: session.user.name || session.user.email || "Unknown User" },
+                entityId: originalSelection.id,
+                metadata: { title: originalSelection.title, actorName: session.user.name || session.user.email || "Unknown User" },
                 actorId: session.user.id,
             });
         }

@@ -246,17 +246,17 @@ function getPath<K extends keyof ActivityEventMap>(
         case "selection.created_by_self":
         case "selection.cloned_by_self":
         case "selection.updated_by_self":
-            return `/selections/${entityId}`;
+            return `/liturgical-selections/${entityId}`;
 
         case "selection.cloned_by_other":
-            return `/selections/${entityId}`;
+            return `/liturgical-selections/${entityId}`;
 
         case "selection.deleted_by_self":
             return `/dashboard`;
 
         case "draft.created_by_self":
         case "draft.updated_by_self":
-            return `/drafts/${entityId}`;
+            return `/liturgical-selections/new/${entityId}`;
 
         case "draft.deleted_by_self":
             return `/dashboard`;
