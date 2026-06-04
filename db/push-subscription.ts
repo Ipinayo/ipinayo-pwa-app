@@ -10,6 +10,7 @@ export async function createPushSubscription(data: {
     return await prisma.pushSubscription.upsert({
         where: { endpoint: data.endpoint },
         update: {
+            userId: data.userId,
             p256dh: data.p256dh,
             auth: data.auth,
             userAgent: data.userAgent,
