@@ -26,6 +26,12 @@ export enum SortDraftsBy {
     TITLE = 'title',
 }
 
+export enum NotificationChannel {
+    IN_APP = 'inApp',
+    EMAIL = 'email',
+    PUSH = 'push'
+}
+
 export interface MassSelectionFilter {
     page?: number,
     limit?: number,
@@ -64,4 +70,105 @@ export interface UsersFilter {
     userRole?: UserRole
     sortBy?: SortUsersBy,
     sortOrder?: SortOrder
+}
+
+export type ActivityEventMap = {
+    "selection.created_by_self": {
+        entityType: "selection";
+        metadata: {
+            title: string;
+        };
+    };
+
+    "selection.cloned_by_self": {
+        entityType: "selection";
+        metadata: {
+            title: string;
+        };
+    };
+
+    "selection.cloned_by_other": {
+        entityType: "selection";
+        metadata: {
+            title: string;
+            actorName: string;
+        };
+    };
+
+    "selection.updated_by_self": {
+        entityType: "selection";
+        metadata: {
+            title: string;
+        };
+    };
+
+    "selection.deleted_by_self": {
+        entityType: "selection";
+        metadata: {
+            title: string;
+        };
+    };
+
+    "user.registered": {
+        entityType: "user";
+        metadata: {
+            name: string;
+        };
+    };
+
+    "user.updated": {
+        entityType: "user";
+        metadata: {};
+    };
+
+    "draft.created_by_self": {
+        entityType: "draft";
+        metadata: {};
+    };
+
+    "draft.updated_by_self": {
+        entityType: "draft";
+        metadata: {
+            title: string;
+        };
+    };
+
+    "draft.expiring": {
+        entityType: "draft";
+        metadata: {
+            title: string;
+        };
+    };
+
+    "draft.expired": {
+        entityType: "draft";
+        metadata: {
+            title: string;
+        };
+    };
+
+    "draft.deleted_by_self": {
+        entityType: "draft";
+        metadata: {
+            title: string;
+        };
+    };
+
+    "draft.deleted_by_other": {
+        entityType: "draft";
+        metadata: {
+            title: string;
+            actorName: string;
+            expired: boolean;
+            reason?: string;
+        };
+    };
+
+    "system.announcement": {
+        entityType: "system";
+        metadata: {
+            title: string;
+            message: string;
+        };
+    };
 }

@@ -1,6 +1,8 @@
 import { Church, FileText, Flower, Heart, Music2, Users } from "lucide-react";
 import { KeySignature, LiturgicalSeason, LiturgicalYear } from "@/types/models";
 
+import { ActivityEventMap } from '../types/utils';
+
 export const liturgicalSeasonItems = [
     { label: "Advent", value: LiturgicalSeason.ADVENT },
     { label: "Christmas", value: LiturgicalSeason.CHRISTMAS },
@@ -412,3 +414,66 @@ export const typesFilter = [
     { label: "Public", value: "true" },
     { label: "Private", value: "false" },
 ];
+
+export const userNotificationEvents: Partial<Record<keyof ActivityEventMap, { label: string; description: string; default: { inApp: boolean; email: boolean; push: boolean } }>> = {
+    "selection.created_by_self": {
+        label: "Selection Created",
+        description: "These are notifications for selections you create",
+        default: { inApp: false, email: false, push: false },
+    },
+    "selection.cloned_by_self": {
+        label: "Selection Cloned",
+        description: "These are notifications for when you clone a selection",
+        default: { inApp: false, email: false, push: false },
+    },
+    "selection.cloned_by_other": {
+        label: "Your Selection Cloned",
+        description: "These are notifications for when someone clones your selection",
+        default: { inApp: true, email: true, push: true },
+    },
+    "selection.updated_by_self": {
+        label: "Selection Updated",
+        description: "These are notifications for when you update a selection",
+        default: { inApp: false, email: false, push: false },
+    },
+    "selection.deleted_by_self": {
+        label: "Selection Deleted",
+        description: "These are notifications for when you delete a selection",
+        default: { inApp: true, email: false, push: false },
+    },
+    "draft.created_by_self": {
+        label: "Draft Created",
+        description: "These are notifications for when you create a new draft",
+        default: { inApp: false, email: false, push: false },
+    },
+    "draft.updated_by_self": {
+        label: "Draft Updated",
+        description: "These are notifications for when you update a draft",
+        default: { inApp: false, email: false, push: false },
+    },
+    "draft.expiring": {
+        label: "Draft Expiring",
+        description: "These are notifications for when your draft is about to expire",
+        default: { inApp: true, email: true, push: true },
+    },
+    "draft.expired": {
+        label: "Draft Expired",
+        description: "These are notifications for when your draft has expired and will be automatically deleted",
+        default: { inApp: true, email: true, push: true },
+    },
+    "draft.deleted_by_self": {
+        label: "Draft Deleted",
+        description: "These are notifications for when you delete a draft",
+        default: { inApp: true, email: false, push: false },
+    },
+    "draft.deleted_by_other": {
+        label: "My Draft Deleted",
+        description: "These are notifications for when someone else deletes your draft",
+        default: { inApp: true, email: true, push: true },
+    },
+    "system.announcement": {
+        label: "System Announcements",
+        description: "Important updates from Ìpínayò.",
+        default: { inApp: true, email: true, push: true },
+    }
+}

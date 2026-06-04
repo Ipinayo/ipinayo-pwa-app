@@ -11,6 +11,7 @@ import AdminAppToggle from "./AdminAppToggle";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import MobileMenuTrigger from "./MobileMenuTrigger";
+import { NotificationBell } from "@/components/app/notifications/notification-bell";
 import SignInButton from "./SignInButton";
 import SignoutButton from "./SignoutButton";
 import UserAvatar from "@/components/common/user-avatar";
@@ -44,6 +45,7 @@ export default async function Header({
               <span className="hidden text-sm font-medium md:inline-block">
                 {user.name}
               </span>
+              <NotificationBell />
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button

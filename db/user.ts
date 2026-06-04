@@ -5,8 +5,16 @@ import { capitalize } from "@/lib/utils";
 import prisma from "@/lib/prisma";
 
 export async function createUserProfile(userId: string) {
-    await prisma.userProfile.create({
+    return await prisma.userProfile.create({
         data: { userId, bio: "" },
+        include: {
+            user: {
+                select: {
+                    email: true,
+                    name: true,
+                }
+            },
+        }
     })
 }
 
@@ -56,7 +64,7 @@ export async function updateUserProfile(userId: string, updates: UpdateUserProfi
             favoriteGenres: favoriteGenres ? { set: favoriteGenres } : undefined,
 
             // Handle location update
-            ...(parishLocation && parishLocation.country && {
+            ...(parishLocation?.country && {
                 parishLocation: {
                     connectOrCreate: {
                         where: {
@@ -83,6 +91,14 @@ export async function updateUserProfile(userId: string, updates: UpdateUserProfi
                     : {}),
             }),
         },
+    });
+}
+
+/** Permanently deletes a user. Cascades to their profile, selections, drafts,
+ * notifications, activities, preferences and sessions (see schema onDelete). */
+export async function deleteUserById(userId: string) {
+    return await prisma.user.delete({
+        where: { id: userId },
     });
 }
 

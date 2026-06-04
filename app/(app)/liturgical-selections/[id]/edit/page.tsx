@@ -7,6 +7,7 @@ import {
 import BackButton from "@/components/common/back-button";
 import EditForm from "@/components/app/mass-selections/edit-selection";
 import { Params } from "@/types/utils";
+import { PushNotificationPrompt } from "@/components/push-notification-prompt";
 import { requireAuth } from "@/lib/auth";
 
 export default async function EditPage(props: { params: Params }) {
@@ -43,6 +44,8 @@ export default async function EditPage(props: { params: Params }) {
       </div>
 
       <EditForm selection={selection} themes={themes} partNames={partNames} />
+
+      <PushNotificationPrompt />
     </div>
   );
 }

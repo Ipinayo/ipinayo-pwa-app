@@ -1,12 +1,26 @@
 'use server'
 
 import { AppUser, UserProfile } from "@/types/models";
-import { findUser, findUserParishAndChoirInfo, findUserProfile, updateUserProfile } from "@/db/user";
+import { NotificationChannel, UpdateUserProfile } from "@/types/utils";
+import { createUserProfile, findUser, findUserParishAndChoirInfo, findUserProfile, updateUserProfile } from "@/db/user";
 
-import { UpdateUserProfile } from "@/types/utils";
 import { auth } from "@/auth";
+import { createActivity } from "@/lib/notifications/dispatch";
 import { revalidatePath } from "next/cache";
 import { updateUserProfileSchema } from "@/types/schemas/user";
+
+export async function createUserProfileAction(userId: string) {
+    const userProfile = await createUserProfile(userId);
+
+    createActivity({
+        targetUsers: [userId],
+        event: "user.registered",
+        entityId: userId,
+        metadata: { name: userProfile.user.name || userProfile.user.email },
+        channels: [NotificationChannel.EMAIL, NotificationChannel.IN_APP],
+        actorId: userId,
+    })
+}
 
 export async function getUserProfile(): Promise<UserProfile> {
     const session = await auth();
@@ -30,6 +44,14 @@ export async function updateUserProfileAction(updates: UpdateUserProfile) {
     }
 
     const result = await updateUserProfile(session.user.id, updates);
+
+    createActivity({
+        targetUsers: [session.user.id],
+        event: "user.updated",
+        entityId: session.user.id,
+        metadata: {},
+        actorId: session.user.id,
+    })
 
     revalidatePath('/profile');
     revalidatePath('/settings/profile');
