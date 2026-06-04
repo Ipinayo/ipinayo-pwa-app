@@ -26,9 +26,9 @@ export async function createPushSubscription(data: {
     });
 }
 
-export async function deletePushSubscriptionByEndpoint(endpoint: string) {
-    return await prisma.pushSubscription.delete({
-        where: { endpoint },
+export async function deletePushSubscriptionByEndpoint(endpoint: string, userId: string) {
+    return await prisma.pushSubscription.deleteMany({
+        where: { endpoint, userId },
     });
 }
 

@@ -387,7 +387,7 @@ async function sendPushNotifications(
             } catch (error: any) {
                 // 410 Gone or 404 Not Found means the subscription is no longer valid
                 if (error?.statusCode === 410 || error?.statusCode === 404) {
-                    await deletePushSubscriptionByEndpoint(sub.endpoint);
+                    await deletePushSubscriptionByEndpoint(sub.endpoint, userId);
                 } else {
                     console.error(`Push delivery failed for ${sub.endpoint}:`, error);
                 }

@@ -314,3 +314,62 @@ export async function findAllUsersForSelect() {
         orderBy: { name: "asc" },
     });
 }
+
+export async function findAllActivities({
+    page = 1,
+    limit = 20,
+    actorId,
+    entityType,
+    event,
+}: {
+    page?: number;
+    limit?: number;
+    actorId?: string;
+    entityType?: string;
+    event?: string;
+} = {}) {
+    const skip = (page - 1) * limit;
+
+    const whereClause: Prisma.ActivityWhereInput = {};
+    const andConditions: Prisma.ActivityWhereInput[] = [];
+
+    if (actorId) andConditions.push({ actorId });
+    if (entityType) andConditions.push({ entityType });
+    if (event) andConditions.push({ event });
+
+    if (andConditions.length > 0) {
+        whereClause.AND = andConditions;
+    }
+
+    const [activities, total] = await Promise.all([
+        prisma.activity.findMany({
+            where: whereClause,
+            include: {
+                actor: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                    },
+                },
+                recipients: {
+                    include: {
+                        user: {
+                            select: {
+                                id: true,
+                                name: true,
+                                email: true,
+                            },
+                        },
+                    },
+                },
+            },
+            orderBy: { createdAt: "desc" },
+            skip,
+            take: limit,
+        }),
+        prisma.activity.count({ where: whereClause }),
+    ]);
+
+    return { activities, total };
+}

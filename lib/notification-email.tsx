@@ -27,7 +27,7 @@ function getTransporter() {
   transporter = createTransport({
     host: process.env.NOTIFICATION_EMAIL_SERVER_HOST,
     port,
-    secure: true,
+    secure: process.env.NOTIFICATION_EMAIL_SERVER_SECURE === "true",
     auth: {
       user: process.env.NOTIFICATION_EMAIL_SERVER_USER,
       pass: process.env.NOTIFICATION_EMAIL_SERVER_PASSWORD,

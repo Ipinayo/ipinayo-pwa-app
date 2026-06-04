@@ -219,36 +219,6 @@ export type Notification = Prisma.NotificationGetPayload<{
     }
 }>;
 
-export type AdminNotification = Prisma.NotificationGetPayload<{
-    include: {
-        user: {
-            select: {
-                id: true,
-                name: true,
-                email: true,
-            }
-        },
-        activity: {
-            include: {
-                actor: {
-                    select: {
-                        id: true,
-                        name: true,
-                        email: true,
-                    }
-                },
-                targetUsers: {
-                    select: {
-                        id: true,
-                        name: true,
-                        email: true,
-                    }
-                }
-            }
-        }
-    }
-}>;
-
 export type Announcement = Prisma.AnnouncementGetPayload<{
     include: {
         createdBy: {

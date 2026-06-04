@@ -30,12 +30,7 @@ export interface EmailLayoutProps {
   children: React.ReactNode;
 }
 
-/**
- * Shared Ìpínayò email chrome — brand header, body section, optional CTA and
- * footer. Styles are inline and email-client safe (no gradients/box-shadow that
- * break in Outlook). Used by every notification email, and will back the auth
- * magic-link email in the follow-up migration.
- */
+// Shared Ìpínayò email chrome — brand header, body section, optional CTA and footer.
 export function EmailLayout({
   preview,
   heading,
@@ -156,7 +151,7 @@ const footerSection: React.CSSProperties = {
 };
 
 export const button: React.CSSProperties = {
-  backgroundImage: 'linear-gradient(135deg, #00c5fb 0%, #175bea 100%)',
+  backgroundImage: "linear-gradient(135deg, #00c5fb 0%, #175bea 100%)",
   color: "#ffffff",
   textDecoration: "none",
   padding: "16px 32px",

@@ -37,7 +37,7 @@ export async function deletePushSubscriptionAction(endpoint: string) {
             throw new Error("Unauthorized");
         }
 
-        return await deletePushSubscriptionByEndpoint(endpoint);
+        return await deletePushSubscriptionByEndpoint(endpoint, session.user.id);
     } catch (error: any) {
         console.error("Error deleting push subscription:", error);
         throw new Error("Error deleting push subscription: " + error?.message);

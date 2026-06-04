@@ -1,7 +1,6 @@
 'use server';
 
 import {
-    findActivity,
     findUserActivityById,
     findUserActivityFeed,
 } from "@/db/activity";
@@ -10,25 +9,6 @@ import { auth } from "@/auth";
 
 // Events the user is notified about but shouldn't see in their activity feed.
 const HIDDEN_FEED_EVENTS = ["draft.expiring"];
-
-export async function getActivityById(activityId: string) {
-    try {
-        const session = await auth();
-        if (!session?.user?.id) {
-            throw new Error("Unauthorized");
-        }
-
-        const activity = await findActivity(activityId);
-        if (!activity) {
-            throw new Error("Activity not found");
-        }
-
-        return activity;
-    } catch (error: any) {
-        console.error("Error fetching activity:", error);
-        throw new Error("Error fetching activity: " + error?.message);
-    }
-}
 
 export async function getUserActivityById(activityId: string) {
     try {
