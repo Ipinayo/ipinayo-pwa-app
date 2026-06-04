@@ -5,7 +5,7 @@ import findDraftsByUserId, { createDraft, deleteDraftById, findDraftById, update
 import { DraftMassSelection } from "@/types/schemas/mass-selections";
 import { DraftSelectionFilter } from "@/types/utils";
 import { auth } from "@/auth";
-import { createActivity } from "./activity";
+import { createActivity } from "@/lib/notifications/dispatch";
 import { findUserParishAndChoirInfo } from "@/db/user";
 import { liturgyTemplates } from "../constants";
 import { revalidatePath } from "next/cache";
@@ -114,6 +114,7 @@ export async function createNewDraft(templateId: string) {
             event: "draft.created_by_self",
             entityId: newDraft.id,
             metadata: {},
+            actorId: session.user.id,
         });
 
         revalidatePath('/liturgical-selections/new');
@@ -142,6 +143,7 @@ export async function updateDraft(id: string, selection: DraftMassSelection) {
             event: "draft.updated_by_self",
             entityId: updatedDraft.id,
             metadata: { title: updatedDraft.title || "Untitled Draft" },
+            actorId: session.user.id,
         });
 
         revalidatePath('/liturgical-selections/new');
@@ -169,6 +171,7 @@ export async function deleteDraft(id: string) {
             event: "draft.deleted_by_self",
             entityId: deletedDraft.id,
             metadata: { title: deletedDraft.title || "Untitled Draft" },
+            actorId: session.user.id,
         });
 
         revalidatePath('/liturgical-selections/new');

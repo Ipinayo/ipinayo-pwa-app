@@ -18,7 +18,7 @@ import {
 
 import { NewMassSelection } from "@/types/models";
 import { auth } from "@/auth";
-import { createActivity } from "./activity";
+import { createActivity } from "@/lib/notifications/dispatch";
 import { createDraft } from "@/db/draft";
 import { findUserParishAndChoirInfo } from "@/db/user";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
@@ -141,6 +141,7 @@ export async function createSelection(data: NewMassSelection, draftId: string) {
             event: "selection.created_by_self",
             entityId: result.id,
             metadata: { title: result.title },
+            actorId: session.user.id,
         })
 
         revalidatePath('/liturgical-selections');
@@ -182,6 +183,7 @@ export async function updateSelection(id: string, data: Partial<NewMassSelection
             event: "selection.updated_by_self",
             entityId: existingSelection.id,
             metadata: { title: data.title || existingSelection.title },
+            actorId: session.user.id,
         })
 
         revalidatePath('/liturgical-selections');
@@ -216,6 +218,7 @@ export async function deleteSelection(id: string) {
             event: "selection.deleted_by_self",
             entityId: existingSelection.id,
             metadata: { title: existingSelection.title },
+            actorId: session.user.id,
         });
 
         revalidatePath('/liturgical-selections');
@@ -266,6 +269,7 @@ export async function cloneSelection(selectionId: string) {
                 event: "selection.cloned_by_self",
                 entityId: result.id,
                 metadata: { title: result.title },
+                actorId: session.user.id,
             });
         else {
             createActivity({
@@ -273,6 +277,7 @@ export async function cloneSelection(selectionId: string) {
                 event: "selection.cloned_by_self",
                 entityId: result.id,
                 metadata: { title: result.title },
+                actorId: session.user.id,
             });
 
             createActivity({
@@ -280,6 +285,7 @@ export async function cloneSelection(selectionId: string) {
                 event: "selection.cloned_by_other",
                 entityId: result.id,
                 metadata: { title: result.title, actorName: session.user.name || session.user.email || "Unknown User" },
+                actorId: session.user.id,
             });
         }
 

@@ -3,12 +3,13 @@
 import { AppUser, UserProfile } from "@/types/models";
 import { DraftSelectionFilter, MassSelectionFilter, NotificationChannel, SortBy, SortOrder, SortUsersBy, UsersFilter } from "@/types/utils";
 import { countAnnouncementStats, createAnnouncement, findAllAnnouncements } from "@/db/announcement";
-import findAllDrafts, { deleteAllOldDrafts, deleteDraftById, findAdminDashboardStats, findAllAdminUserIds, findAllUserIds, findAllUsersForSelect, findDraftsExpiringSoon, findDraftsStats, findSelectionsStats, findUsersStats, updateUserAdminStatus } from "@/db/admin";
+import findAllDrafts, { deleteDraftById, findAdminDashboardStats, findAllAdminUserIds, findAllUserIds, findAllUsersForSelect, findDraftsStats, findSelectionsStats, findUsersStats, updateUserAdminStatus } from "@/db/admin";
 import { findAllUserSelections, findMassSelectionStats } from "@/db/mass-selections";
 import findAllUsers, { findUser, findUserProfile } from "@/db/user";
+import { notifyExpiringDrafts, purgeOldDrafts } from "@/lib/jobs/draft-maintenance";
 
 import { auth } from "@/auth";
-import { createActivity } from "./activity";
+import { createActivity } from "@/lib/notifications/dispatch";
 import { findAllActivities } from "@/db/activity";
 import findDraftsByUserId from "@/db/draft";
 import { isAdmin } from "../utils";
@@ -300,9 +301,10 @@ export async function deleteDraft(id: string) {
             entityId: deletedDraft.id,
             metadata: {
                 title: deletedDraft.title || "Untitled Draft",
-                actorName: user?.name || user?.email || "Unknown User",
+                actorName: "Ìpínayò System",
                 expired: true
             },
+            actorId: session.user.id,
         });
 
         revalidatePath('/admin');
@@ -326,18 +328,7 @@ export async function notifyDraftsExpiringSoon() {
             throw new Error("Forbidden");
         }
 
-        const expiringDrafts = await findDraftsExpiringSoon();
-
-        expiringDrafts.forEach(expiringDraft => {
-            createActivity({
-                targetUsers: [expiringDraft.createdById],
-                event: "draft.expiring",
-                entityId: expiringDraft.id,
-                metadata: {
-                    title: expiringDraft.title || "Untitled Draft",
-                },
-            });
-        });
+        await notifyExpiringDrafts(session.user.id);
 
     } catch (error: any) {
         console.error("Error notifying about expiring drafts:", error);
@@ -356,20 +347,7 @@ export async function deleteOldDrafts() {
             throw new Error("Forbidden");
         }
 
-        const deletedDrafts = await deleteAllOldDrafts();
-
-        deletedDrafts.forEach(deletedDraft => {
-            createActivity({
-                targetUsers: [deletedDraft.createdById],
-                event: "draft.deleted_by_other",
-                entityId: deletedDraft.id,
-                metadata: {
-                    title: deletedDraft.title || "Untitled Draft",
-                    actorName: user?.name || user?.email || "Unknown User",
-                    expired: true
-                },
-            });
-        });
+        await purgeOldDrafts(session.user.id);
 
         revalidatePath('/admin');
         revalidatePath('/admin/drafts');
@@ -494,6 +472,7 @@ export async function createAnnouncementAction({
             entityId: announcement.id,
             metadata: { title, message },
             channels,
+            actorId: session.user.id,
         });
 
         revalidatePath("/admin/notifications");

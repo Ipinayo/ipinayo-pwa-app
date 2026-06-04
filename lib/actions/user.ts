@@ -5,7 +5,7 @@ import { NotificationChannel, UpdateUserProfile } from "@/types/utils";
 import { createUserProfile, findUser, findUserParishAndChoirInfo, findUserProfile, updateUserProfile } from "@/db/user";
 
 import { auth } from "@/auth";
-import { createActivity } from "./activity";
+import { createActivity } from "@/lib/notifications/dispatch";
 import { revalidatePath } from "next/cache";
 import { updateUserProfileSchema } from "@/types/schemas/user";
 
@@ -18,6 +18,7 @@ export async function createUserProfileAction(userId: string) {
         entityId: userId,
         metadata: { name: userProfile.user.name || userProfile.user.email },
         channels: [NotificationChannel.EMAIL, NotificationChannel.IN_APP],
+        actorId: userId,
     })
 }
 
@@ -49,6 +50,7 @@ export async function updateUserProfileAction(updates: UpdateUserProfile) {
         event: "user.updated",
         entityId: session.user.id,
         metadata: {},
+        actorId: session.user.id,
     })
 
     revalidatePath('/profile');
