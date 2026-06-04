@@ -5,6 +5,7 @@ import findDraftsByUserId, { createDraft, deleteDraftById, findDraftById, update
 import { DraftMassSelection } from "@/types/schemas/mass-selections";
 import { DraftSelectionFilter } from "@/types/utils";
 import { auth } from "@/auth";
+import { createActivity } from "@/lib/notifications/dispatch";
 import { findUserParishAndChoirInfo } from "@/db/user";
 import { liturgyTemplates } from "../constants";
 import { revalidatePath } from "next/cache";
@@ -108,6 +109,14 @@ export async function createNewDraft(templateId: string) {
 
         const newDraft = await createDraft(draft, session.user.id);
 
+        createActivity({
+            targetUsers: [session.user.id],
+            event: "draft.created_by_self",
+            entityId: newDraft.id,
+            metadata: {},
+            actorId: session.user.id,
+        });
+
         revalidatePath('/liturgical-selections/new');
         revalidatePath('/dashboard');
         revalidatePath('/dashboard/drafts');
@@ -129,6 +138,14 @@ export async function updateDraft(id: string, selection: DraftMassSelection) {
 
         const updatedDraft = await updateDraftById(id, selection, session.user.id);
 
+        createActivity({
+            targetUsers: [session.user.id],
+            event: "draft.updated_by_self",
+            entityId: updatedDraft.id,
+            metadata: { title: updatedDraft.title || "Untitled Draft" },
+            actorId: session.user.id,
+        });
+
         revalidatePath('/liturgical-selections/new');
         revalidatePath('/dashboard');
         revalidatePath('/dashboard/drafts');
@@ -147,7 +164,15 @@ export async function deleteDraft(id: string) {
             throw new Error("Unauthorized");
         }
 
-        await deleteDraftById(id, session.user.id);
+        const deletedDraft = await deleteDraftById(id, session.user.id);
+
+        createActivity({
+            targetUsers: [session.user.id],
+            event: "draft.deleted_by_self",
+            entityId: deletedDraft.id,
+            metadata: { title: deletedDraft.title || "Untitled Draft" },
+            actorId: session.user.id,
+        });
 
         revalidatePath('/liturgical-selections/new');
         revalidatePath('/dashboard');

@@ -38,7 +38,7 @@ export async function findAdminDashboardStats(): Promise<AdminDashboardStats> {
                 createdAt: { gte: startOfWeek }
             }
         }),
-        Promise.resolve(0)
+        prisma.announcement.count(),
     ]);
 
     return {
@@ -260,16 +260,116 @@ export async function deleteDraftById(draftId: string) {
     })
 }
 
-export async function deleteAllOldDrafts() {
-
+export async function findDraftsExpiringSoon() {
     const fifteenDaysAgo = new Date();
     fifteenDaysAgo.setDate(fifteenDaysAgo.getDate() - 15); // 15 days ago
 
-    return await prisma.massSelectionDraft.deleteMany({
+    return await prisma.massSelectionDraft.findMany({
         where: {
             updatedAt: {
-                lt: fifteenDaysAgo
-            }
-        },
+                lt: fifteenDaysAgo,
+            },
+        }
+    });
+}
+
+export async function deleteAllOldDrafts() {
+
+    const twentyDaysAgo = new Date();
+    twentyDaysAgo.setDate(twentyDaysAgo.getDate() - 20); // 20 days ago
+
+    const where = {
+        updatedAt: {
+            lt: twentyDaysAgo
+        }
+    };
+
+    const oldDrafts = await prisma.massSelectionDraft.findMany({
+        where
+    });
+
+    await prisma.massSelectionDraft.deleteMany({
+        where
     })
+
+    return oldDrafts;
+}
+
+export async function findAllUserIds(): Promise<string[]> {
+    const users = await prisma.user.findMany({ select: { id: true } });
+    return users.map((u) => u.id);
+}
+
+export async function findAllAdminUserIds(): Promise<string[]> {
+    const users = await prisma.user.findMany({
+        where: { userRole: { in: [UserRole.ADMIN, UserRole.SUPERADMIN] } },
+        select: { id: true },
+    });
+    return users.map((u) => u.id);
+}
+
+export async function findAllUsersForSelect() {
+    return await prisma.user.findMany({
+        select: { id: true, name: true, email: true },
+        orderBy: { name: "asc" },
+    });
+}
+
+export async function findAllActivities({
+    page = 1,
+    limit = 20,
+    actorId,
+    entityType,
+    event,
+}: {
+    page?: number;
+    limit?: number;
+    actorId?: string;
+    entityType?: string;
+    event?: string;
+} = {}) {
+    const skip = (page - 1) * limit;
+
+    const whereClause: Prisma.ActivityWhereInput = {};
+    const andConditions: Prisma.ActivityWhereInput[] = [];
+
+    if (actorId) andConditions.push({ actorId });
+    if (entityType) andConditions.push({ entityType });
+    if (event) andConditions.push({ event });
+
+    if (andConditions.length > 0) {
+        whereClause.AND = andConditions;
+    }
+
+    const [activities, total] = await Promise.all([
+        prisma.activity.findMany({
+            where: whereClause,
+            include: {
+                actor: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                    },
+                },
+                recipients: {
+                    include: {
+                        user: {
+                            select: {
+                                id: true,
+                                name: true,
+                                email: true,
+                            },
+                        },
+                    },
+                },
+            },
+            orderBy: { createdAt: "desc" },
+            skip,
+            take: limit,
+        }),
+        prisma.activity.count({ where: whereClause }),
+    ]);
+
+    return { activities, total };
 }

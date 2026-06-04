@@ -2,7 +2,7 @@ import NextAuth from 'next-auth';
 import Nodemailer from "next-auth/providers/nodemailer"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 import authConfig from "./auth.config";
-import { createUserProfile } from './db/user';
+import { createUserProfileAction } from './lib/actions/user';
 import prisma from './lib/prisma';
 import { sendVerificationRequest } from './lib/email';
 
@@ -27,7 +27,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         })],
     events: {
         async createUser({ user }) {
-            await createUserProfile(user.id);
+            await createUserProfileAction(user.id);
         }
     }
 });

@@ -152,7 +152,79 @@ export interface DraftStats {
     totalDrafts: number
     newDraftsThisMonth: number,
     newDraftsThisWeek: number,
+
     oldDrafts: number
 }
 
-export { KeySignature, LiturgicalSeason, LiturgicalYear, UserRole } from "@/lib/generated/prisma";
+export type ActivityRecipientInput = {
+    userId: string;
+    entityId?: string | null;
+    metadata?: Prisma.InputJsonValue;
+};
+
+export type CreateActivity = {
+    actorId: string;
+    event: string;
+    entityType: string;
+    entityId: string;
+    metadata: Prisma.InputJsonValue;
+    recipients: ActivityRecipientInput[];
+};
+
+export type UserActivity = Prisma.ActivityGetPayload<{}>;
+
+export type Activity = Prisma.ActivityGetPayload<{
+    include: {
+        actor: {
+            select: {
+                id: true,
+                name: true,
+                email: true,
+            }
+        },
+        recipients: {
+            include: {
+                user: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                    }
+                }
+            }
+        }
+    }
+}>;
+
+export type UserNotification = Prisma.NotificationGetPayload<{}>;
+
+export type CreateNotification = Omit<Prisma.NotificationCreateInput, 'activity' | 'user' | 'id' | 'createdAt'> & {
+    activityId: string;
+    userId: string;
+};
+
+export type Notification = Prisma.NotificationGetPayload<{
+    include: {
+        activity: {
+            include: {
+                actor: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                    }
+                }
+            }
+        }
+    }
+}>;
+
+export type Announcement = Prisma.AnnouncementGetPayload<{
+    include: {
+        createdBy: {
+            select: { id: true; name: true; email: true }
+        }
+    }
+}>;
+
+export { KeySignature, LiturgicalSeason, LiturgicalYear, UserRole, NotificationStatus } from "@/lib/generated/prisma";

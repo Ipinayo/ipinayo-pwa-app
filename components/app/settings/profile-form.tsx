@@ -8,7 +8,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
-  Form,
   FormControl,
   FormField,
   FormItem,
@@ -249,7 +248,7 @@ export default function ProfileForm({ user }: { user: UserProfile }) {
                         instrumentOptions,
                         "name",
                         "name",
-                        "children"
+                        "children",
                       )}
                       onChange={(selected) =>
                         field.onChange(getValuesFromOptions(selected))

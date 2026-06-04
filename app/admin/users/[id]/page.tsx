@@ -8,8 +8,8 @@ import { Params } from "@/types/utils";
 import SelectionsList from "@/components/app/admin/user/selections-list";
 import SelectionsListSkeleton from "@/components/app/admin/user/selections-list/index-skeleton";
 import { Suspense } from "react";
-import UserDetails from "@/components/app/admin/user/user-details.tsx";
-import UserDetailsSkeleton from "@/components/app/admin/user/user-details.tsx/index-skeleton";
+import UserDetails from "@/components/app/admin/user/user-details";
+import UserDetailsSkeleton from "@/components/app/admin/user/user-details/index-skeleton";
 import UserRoleDisplay from "@/components/app/admin/user/user-role-display";
 import UserRoleDisplaySkeleton from "@/components/app/admin/user/user-role-display/index-skeleton";
 
