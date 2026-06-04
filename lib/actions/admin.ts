@@ -1,11 +1,11 @@
 'use server'
 
-import { AppUser, UserProfile } from "@/types/models";
+import { AppUser, UserProfile, UserRole } from "@/types/models";
 import { DraftSelectionFilter, MassSelectionFilter, NotificationChannel, SortBy, SortOrder, SortUsersBy, UsersFilter } from "@/types/utils";
 import { countAnnouncementStats, createAnnouncement, findAllAnnouncements } from "@/db/announcement";
 import findAllDrafts, { deleteDraftById, findAdminDashboardStats, findAllAdminUserIds, findAllUserIds, findAllUsersForSelect, findDraftsStats, findSelectionsStats, findUsersStats, updateUserAdminStatus } from "@/db/admin";
 import { findAllUserSelections, findMassSelectionStats } from "@/db/mass-selections";
-import findAllUsers, { findUser, findUserProfile } from "@/db/user";
+import findAllUsers, { deleteUserById, findUser, findUserProfile } from "@/db/user";
 import { notifyExpiringDrafts, purgeOldDrafts } from "@/lib/jobs/draft-maintenance";
 
 import { auth } from "@/auth";
@@ -226,6 +226,42 @@ export async function updateUserAdminStatusAction(userId: string, makeAdmin: boo
     revalidatePath(`/admin/users/${result.id}`);
 
     return result;
+}
+
+export async function deleteUserAction(userId: string) {
+    const session = await auth();
+    if (!session?.user?.id) {
+        throw new Error("Unauthorized");
+    }
+
+    const actor = await findUser(session.user.id);
+    if (!isAdmin(actor?.userRole)) {
+        throw new Error("Forbidden");
+    }
+
+    if (userId === session.user.id) {
+        throw new Error("You can't delete your own account.");
+    }
+
+    const target = await findUser(userId);
+    if (!target) {
+        throw new Error("User not found");
+    }
+
+    // Super admins can never be deleted via this action; only a super admin may
+    // delete another admin.
+    if (target.userRole === UserRole.SUPERADMIN) {
+        throw new Error("Super admins can't be deleted.");
+    }
+    if (isAdmin(target.userRole) && actor?.userRole !== UserRole.SUPERADMIN) {
+        throw new Error("Only a super admin can delete an admin.");
+    }
+
+    await deleteUserById(userId);
+
+    revalidatePath('/admin/users');
+
+    return { message: "User deleted" };
 }
 
 export async function getSelectionsStats() {

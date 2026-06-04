@@ -12,13 +12,12 @@ import {
   User,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { formatDate, formatParishInfo } from "@/lib/utils";
+import { formatDate, formatParishInfo, isAdmin } from "@/lib/utils";
 import { getUserProfile, getUserSelectionStats } from "@/lib/actions/admin";
 
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import UserAvatar from "@/components/common/user-avatar";
-import { isAdmin } from "../../../../../lib/utils";
 
 export default async function UserDetails({
   userId,
@@ -49,9 +48,6 @@ export default async function UserDetails({
                     User
                   </Badge>
                 )}
-                {/* {user.status === "disabled" && (
-                  <Badge variant="destructive">Disabled</Badge>
-                )} */}
               </div>
               <p className="text-muted-foreground">{user.email}</p>
               {userProfile.headline && (
@@ -92,7 +88,7 @@ export default async function UserDetails({
                 <p className="font-medium">
                   {formatParishInfo(
                     userProfile.parishLocation,
-                    userProfile.parishName
+                    userProfile.parishName,
                   )}
                 </p>
               </div>
