@@ -261,13 +261,13 @@ export async function deleteDraftById(draftId: string) {
 }
 
 export async function findDraftsExpiringSoon() {
-    const twelveDaysAgo = new Date();
-    twelveDaysAgo.setDate(twelveDaysAgo.getDate() - 12); // 12 days ago
+    const fifteenDaysAgo = new Date();
+    fifteenDaysAgo.setDate(fifteenDaysAgo.getDate() - 15); // 15 days ago
 
     return await prisma.massSelectionDraft.findMany({
         where: {
             updatedAt: {
-                lt: twelveDaysAgo,
+                lt: fifteenDaysAgo,
             },
         }
     });
@@ -275,12 +275,12 @@ export async function findDraftsExpiringSoon() {
 
 export async function deleteAllOldDrafts() {
 
-    const fifteenDaysAgo = new Date();
-    fifteenDaysAgo.setDate(fifteenDaysAgo.getDate() - 15); // 15 days ago
+    const twentyDaysAgo = new Date();
+    twentyDaysAgo.setDate(twentyDaysAgo.getDate() - 20); // 20 days ago
 
     const where = {
         updatedAt: {
-            lt: fifteenDaysAgo
+            lt: twentyDaysAgo
         }
     };
 
