@@ -315,14 +315,14 @@ export function getActivityEntity(
   }
 }
 
-export function getActivityEvent(event: string) {
+export function getActivityEvent(event: string, admin?: boolean): string {
   switch (event) {
     case "selection.created_by_self":
       return `New selection`;
     case "selection.cloned_by_self":
       return `Selection cloned`;
     case "selection.cloned_by_other":
-      return `Your selection was cloned`;
+      return admin ? `Selection cloned by another user` : `Your selection was cloned`;
     case "selection.updated_by_self":
       return `Selection updated`;
     case "selection.deleted_by_self":
@@ -336,7 +336,7 @@ export function getActivityEvent(event: string) {
     case "draft.updated_by_self":
       return `Draft updated`;
     case "draft.deleted_by_other":
-      return `Your draft was deleted`;
+      return admin ? `Draft deleted by another user` : `Your draft was deleted`;
     case "draft.deleted_by_self":
       return `Draft deleted`;
     case "draft.expired":
