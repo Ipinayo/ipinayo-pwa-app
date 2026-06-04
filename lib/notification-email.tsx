@@ -33,7 +33,9 @@ function getTransporter() {
       pass: process.env.NOTIFICATION_EMAIL_SERVER_PASSWORD,
     },
     pool: true,
-    maxConnections: 3,
+    maxConnections: 2,
+    rateDelta: 1000,
+    rateLimit: 4,
   });
 
   return transporter;
