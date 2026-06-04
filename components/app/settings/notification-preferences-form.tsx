@@ -1,6 +1,6 @@
 "use client";
 
-import { BookOpen, FileClock, Save } from "lucide-react";
+import { BookOpen, FileClock, Megaphone, Save } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -29,11 +29,15 @@ const CHANNELS = [
 
 type ChannelKey = (typeof CHANNELS)[number]["key"];
 
+const LOCKED_PREFIXES = ["system"];
+
 const GROUPS: {
   key: string;
   label: string;
   description: string;
   icon: React.ElementType;
+  /** Locked groups are shown for transparency but can't be changed (e.g. system announcements). */
+  locked?: boolean;
 }[] = [
   {
     key: "selection",
@@ -46,6 +50,13 @@ const GROUPS: {
     label: "Drafts",
     description: "Notifications about your drafts",
     icon: FileClock,
+  },
+  {
+    key: "system",
+    label: "Announcements",
+    description: "Ìpínayò Updates.",
+    icon: Megaphone,
+    locked: true,
   },
 ];
 
@@ -60,14 +71,14 @@ export function NotificationPreferencesForm({
 
   const dirty = useMemo(
     () => JSON.stringify(items) !== JSON.stringify(preferences),
-    [items, preferences]
+    [items, preferences],
   );
 
   const toggle = (event: string, channel: ChannelKey, value: boolean) => {
     setItems((prev) =>
       prev.map((item) =>
-        item.event === event ? { ...item, [channel]: value } : item
-      )
+        item.event === event ? { ...item, [channel]: value } : item,
+      ),
     );
   };
 
@@ -76,17 +87,22 @@ export function NotificationPreferencesForm({
     const { error } = await withToast(
       () =>
         updateNotificationPreferencesAction(
-          items.map(({ event, inApp, email, push }) => ({
-            event,
-            inApp,
-            email,
-            push,
-          }))
+          items
+            .filter(
+              (item) =>
+                !LOCKED_PREFIXES.some((p) => item.event.startsWith(`${p}.`)),
+            )
+            .map(({ event, inApp, email, push }) => ({
+              event,
+              inApp,
+              email,
+              push,
+            })),
         ),
       {
         loading: "Saving preferences...",
         success: "Notification preferences updated",
-      }
+      },
     );
     setSaving(false);
     if (!error) router.refresh();
@@ -121,17 +137,21 @@ export function NotificationPreferencesForm({
                   </div>
                   <div className="flex flex-wrap gap-x-6 gap-y-3">
                     {CHANNELS.map((channel) => (
-                      <div key={channel.key} className="flex items-center gap-2">
+                      <div
+                        key={channel.key}
+                        className="flex items-center gap-2"
+                      >
                         <Switch
                           id={`${item.event}-${channel.key}`}
-                          checked={item[channel.key]}
+                          checked={group.locked ? true : item[channel.key]}
+                          disabled={group.locked}
                           onCheckedChange={(value) =>
                             toggle(item.event, channel.key, value)
                           }
                         />
                         <Label
                           htmlFor={`${item.event}-${channel.key}`}
-                          className="cursor-pointer text-sm text-muted-foreground"
+                          className="text-sm text-muted-foreground"
                         >
                           {channel.label}
                         </Label>

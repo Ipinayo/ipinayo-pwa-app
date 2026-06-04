@@ -470,5 +470,10 @@ export const userNotificationEvents: Partial<Record<keyof ActivityEventMap, { la
         label: "My Draft Deleted",
         description: "These are notifications for when someone else deletes your draft",
         default: { inApp: true, email: false, push: true },
+    },
+    "system.announcement": {
+        label: "System Announcements",
+        description: "Important updates from Ìpínayò.",
+        default: { inApp: true, email: true, push: true },
     }
 }

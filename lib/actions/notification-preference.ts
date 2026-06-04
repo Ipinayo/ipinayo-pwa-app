@@ -69,7 +69,10 @@ export async function updateNotificationPreferencesAction(
 
     const userId = session.user.id;
     const validEvents = new Set(Object.keys(userNotificationEvents));
-    const toSave = preferences.filter((p) => validEvents.has(p.event));
+    // System announcements are mandatory — never persist preferences for them.
+    const toSave = preferences.filter(
+        (p) => validEvents.has(p.event) && !p.event.startsWith("system.")
+    );
 
     await Promise.all(
         toSave.map((p) =>

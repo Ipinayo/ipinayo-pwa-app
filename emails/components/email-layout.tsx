@@ -8,10 +8,14 @@ import {
   Heading,
   Hr,
   Html,
+  Link,
   Preview,
   Section,
   Text,
 } from "@react-email/components";
+
+/** Absolute link to the in-app notification settings, for email footers. */
+export const preferencesUrl = `${process.env.AUTH_URL ?? "https://ipinayo.com"}/settings/notifications`;
 
 export interface EmailLayoutProps {
   /** Short summary shown in the inbox preview line. */
@@ -77,7 +81,9 @@ export function EmailLayout({
                   on Ìpínayò.
                 </Text>
                 <Text style={footerText}>
-                  If you didn&apos;t expect this email, you can safely ignore it.
+                  <Link href={preferencesUrl} style={footerLink}>
+                    Manage notification preferences
+                  </Link>
                 </Text>
               </>
             )}
@@ -165,6 +171,12 @@ export const footerText: React.CSSProperties = {
   color: "#63738a",
   fontSize: "12px",
   margin: "1px",
+};
+
+export const footerLink: React.CSSProperties = {
+  color: "#175bea",
+  fontSize: "12px",
+  textDecoration: "underline",
 };
 
 export const paragraph: React.CSSProperties = {
