@@ -45,7 +45,7 @@ export const liturgyTemplates = [
     {
         id: "wedding",
         name: "Wedding",
-        description: "Catholic nuptial Mass wedding ceremony",
+        description: "Nuptial wedding ceremony with special liturgical parts",
         icon: Heart,
         liturgy: "Matrimony",
         themes: [

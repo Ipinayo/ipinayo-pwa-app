@@ -246,7 +246,7 @@ export async function saveSelection(selection: NewMassSelection, userId: string,
         },
     }
 
-    if (parishLocation && parishLocation.country) {
+    if (parishLocation?.country) {
         data.parishLocation = {
             connectOrCreate: {
                 where: {
@@ -354,7 +354,7 @@ export async function updateSelection(
                     }
                 }),
                 // Handle location update
-                ...(parishLocation && parishLocation.country && {
+                ...(parishLocation?.country && {
                     parishLocation: {
                         connectOrCreate: {
                             where: {
