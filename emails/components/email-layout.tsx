@@ -115,9 +115,8 @@ const brand: React.CSSProperties = {
   fontSize: "32px",
   fontWeight: 600,
   margin: 0,
-  background: "linear-gradient(to bottom, #175bea, #00c5fb)",
-  WebkitBackgroundClip: "text",
-  WebkitTextFillColor: "transparent",
+  backgroundImage: "linear-gradient(to bottom, #175bea, #00c5fb)",
+  backgroundClip: "text",
 };
 
 const tagline: React.CSSProperties = {
