@@ -265,7 +265,7 @@ function getPath<K extends keyof ActivityEventMap>(
             return `/profile`;
 
         case "user.registered":
-            return `/dashboard`;
+            return `/settings/profile`;
 
         case "system.announcement":
             return `/`;
