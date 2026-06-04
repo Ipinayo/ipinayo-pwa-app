@@ -204,7 +204,7 @@ model ActivityRecipient {
   metadata   Json?
   createdAt  DateTime @default(now())
 
-  @@unique([activityId, userId])
+  @@index([activityId])
   @@index([userId])
 }
 
