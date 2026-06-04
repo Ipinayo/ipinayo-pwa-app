@@ -156,9 +156,19 @@ export interface DraftStats {
     oldDrafts: number
 }
 
-export type CreateActivity = Omit<Prisma.ActivityCreateInput, 'id' | 'createdAt' | 'actor' | 'targetUsers'> & {
+export type ActivityRecipientInput = {
+    userId: string;
+    entityId?: string | null;
+    metadata?: Prisma.InputJsonValue;
+};
+
+export type CreateActivity = {
     actorId: string;
-    targetUsers: string[]; // Array of user IDs
+    event: string;
+    entityType: string;
+    entityId: string;
+    metadata: Prisma.InputJsonValue;
+    recipients: ActivityRecipientInput[];
 };
 
 export type UserActivity = Prisma.ActivityGetPayload<{}>;
@@ -172,11 +182,15 @@ export type Activity = Prisma.ActivityGetPayload<{
                 email: true,
             }
         },
-        targetUsers: {
-            select: {
-                id: true,
-                name: true,
-                email: true,
+        recipients: {
+            include: {
+                user: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                    }
+                }
             }
         }
     }

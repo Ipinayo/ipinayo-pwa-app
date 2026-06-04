@@ -89,7 +89,7 @@ export default async function ActivitiesPage(props: {
                 <div className="flex items-start gap-4">
                   <div className="p-2 rounded-full bg-muted">
                     <ActivityIcon
-                      event={activity.event}
+                      event={activity.activity.event}
                       className="h-5 w-5 pt-1"
                     />
                   </div>
@@ -97,15 +97,18 @@ export default async function ActivitiesPage(props: {
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1">
                         <h3 className="font-medium">
-                          {getActivityEntity(activity.event, activity.metadata)}
+                          {getActivityEntity(
+                            activity.activity.event,
+                            activity.metadata ?? activity.activity.metadata,
+                          )}
                         </h3>
                         <p className="text-sm text-muted-foreground mt-1">
-                          {getActivityEvent(activity.event)}
+                          {getActivityEvent(activity.activity.event)}
                         </p>
                       </div>
 
                       <Badge variant="outline" className="shrink-0 capitalize">
-                        {activity.entityType}
+                        {activity.activity.entityType}
                       </Badge>
                     </div>
 

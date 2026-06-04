@@ -22,6 +22,12 @@ import { useState } from "react";
 
 type ActivityUser = { id: string; name: string | null; email: string };
 
+type ActivityRecipientItem = {
+  user: ActivityUser;
+  entityId: string | null;
+  metadata: JsonValue;
+};
+
 export type AdminActivityItem = {
   id: string;
   event: string;
@@ -30,11 +36,14 @@ export type AdminActivityItem = {
   metadata: JsonValue;
   createdAt: Date;
   actor: ActivityUser | null;
-  targetUsers: ActivityUser[];
+  recipients: ActivityRecipientItem[];
 };
 
 const displayName = (user: ActivityUser | null) =>
   user?.name || user?.email || "System";
+
+const recipientTitle = (recipient: ActivityRecipientItem) =>
+  (recipient.metadata as { title?: string } | null)?.title;
 
 export default function AdminActivityRow({
   activity,
@@ -44,10 +53,10 @@ export default function AdminActivityRow({
   const [open, setOpen] = useState(false);
 
   const performer = activity.actor;
-  // Affected users are the targets, excluding the actor so a self-action isn't
-  // listed twice.
-  const affected = activity.targetUsers.filter(
-    (user) => user.id !== activity.actor?.id,
+  // Affected users are the recipients, excluding the actor so a self-action
+  // isn't listed twice.
+  const affected = activity.recipients.filter(
+    (recipient) => recipient.user.id !== activity.actor?.id,
   );
   const entity = getActivityEntity(activity.event, activity.metadata);
 
@@ -125,13 +134,19 @@ export default function AdminActivityRow({
                 </span>
               ) : (
                 <ul className="space-y-0.5">
-                  {affected.map((user) => (
-                    <li key={user.id} className="wrap-break-word">
-                      {displayName(user)}
-                      {user.email ? (
+                  {affected.map((recipient) => (
+                    <li key={recipient.user.id} className="wrap-break-word">
+                      {displayName(recipient.user)}
+                      {recipient.user.email ? (
                         <span className="text-muted-foreground">
                           {" "}
-                          · {user.email}
+                          · {recipient.user.email}
+                        </span>
+                      ) : null}
+                      {recipientTitle(recipient) ? (
+                        <span className="text-muted-foreground">
+                          {" "}
+                          — {recipientTitle(recipient)}
                         </span>
                       ) : null}
                     </li>

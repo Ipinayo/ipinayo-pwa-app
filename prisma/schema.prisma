@@ -31,7 +31,7 @@ model User {
   massSelectionDrafts     MassSelectionDraft[]
   notifications           Notification[]
   activities              Activity[]               @relation("ActivityActor")
-  activitiesTargeted      Activity[]               @relation("ActivityTargets")
+  activityRecipients      ActivityRecipient[]
   notificationPreferences NotificationPreference[]
   announcements           Announcement[]           @relation("AnnouncementCreator")
   pushSubscriptions       PushSubscription[]
@@ -182,16 +182,30 @@ model MassSelectionDraft {
 }
 
 model Activity {
-  id            String         @id @default(cuid())
+  id            String              @id @default(cuid())
   event         String
   entityType    String
   entityId      String
   actorId       String
-  actor         User           @relation("ActivityActor", fields: [actorId], references: [id], onDelete: Cascade)
-  targetUsers   User[]         @relation("ActivityTargets")
+  actor         User                @relation("ActivityActor", fields: [actorId], references: [id], onDelete: Cascade)
+  recipients    ActivityRecipient[]
   metadata      Json
-  createdAt     DateTime       @default(now())
+  createdAt     DateTime            @default(now())
   notifications Notification[]
+}
+
+model ActivityRecipient {
+  id         String   @id @default(cuid())
+  activityId String
+  activity   Activity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  entityId   String?
+  metadata   Json?
+  createdAt  DateTime @default(now())
+
+  @@unique([activityId, userId])
+  @@index([userId])
 }
 
 model Notification {

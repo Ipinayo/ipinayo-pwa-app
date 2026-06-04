@@ -31,14 +31,20 @@ export default async function RecentActivities() {
         {recentActivities.activities.map((activity, index) => (
           <div key={index} className="flex items-center gap-3">
             <div className="p-2 rounded-full bg-muted">
-              <ActivityIcon event={activity.event} className="h-4 w-4" />
+              <ActivityIcon
+                event={activity.activity.event}
+                className="h-4 w-4"
+              />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium truncate">
-                {getActivityEntity(activity.event, activity.metadata)}
+                {getActivityEntity(
+                  activity.activity.event,
+                  activity.metadata ?? activity.activity.metadata,
+                )}
               </p>
               <p className="text-xs text-muted-foreground">
-                {getActivityEvent(activity.event)}
+                {getActivityEvent(activity.activity.event)}
               </p>
             </div>
             <div className="text-xs text-muted-foreground">

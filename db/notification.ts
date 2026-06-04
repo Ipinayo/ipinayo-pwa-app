@@ -18,7 +18,11 @@ export async function findNotificationById(notificationId: string) {
             activity: {
                 include: {
                     actor: { select: { id: true, name: true, email: true } },
-                    targetUsers: { select: { id: true, name: true, email: true } },
+                    recipients: {
+                        include: {
+                            user: { select: { id: true, name: true, email: true } },
+                        },
+                    },
                 },
             },
             user: { select: { id: true, name: true, email: true } },

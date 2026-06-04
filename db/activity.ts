@@ -2,12 +2,28 @@ import { CreateActivity } from "@/types/models";
 import { Prisma } from "@/lib/generated/prisma";
 import prisma from "@/lib/prisma";
 
+const recipientUserSelect = {
+    user: {
+        select: {
+            id: true,
+            name: true,
+            email: true,
+        },
+    },
+} satisfies Prisma.ActivityRecipientInclude;
+
 export async function createUserActivity(data: CreateActivity) {
+    const { recipients, ...activity } = data;
+
     return await prisma.activity.create({
         data: {
-            ...data,
-            targetUsers: {
-                connect: data.targetUsers.map((userId) => ({ id: userId })),
+            ...activity,
+            recipients: {
+                create: recipients.map((recipient) => ({
+                    userId: recipient.userId,
+                    entityId: recipient.entityId ?? undefined,
+                    metadata: recipient.metadata ?? undefined,
+                })),
             },
         },
     });
@@ -30,12 +46,8 @@ export async function findActivity(activityId: string) {
                     email: true,
                 },
             },
-            targetUsers: {
-                select: {
-                    id: true,
-                    name: true,
-                    email: true,
-                },
+            recipients: {
+                include: recipientUserSelect,
             },
         },
     });
@@ -78,12 +90,8 @@ export async function findAllActivities({
                         email: true,
                     },
                 },
-                targetUsers: {
-                    select: {
-                        id: true,
-                        name: true,
-                        email: true,
-                    },
+                recipients: {
+                    include: recipientUserSelect,
                 },
             },
             orderBy: { createdAt: "desc" },
@@ -96,108 +104,46 @@ export async function findAllActivities({
     return { activities, total };
 }
 
-export async function findUserActivities(
+/**
+ * The per-user activity feed, backed by ActivityRecipient so each user sees
+ * their own slice (entityId/metadata) of shared/batch activities. Events listed
+ * in `excludeEvents` (e.g. draft.expiring) are filtered out at the DB.
+ */
+export async function findUserActivityFeed(
     userId: string,
-    { page = 1, limit = 20 }: { page?: number; limit?: number } = {}
+    { page = 1, limit = 20, excludeEvents = [] }: { page?: number; limit?: number; excludeEvents?: string[] } = {}
 ) {
     const skip = (page - 1) * limit;
 
-    const whereClause: Prisma.ActivityWhereInput = {
-        actorId: userId,
+    const where: Prisma.ActivityRecipientWhereInput = {
+        userId,
+        ...(excludeEvents.length > 0
+            ? { activity: { event: { notIn: excludeEvents } } }
+            : {}),
     };
 
-    const [activities, total] = await Promise.all([
-        prisma.activity.findMany({
-            where: whereClause,
-            orderBy: { createdAt: "desc" },
-            skip,
-            take: limit,
-        }),
-        prisma.activity.count({ where: whereClause }),
-    ]);
-
-    return { activities, total };
-}
-
-export async function findActivitiesTargetingUser(
-    userId: string,
-    { page = 1, limit = 20 }: { page?: number; limit?: number } = {}
-) {
-    const skip = (page - 1) * limit;
-
-    const whereClause: Prisma.ActivityWhereInput = {
-        targetUsers: {
-            some: { id: userId },
-        },
-    };
-
-    const [activities, total] = await Promise.all([
-        prisma.activity.findMany({
-            where: whereClause,
+    const [recipients, total] = await Promise.all([
+        prisma.activityRecipient.findMany({
+            where,
             include: {
-                actor: {
-                    select: {
-                        id: true,
-                        name: true,
-                        email: true,
-                    },
-                },
-                targetUsers: {
-                    select: {
-                        id: true,
-                        name: true,
-                        email: true,
+                activity: {
+                    include: {
+                        actor: {
+                            select: {
+                                id: true,
+                                name: true,
+                                email: true,
+                            },
+                        },
                     },
                 },
             },
-            orderBy: { createdAt: "desc" },
+            orderBy: { activity: { createdAt: "desc" } },
             skip,
             take: limit,
         }),
-        prisma.activity.count({ where: whereClause }),
+        prisma.activityRecipient.count({ where }),
     ]);
 
-    return { activities, total };
-}
-
-export async function findAllUserRelatedActivities(
-    userId: string,
-    { page = 1, limit = 20 }: { page?: number; limit?: number } = {}
-) {
-    const skip = (page - 1) * limit;
-
-    const whereClause: Prisma.ActivityWhereInput = {
-        OR: [
-            { actorId: userId },
-            { targetUsers: { some: { id: userId } } },
-        ],
-    };
-
-    const [activities, total] = await Promise.all([
-        prisma.activity.findMany({
-            where: whereClause,
-            include: {
-                actor: {
-                    select: {
-                        id: true,
-                        name: true,
-                        email: true,
-                    },
-                },
-                targetUsers: {
-                    select: {
-                        id: true,
-                        name: true,
-                        email: true,
-                    },
-                },
-            },
-            orderBy: { createdAt: "desc" },
-            skip,
-            take: limit,
-        }),
-        prisma.activity.count({ where: whereClause }),
-    ]);
-
-    return { activities, total };
+    return { recipients, total };
 }

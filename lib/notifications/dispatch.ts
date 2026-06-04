@@ -56,13 +56,15 @@ export async function createActivity<E extends keyof ActivityEventMap>({
 
     after(async () => {
         try {
+            // All recipients share the same metadata/entityId for a non-batch
+            // event, so it lives on the Activity; recipients carry no override.
             const activity = await createUserActivity({
                 actorId,
-                targetUsers,
                 event,
                 entityId,
                 entityType,
                 metadata,
+                recipients: targetUsers.map((userId) => ({ userId })),
             });
 
             await Promise.all(
@@ -81,6 +83,73 @@ export async function createActivity<E extends keyof ActivityEventMap>({
             );
         } catch (error: any) {
             console.error("Error dispatching activity:", error);
+        }
+    });
+}
+
+/**
+ * Bulk variant of createActivity for fan-outs where each recipient has DIFFERENT
+ * details (e.g. the draft-maintenance cron, where every user's draft differs).
+ *
+ * Writes a SINGLE Activity (carrying the shared `summaryMetadata`) plus one
+ * ActivityRecipient per user holding that user's own `entityId`/`metadata`, then
+ * a personalized notification per recipient. The personal activity feed reads
+ * the recipient row, so each user sees only their own details from one Activity.
+ */
+export async function createBatchActivity<E extends keyof ActivityEventMap>({
+    event,
+    actorId,
+    channels,
+    summaryMetadata,
+    summaryEntityId,
+    recipients,
+}: {
+    event: E;
+    actorId: string;
+    channels?: NotificationChannel[];
+    summaryMetadata: ActivityEventMap[E]["metadata"];
+    summaryEntityId?: string;
+    recipients: {
+        userId: string;
+        entityId: string;
+        metadata: ActivityEventMap[E]["metadata"];
+    }[];
+}) {
+    if (recipients.length === 0) return;
+
+    const entityType = (event as string).split(".")[0];
+
+    after(async () => {
+        try {
+            const activity = await createUserActivity({
+                actorId,
+                event,
+                entityType,
+                entityId: summaryEntityId ?? "",
+                metadata: summaryMetadata,
+                recipients: recipients.map((recipient) => ({
+                    userId: recipient.userId,
+                    entityId: recipient.entityId,
+                    metadata: recipient.metadata,
+                })),
+            });
+
+            await Promise.all(
+                recipients.map(async (recipient) => {
+                    const resolvedChannels =
+                        channels ?? (await resolveChannel(recipient.userId, event));
+                    await sendNotification(
+                        activity.id,
+                        recipient.entityId,
+                        recipient.userId,
+                        resolvedChannels,
+                        event,
+                        recipient.metadata
+                    );
+                })
+            );
+        } catch (error: any) {
+            console.error("Error dispatching batch activity:", error);
         }
     });
 }
