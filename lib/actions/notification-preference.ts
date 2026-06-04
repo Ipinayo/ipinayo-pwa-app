@@ -1,6 +1,7 @@
 'use server';
 
 import {
+    deleteUserNotificationPreferences,
     findUserNotificationPreferences,
     upsertNotificationPreference,
 } from "@/db/notification-preference";
@@ -89,4 +90,21 @@ export async function updateNotificationPreferencesAction(
     revalidatePath("/settings/notifications");
 
     return { message: "Notification preferences updated" };
+}
+
+/**
+ * Clears all of the user's saved preferences so every event falls back to its
+ * default channels.
+ */
+export async function restoreNotificationDefaultsAction() {
+    const session = await auth();
+    if (!session?.user?.id) {
+        throw new Error("Unauthorized");
+    }
+
+    await deleteUserNotificationPreferences(session.user.id);
+
+    revalidatePath("/settings/notifications");
+
+    return { message: "Notification preferences restored to defaults" };
 }

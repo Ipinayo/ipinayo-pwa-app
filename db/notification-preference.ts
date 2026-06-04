@@ -54,6 +54,13 @@ export async function deleteNotificationPreference(id: string) {
     });
 }
 
+/** Removes all of a user's saved preferences, reverting them to event defaults. */
+export async function deleteUserNotificationPreferences(userId: string) {
+    return await prisma.notificationPreference.deleteMany({
+        where: { userId },
+    });
+}
+
 export async function deleteNotificationPreferenceByUserAndEvent(
     userId: string,
     event: string

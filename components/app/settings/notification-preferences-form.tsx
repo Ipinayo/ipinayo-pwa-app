@@ -1,6 +1,17 @@
 "use client";
 
-import { BookOpen, FileClock, Megaphone, Save } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { BookOpen, FileClock, Megaphone, RotateCcw, Save } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -10,6 +21,7 @@ import {
 } from "@/components/ui/card";
 import {
   NotificationPreferenceItem,
+  restoreNotificationDefaultsAction,
   updateNotificationPreferencesAction,
 } from "@/lib/actions/notification-preference";
 import { useMemo, useState } from "react";
@@ -68,6 +80,7 @@ export function NotificationPreferencesForm({
   const router = useRouter();
   const [items, setItems] = useState<NotificationPreferenceItem[]>(preferences);
   const [saving, setSaving] = useState(false);
+  const [restoring, setRestoring] = useState(false);
 
   const dirty = useMemo(
     () => JSON.stringify(items) !== JSON.stringify(preferences),
@@ -105,6 +118,19 @@ export function NotificationPreferencesForm({
       },
     );
     setSaving(false);
+    if (!error) router.refresh();
+  };
+
+  const handleRestoreDefaults = async () => {
+    setRestoring(true);
+    const { error } = await withToast(
+      () => restoreNotificationDefaultsAction(),
+      {
+        loading: "Restoring defaults...",
+        success: "Notification preferences restored to defaults",
+      },
+    );
+    setRestoring(false);
     if (!error) router.refresh();
   };
 
@@ -165,10 +191,35 @@ export function NotificationPreferencesForm({
         </Card>
       ))}
 
-      <div className="flex justify-end">
+      <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button type="button" variant="outline" disabled={restoring || saving}>
+              <RotateCcw className="mr-2 h-4 w-4" />
+              {restoring ? "Restoring..." : "Restore defaults"}
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Restore default preferences?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This clears all your saved notification preferences and reverts
+                every notification type to its default channels. This can&apos;t
+                be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={handleRestoreDefaults}>
+                Restore defaults
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
         <Button
           onClick={handleSave}
-          disabled={saving || !dirty}
+          disabled={saving || restoring || !dirty}
           className="bg-primary hover:bg-primary/90"
         >
           <Save className="mr-2 h-4 w-4" />
