@@ -116,6 +116,7 @@ const brand: React.CSSProperties = {
   fontWeight: 600,
   margin: 0,
   backgroundImage: "linear-gradient(to bottom, #175bea, #00c5fb)",
+  backgroundColor: "#175bea",
   backgroundClip: "text",
 };
 
@@ -159,6 +160,7 @@ export const button: React.CSSProperties = {
   fontSize: "16px",
   display: "inline-block",
   margin: "20px 0",
+  backgroundColor: "#175bea",
 };
 
 export const footerText: React.CSSProperties = {
