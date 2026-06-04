@@ -22,12 +22,5 @@ ALTER TABLE "ActivityRecipient" ADD CONSTRAINT "ActivityRecipient_activityId_fke
 -- AddForeignKey
 ALTER TABLE "ActivityRecipient" ADD CONSTRAINT "ActivityRecipient_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
--- Backfill recipients from the existing implicit many-to-many join table.
--- In "_ActivityTargets", column "A" is Activity.id and "B" is User.id
--- (ordered alphabetically by model name: Activity < User).
-INSERT INTO "ActivityRecipient" ("id", "activityId", "userId", "createdAt")
-SELECT gen_random_uuid()::text, "A", "B", CURRENT_TIMESTAMP
-FROM "_ActivityTargets";
-
 -- DropTable (old M2M join table, replaced by ActivityRecipient)
 DROP TABLE "_ActivityTargets";

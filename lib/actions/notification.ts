@@ -30,7 +30,7 @@ export async function markNotificationAsReadAction(notificationId: string) {
             throw new Error("Unauthorized");
         }
 
-        return await markNotificationAsRead(notificationId, session.user.id);
+        return await markNotificationAsRead(notificationId);
     } catch (error: any) {
         console.error("Error marking notification as read:", error);
         throw new Error("Error marking notification as read: " + error?.message);

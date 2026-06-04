@@ -238,7 +238,7 @@ export async function sendNotificationEmail<K extends keyof ActivityEventMap>(
 
   const result = await getTransporter().sendMail({
     to,
-    from: process.env.EMAIL_FROM,
+    from: process.env.NOTIFICATION_EMAIL_FROM,
     subject,
     html,
     text,

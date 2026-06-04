@@ -4,7 +4,7 @@ import { Notification, NotificationStatus } from "@/types/models";
 import { cn, formatDateFromNow } from "@/lib/utils";
 
 import ActivityIcon from "@/components/common/activity-icon";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 interface NotificationItemProps {
   notification: Notification;
@@ -15,13 +15,18 @@ export function NotificationItem({
   notification,
   onMarkAsRead,
 }: Readonly<NotificationItemProps>) {
+  const router = useRouter();
+
   const handleClick = () => {
     if (notification.status === NotificationStatus.UNREAD) {
       onMarkAsRead?.(notification.id);
     }
+    if (notification.actionUrl) {
+      router.push(notification.actionUrl);
+    }
   };
 
-  const content = (
+  return (
     <button
       className={cn(
         "px-4 py-3 hover:bg-muted/50 transition-colors flex items-start gap-3 group w-full",
@@ -62,11 +67,4 @@ export function NotificationItem({
       </div>
     </button>
   );
-
-  // If notification has an action URL, wrap in Link
-  if (notification.actionUrl) {
-    return <Link href={notification.actionUrl}>{content}</Link>;
-  }
-
-  return content;
 }

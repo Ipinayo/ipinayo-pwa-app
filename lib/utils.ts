@@ -309,6 +309,11 @@ export function getActivityEntity(
         const data = metadata as ActivityEventMap["draft.expiring"]["metadata"];
         return `${data.title}`;
       }
+    case "system.announcement":
+      {
+        const data = metadata as ActivityEventMap["system.announcement"]["metadata"];
+        return `${data.title}`;
+      }
 
     default:
       return "";

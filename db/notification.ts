@@ -95,21 +95,11 @@ export async function findNotificationsByActivityId(activityId: string) {
     });
 }
 
-export async function markNotificationAsRead(notificationId: string, userId: string) {
+export async function markNotificationAsRead(notificationId: string) {
     return await prisma.notification.update({
-        where: { id: notificationId, userId },
+        where: { id: notificationId },
         data: {
             status: NotificationStatus.READ,
-            readAt: new Date(),
-        },
-    });
-}
-
-export async function markNotificationAsDismissed(notificationId: string, userId: string) {
-    return await prisma.notification.update({
-        where: { id: notificationId, userId },
-        data: {
-            status: NotificationStatus.DISMISSED,
             readAt: new Date(),
         },
     });
@@ -149,12 +139,6 @@ export async function markManyNotificationsAsRead(notificationIds: string[], use
             status: NotificationStatus.READ,
             readAt: new Date(),
         },
-    });
-}
-
-export async function deleteNotificationById(notificationId: string, userId: string) {
-    return await prisma.notification.delete({
-        where: { id: notificationId, userId },
     });
 }
 

@@ -64,13 +64,6 @@ export function PushNotificationPrompt() {
     setShowPrompt(false);
   };
 
-  console.log(
-    "PushNotificationPrompt state:",
-    state,
-    "showPrompt:",
-    showPrompt,
-  );
-
   if (!showPrompt) {
     return null;
   }

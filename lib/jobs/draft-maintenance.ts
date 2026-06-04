@@ -6,11 +6,6 @@ import { createBatchActivity } from "@/lib/notifications/dispatch";
 
 const SYSTEM_ACTOR_NAME = "Ìpínayò System";
 
-/**
- * Notifies draft owners whose drafts are expiring soon. Creates a single
- * Activity with one recipient per owner (each carrying their own draft).
- * Returns the count.
- */
 export async function notifyExpiringDrafts(actorId: string) {
     const expiringDrafts = await findDraftsExpiringSoon();
 
@@ -30,10 +25,6 @@ export async function notifyExpiringDrafts(actorId: string) {
     return expiringDrafts.length;
 }
 
-/**
- * Deletes expired drafts and notifies their owners via a single Activity with
- * one recipient per owner. Returns the count.
- */
 export async function purgeOldDrafts(actorId: string) {
     const deletedDrafts = await deleteAllOldDrafts();
 
