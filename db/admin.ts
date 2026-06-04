@@ -38,7 +38,7 @@ export async function findAdminDashboardStats(): Promise<AdminDashboardStats> {
                 createdAt: { gte: startOfWeek }
             }
         }),
-        Promise.resolve(0)
+        prisma.announcement.count(),
     ]);
 
     return {

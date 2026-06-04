@@ -41,7 +41,7 @@ export default async function AdminDashboard() {
       color: "text-primary",
     },
     {
-      title: "Notifications Sent",
+      title: "Broadcasts Sent",
       value: stats.notificationsSent,
       description: "Total announcements",
       icon: Bell,
