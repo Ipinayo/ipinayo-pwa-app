@@ -12,7 +12,7 @@ import {
   Preview,
   Section,
   Text,
-} from "@react-email/components";
+} from "react-email";
 
 /** Absolute link to the in-app notification settings, for email footers. */
 export const preferencesUrl = `${process.env.AUTH_URL ?? "https://ipinayo.com"}/settings/notifications`;

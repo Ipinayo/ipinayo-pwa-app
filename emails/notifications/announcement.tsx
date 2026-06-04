@@ -5,7 +5,7 @@ import {
   paragraph,
   preferencesUrl,
 } from "../components/email-layout";
-import { Link, Text } from "@react-email/components";
+import { Link, Text } from "react-email";
 
 import { ActivityEventMap } from "@/types/utils";
 
