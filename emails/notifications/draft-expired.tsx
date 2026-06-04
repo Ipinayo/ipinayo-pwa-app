@@ -1,7 +1,7 @@
 import { EmailLayout, paragraph } from "../components/email-layout";
 
 import { ActivityEventMap } from "@/types/utils";
-import { Text } from "@react-email/components";
+import { Text } from "react-email";
 
 type Metadata = ActivityEventMap["draft.expired"]["metadata"];
 
