@@ -262,12 +262,18 @@ export async function deleteDraftById(draftId: string) {
 
 export async function findDraftsExpiringSoon() {
     const fifteenDaysAgo = new Date();
-    fifteenDaysAgo.setDate(fifteenDaysAgo.getDate() - 15); // 15 days ago
+    fifteenDaysAgo.setDate(fifteenDaysAgo.getDate() - 15); // expiring threshold
 
+    const twentyDaysAgo = new Date();
+    twentyDaysAgo.setDate(twentyDaysAgo.getDate() - 20); // deletion threshold
+
+    // Only the 15–20 day band: older than 15 days but not yet past the deletion
+    // threshold, so a draft is never both "expiring" and "deleted" in one run.
     return await prisma.massSelectionDraft.findMany({
         where: {
             updatedAt: {
                 lt: fifteenDaysAgo,
+                gte: twentyDaysAgo,
             },
         }
     });
