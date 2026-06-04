@@ -1,6 +1,6 @@
 import { EmailLayout, paragraph } from "../components/email-layout";
 
-import { Text } from "@react-email/components";
+import { Text } from "react-email";
 
 export interface GenericNotificationEmailProps {
   preview: string;
