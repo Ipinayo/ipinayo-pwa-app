@@ -7,7 +7,7 @@ export default async function Statistics() {
   const stats = await getMassSelectionStats();
 
   return (
-    <div className="grid grid-cols-2 gap-4 md:grid-cols-4 mb-8">
+    <div className="grid grid-cols-2 gap-4 md:grid-cols-4 mb-8 assistant-open:lg:grid-cols-2 assistant-open:xl:grid-cols-4">
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">

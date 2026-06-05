@@ -1,6 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Download, FileText, Music, Users } from "lucide-react";
 
+import { AssistantTrigger } from "@/components/app/assistant/assistant-trigger";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
@@ -97,9 +98,12 @@ export default function HomePage() {
         <p className="text-muted-foreground mx-auto mb-6 max-w-md">
           Join our community and share your selections with the world.
         </p>
-        <Button asChild>
-          <Link href="/liturgical-selections/new">Create Selection</Link>
-        </Button>
+        <div className="flex flex-wrap items-center justify-center gap-2">
+          <AssistantTrigger />
+          <Button size="lg" asChild>
+            <Link href="/liturgical-selections/new">Create Selection</Link>
+          </Button>
+        </div>
       </section>
     </div>
   );

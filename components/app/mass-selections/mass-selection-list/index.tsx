@@ -30,8 +30,8 @@ export default async function MassSelectionList({
   const selectionsResponse = userId
     ? await getUserSelectionsAdmin(userId, filter)
     : userOnly
-    ? await getUserSelections(filter)
-    : await getSelections(filter);
+      ? await getUserSelections(filter)
+      : await getSelections(filter);
 
   const selectionsPage = selectionsResponse.pagination;
   const selections = selectionsResponse.selections;
@@ -71,7 +71,10 @@ export default async function MassSelectionList({
       <div
         className={cn(
           className ??
-            "grid gap-6 lg:gap-3 xl:gap-6 md:grid-cols-2 lg:grid-cols-3"
+            "grid gap-6 lg:gap-3 xl:gap-6 md:grid-cols-2 lg:grid-cols-3",
+          userOnly
+            ? "assistant-open:lg:grid-cols-2"
+            : "assistant-open:lg:grid-cols-1 assistant-open:xl:grid-cols-2",
         )}
       >
         {selections.map((selection) => (

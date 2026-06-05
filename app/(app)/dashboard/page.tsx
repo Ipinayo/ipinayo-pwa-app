@@ -2,6 +2,7 @@ import { Activity, BookOpen, Plus } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
+import { AssistantTrigger } from "@/components/app/assistant/assistant-trigger";
 import { Button } from "@/components/ui/button";
 import DraftList from "@/components/app/dashboard/draft-list";
 import DraftListSkeleton from "@/components/app/dashboard/draft-list/index-skeleton";
@@ -22,11 +23,17 @@ export default async function DashboardPage() {
   return (
     <div className="max-w-full w-full">
       {/* Welcome Section */}
-      <div className="mb-8">
-        <div className="flex items-center gap-5 w-full justify-between">
+      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between assistant-open:lg:flex-col assistant-open:xl:flex-row">
+        <div>
           <h2 className="text-3xl font-display text-foreground">
             Welcome Back
           </h2>
+          <p className="text-muted-foreground mt-2">
+            Plan and organize your liturgical music.
+          </p>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <AssistantTrigger />
           <Button size="lg" className="gap-2" asChild>
             <Link href="/liturgical-selections/new">
               <Plus className="h-5 w-5" />
@@ -34,16 +41,13 @@ export default async function DashboardPage() {
             </Link>
           </Button>
         </div>
-        <p className="text-muted-foreground mt-2">
-          Plan and organize your liturgical music.
-        </p>
       </div>
 
       <Suspense fallback={<StatisticsSkeleton />}>
         <Statistics />
       </Suspense>
 
-      <div className="grid gap-6 lg:grid-cols-3 mb-8">
+      <div className="grid gap-6 lg:grid-cols-3 mb-8 assistant-open:lg:grid-cols-1 assistant-open:xl:grid-cols-3">
         <Tabs
           defaultValue="selections"
           className="lg:col-span-2 space-y-6 min-w-0"

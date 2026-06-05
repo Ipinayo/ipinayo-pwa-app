@@ -49,7 +49,8 @@ export default async function DraftSelectionsList({
     <>
       <div
         className={cn(
-          className ?? "grid gap-4 xs:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+          className ??
+          "grid gap-4 xs:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 assistant-open:lg:grid-cols-2 assistant-open:xl:grid-cols-3"
         )}
       >
         {drafts.map((draft) => (

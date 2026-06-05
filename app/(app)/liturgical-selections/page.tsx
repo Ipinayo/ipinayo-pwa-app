@@ -5,6 +5,7 @@ import {
 import { SearchParams, SortBy, SortOrder } from "@/types/utils";
 import { seasonsFilter, yearsFilter } from "@/lib/constants";
 
+import { AssistantTrigger } from "@/components/app/assistant/assistant-trigger";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import MassSelectionList from "@/components/app/mass-selections/mass-selection-list";
@@ -46,11 +47,17 @@ export default async function MassSelectionsPage(props: {
 
   return (
     <div className="max-w-full w-full">
-      <div className="mb-8">
-        <div className="flex items-center justify-between">
+      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between assistant-open:lg:flex-col assistant-open:xl:flex-row">
+        <div>
           <h2 className="text-3xl font-display text-foreground">
             Liturgical Selections
           </h2>
+          <p className="text-muted-foreground mt-2">
+            Plan and organize liturgical music with ease
+          </p>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <AssistantTrigger />
           <Link href="/liturgical-selections/new">
             <Button size="lg" className="gap-2">
               <Plus className="h-5 w-5" />
@@ -58,9 +65,6 @@ export default async function MassSelectionsPage(props: {
             </Button>
           </Link>
         </div>
-        <p className="text-muted-foreground mt-2">
-          Plan and organize liturgical music with ease
-        </p>
       </div>
 
       {/* Filters */}

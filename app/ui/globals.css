@@ -3,6 +3,44 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/**
+ * Active when the docked assistant is open (set on the content wrapper as
+ * `data-assistant-open="true"`).
+ */
+@custom-variant assistant-open (&:is([data-assistant-open="true"] *));
+
+/* Continuous diagonal sheen for the "Create with AI" trigger. */
+@keyframes assistant-sheen {
+  0% {
+    transform: translateX(-160%) skewX(-12deg);
+  }
+
+  55%,
+  100% {
+    transform: translateX(420%) skewX(-12deg);
+  }
+}
+
+@utility animate-assistant-sheen {
+  animation: assistant-sheen 3s ease-in-out infinite;
+}
+
+@keyframes assistant-gradient {
+
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@utility animate-assistant-gradient {
+  animation: assistant-gradient 5s ease infinite;
+}
+
 :root {
   --background: oklch(1 0 0);
   --foreground: oklch(0.18 0.0604 261.83);

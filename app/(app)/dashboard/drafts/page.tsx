@@ -1,3 +1,4 @@
+import { AssistantTrigger } from "@/components/app/assistant/assistant-trigger";
 import BackButton from "@/components/common/back-button";
 import { Button } from "@/components/ui/button";
 import DraftSelectionListSkeleton from "@/components/app/draft-selections/draft-selections-list/index-skeleton";
@@ -24,16 +25,19 @@ export default async function DraftsPage(props: {
   return (
     <div className="max-w-full w-full">
       <BackButton to="/dashboard" backText="Back to dashboard" />
-      <div className="mb-8 flex items-center justify-between">
+      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between assistant-open:lg:flex-col assistant-open:xl:flex-row">
         <div>
           <h2 className="text-3xl font-display text-foreground">My Drafts</h2>
         </div>
-        <Link href="/liturgical-selections/new">
-          <Button size="lg" className="gap-2">
-            <Plus className="h-5 w-5" />
-            Create Selection
-          </Button>
-        </Link>
+        <div className="flex flex-wrap items-center gap-2">
+          <AssistantTrigger />
+          <Link href="/liturgical-selections/new">
+            <Button size="lg" className="gap-2">
+              <Plus className="h-5 w-5" />
+              Create Selection
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {/* Filters */}

@@ -28,7 +28,7 @@ export default function LiturgicalSelectionLoading() {
         </div>
       </div>
 
-      <div className="grid gap-8 lg:grid-cols-3 w-full">
+      <div className="grid gap-8 lg:grid-cols-3 w-full assistant-open:lg:grid-cols-1 assistant-open:xl:grid-cols-3">
         <div className="lg:col-span-2 overflow-x-hidden">
           <Card>
             <CardHeader>
@@ -38,9 +38,9 @@ export default function LiturgicalSelectionLoading() {
               <Table className="w-full">
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-[200px]">Name</TableHead>
+                    <TableHead className="w-50">Name</TableHead>
                     <TableHead>Song Title</TableHead>
-                    <TableHead className="w-[120px]">Key</TableHead>
+                    <TableHead className="w-30">Key</TableHead>
                     <TableHead>Notes</TableHead>
                   </TableRow>
                 </TableHeader>

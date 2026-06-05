@@ -47,7 +47,7 @@ export default async function SelectionsList() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 2xl:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 2xl:grid-cols-3 assistant-open:lg:grid-cols-2">
           {selections.map((selection) => (
             <MassSelectionCard
               key={selection.id}
