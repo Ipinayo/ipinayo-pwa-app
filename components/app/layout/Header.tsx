@@ -27,7 +27,7 @@ export default async function Header({
 
   return (
     <div className="bg-background sticky top-0 z-40 w-full border-b">
-      <div className="flex h-16 items-center px-4 md:px-6">
+      <div className="flex h-14 items-center px-4 md:px-6">
         <MobileMenuTrigger adminNav={adminNav} />
 
         <Link href="/" className="flex items-center">
