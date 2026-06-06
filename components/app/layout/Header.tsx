@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import AdminAppToggle from "./AdminAppToggle";
+import { AssistantTrigger } from "@/components/app/assistant/assistant-trigger";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import MobileMenuTrigger from "./MobileMenuTrigger";
@@ -41,6 +42,7 @@ export default async function Header({
         <div className="ml-auto flex items-center space-x-4">
           {user ? (
             <div className="flex items-center gap-2">
+              <AssistantTrigger collapse label="Ìpínayò AI" />
               {isAdmin(user.userRole) && <AdminAppToggle />}
               <span className="hidden text-sm font-medium md:inline-block">
                 {user.name}

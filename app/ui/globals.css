@@ -9,22 +9,6 @@
  */
 @custom-variant assistant-open (&:is([data-assistant-open="true"] *));
 
-/* Continuous diagonal sheen for the "Create with AI" trigger. */
-@keyframes assistant-sheen {
-  0% {
-    transform: translateX(-160%) skewX(-12deg);
-  }
-
-  55%,
-  100% {
-    transform: translateX(420%) skewX(-12deg);
-  }
-}
-
-@utility animate-assistant-sheen {
-  animation: assistant-sheen 3s ease-in-out infinite;
-}
-
 @keyframes assistant-gradient {
 
   0%,
@@ -38,7 +22,7 @@
 }
 
 @utility animate-assistant-gradient {
-  animation: assistant-gradient 5s ease infinite;
+  animation: assistant-gradient 10s ease infinite;
 }
 
 :root {
