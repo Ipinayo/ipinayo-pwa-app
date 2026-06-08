@@ -8,7 +8,11 @@ import {
   useState,
 } from "react";
 
-import { AssistantMessage } from "@/types/assistant";
+import { DefaultChatTransport } from "ai";
+import type { SelectionUIMessage } from "@/lib/agent/selection-agent";
+import { useChat } from "@ai-sdk/react";
+
+type ChatStatus = "submitted" | "streaming" | "ready" | "error";
 
 type AssistantContextValue = {
   isOpen: boolean;
@@ -16,92 +20,56 @@ type AssistantContextValue = {
   close: () => void;
   toggle: () => void;
 
-  messages: AssistantMessage[];
-  isStreaming: boolean;
+  isAuthenticated: boolean;
 
-  /** Send a user turn. UI-only for now — wiring to the agent loop comes later. */
+  messages: SelectionUIMessage[];
+  status: ChatStatus;
+  isBusy: boolean;
+
   sendMessage: (text: string) => void;
-  /** Clear the thread and start fresh. */
+  stop: () => void;
   newConversation: () => void;
 };
 
 const AssistantContext = createContext<AssistantContextValue | null>(null);
 
-/**
- * Seeded example thread so the panel has something to show while we build the
- * UI. Static ids/timestamps avoid hydration mismatches. Remove once the agent
- * loop is wired in.
- */
-const SEED_MESSAGES: AssistantMessage[] = [
-  {
-    id: "seed-1",
-    role: "user",
-    content: "Create a selection for Pentecost Sunday this year.",
-  },
-  {
-    id: "seed-2",
-    role: "assistant",
-    content:
-      "Let's build it. I've started a draft titled \"Pentecost Sunday\" with the usual parts. What's your entrance hymn?",
-    tools: [
-      { id: "seed-2-t1", label: "Created draft", state: "done" },
-      { id: "seed-2-t2", label: "Added 6 parts", state: "done" },
-    ],
-    entities: [{ type: "draft", id: "demo-draft", title: "Pentecost Sunday" }],
-  },
-];
-
 export function AssistantProvider({
   children,
-}: Readonly<{ children: React.ReactNode }>) {
+  isAuthenticated,
+}: Readonly<{ children: React.ReactNode; isAuthenticated: boolean }>) {
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<AssistantMessage[]>(SEED_MESSAGES);
-  const [isStreaming, setIsStreaming] = useState(false);
+  // One conversation id per chat session; persisted server-side under this id.
+  const [chatId, setChatId] = useState(() => crypto.randomUUID());
+
+  const { messages, sendMessage, status, stop, setMessages } =
+    useChat<SelectionUIMessage>({
+      id: chatId,
+      transport: new DefaultChatTransport({
+        api: "/api/assistant",
+        // Server keys persistence on chatId.
+        prepareSendMessagesRequest: ({ messages, id }) => ({
+          body: { messages, chatId: id },
+        }),
+      }),
+    });
 
   const open = useCallback(() => setIsOpen(true), []);
   const close = useCallback(() => setIsOpen(false), []);
   const toggle = useCallback(() => setIsOpen((v) => !v), []);
 
+  const send = useCallback(
+    (text: string) => {
+      const trimmed = text.trim();
+      if (trimmed) sendMessage({ text: trimmed });
+    },
+    [sendMessage],
+  );
+
   const newConversation = useCallback(() => {
+    stop();
     setMessages([]);
-    setIsStreaming(false);
-  }, []);
-
-  const sendMessage = useCallback((text: string) => {
-    const trimmed = text.trim();
-    if (!trimmed) return;
-
-    // Optimistically append the user's turn.
-    setMessages((prev) => [
-      ...prev,
-      { id: crypto.randomUUID(), role: "user", content: trimmed },
-    ]);
-
-    // TODO(agent): replace this placeholder with the SSE agent loop. For now we
-    // echo a static assistant turn so the chat surface is fully visible.
-    const replyId = crypto.randomUUID();
-    setIsStreaming(true);
-    setMessages((prev) => [
-      ...prev,
-      { id: replyId, role: "assistant", content: "", pending: true },
-    ]);
-
-    globalThis.window.setTimeout(() => {
-      setMessages((prev) =>
-        prev.map((m) =>
-          m.id === replyId
-            ? {
-                ...m,
-                pending: false,
-                content:
-                  "The assistant backend isn't connected yet — this is the UI preview. Once wired, I'll gather the details and create your selection here.",
-              }
-            : m,
-        ),
-      );
-      setIsStreaming(false);
-    }, 700);
-  }, []);
+    setChatId(crypto.randomUUID());
+  }, [stop, setMessages]);
 
   const value = useMemo<AssistantContextValue>(
     () => ({
@@ -109,9 +77,12 @@ export function AssistantProvider({
       open,
       close,
       toggle,
+      isAuthenticated,
       messages,
-      isStreaming,
-      sendMessage,
+      status: status as ChatStatus,
+      isBusy: status === "submitted" || status === "streaming",
+      sendMessage: send,
+      stop,
       newConversation,
     }),
     [
@@ -119,9 +90,11 @@ export function AssistantProvider({
       open,
       close,
       toggle,
+      isAuthenticated,
       messages,
-      isStreaming,
-      sendMessage,
+      status,
+      send,
+      stop,
       newConversation,
     ],
   );

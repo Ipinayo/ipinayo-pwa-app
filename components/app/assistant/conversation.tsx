@@ -6,9 +6,52 @@ import { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Composer } from "./composer";
 import { EmptyState } from "./empty-state";
+import Link from "next/link";
 import { MessageBubble } from "./message-bubble";
 import { cn } from "@/lib/utils";
 import { useAssistant } from "./assistant-provider";
+
+/** Default assistant turn shown to signed-out visitors, with a sign-in link. */
+function WelcomeSignIn() {
+  return (
+    <div className="flex flex-col gap-4 p-4">
+      <div className="flex gap-2.5">
+        <span className="bg-muted text-primary flex size-7 shrink-0 items-center justify-center rounded-full">
+          <Sparkles className="size-3.5" aria-hidden />
+        </span>
+        <div className="flex min-w-0 flex-col gap-3">
+          <div className="bg-muted text-foreground w-fit max-w-[90%] rounded-2xl rounded-tl-sm px-4 py-2.5 text-sm">
+            Hi! I&apos;m Ìpínayò&apos;s AI assistant. I can create, edit, and
+            organise your liturgical selections — just describe the liturgy and
+            I&apos;ll build it for you. Sign in to get started.
+          </div>
+          <Button asChild className="w-fit">
+            <Link href="/signin">Sign in</Link>
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function TypingIndicator() {
+  return (
+    <div className="flex gap-2.5">
+      <span className="bg-muted text-primary flex size-7 shrink-0 items-center justify-center rounded-full">
+        <Sparkles className="size-3.5" aria-hidden />
+      </span>
+      <div className="bg-muted flex w-fit items-center gap-1 rounded-2xl rounded-tl-sm px-4 py-3">
+        {[0, 150, 300].map((delay) => (
+          <span
+            key={delay}
+            className="bg-muted-foreground/60 size-1.5 animate-bounce rounded-full"
+            style={{ animationDelay: `${delay}ms` }}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
 
 /**
  * The chat surface itself — header, scrollable message list, composer. Shared
@@ -22,15 +65,26 @@ export function Conversation({
   onClose,
   inSheet,
 }: Readonly<{ onClose?: () => void; inSheet?: boolean }>) {
-  const { messages, isStreaming, sendMessage, newConversation } = useAssistant();
+  const {
+    isAuthenticated,
+    messages,
+    isBusy,
+    status,
+    sendMessage,
+    newConversation,
+  } = useAssistant();
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const el = scrollRef.current;
     if (el) el.scrollTop = el.scrollHeight;
-  }, [messages]);
+  }, [messages, isBusy]);
 
   const hasMessages = messages.length > 0;
+  // Show a typing indicator once a request is in flight but the assistant
+  // hasn't produced its message yet (last turn is still the user's).
+  const awaitingReply =
+    isBusy && messages[messages.length - 1]?.role === "user";
 
   return (
     <div className="flex h-full flex-col">
@@ -75,19 +129,33 @@ export function Conversation({
 
       {/* Messages */}
       <div ref={scrollRef} className="flex-1 overflow-y-auto">
-        {hasMessages ? (
-          <div className="flex flex-col gap-4 p-4">
-            {messages.map((message) => (
-              <MessageBubble key={message.id} message={message} />
-            ))}
-          </div>
+        {isAuthenticated ? (
+          hasMessages ? (
+            <div className="flex flex-col gap-4 p-4">
+              {messages.map((message) => (
+                <MessageBubble key={message.id} message={message} />
+              ))}
+              {awaitingReply && <TypingIndicator />}
+            </div>
+          ) : (
+            <EmptyState onSuggestion={sendMessage} />
+          )
         ) : (
-          <EmptyState onSuggestion={sendMessage} />
+          <WelcomeSignIn />
         )}
       </div>
 
-      {/* Composer */}
-      <Composer onSend={sendMessage} disabled={isStreaming} />
+      {/* Composer — only when signed in */}
+      {isAuthenticated && (
+        <>
+          <Composer onSend={sendMessage} disabled={isBusy} />
+          {status === "error" && (
+            <p className="text-destructive px-4 pb-2 text-xs">
+              Something went wrong. Please try again.
+            </p>
+          )}
+        </>
+      )}
     </div>
   );
 }

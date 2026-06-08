@@ -6,14 +6,17 @@ import Header from "@/components/app/layout/Header";
 import HeaderSkeleton from "@/components/app/layout/HeaderSkeleton";
 import SideNav from "@/components/app/layout/SideNav";
 import { Suspense } from "react";
+import { auth } from "@/auth";
 
-export default function AppLayout({
+export default async function AppLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await auth();
+
   return (
-    <AssistantProvider>
+    <AssistantProvider isAuthenticated={!!session?.user}>
       {/* AppShell wraps the whole app so the docked assistant shifts the top
           nav too, not just the page body. */}
       <AppShell>

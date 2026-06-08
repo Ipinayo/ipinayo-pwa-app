@@ -1,31 +1,59 @@
-import { AssistantMessage } from "@/types/assistant";
+import { EntityRef, ToolStatus } from "@/types/assistant";
+
 import { EntityCard } from "./entity-card";
+import { Markdown } from "./markdown";
+import type { SelectionUIMessage } from "@/lib/agent/selection-agent";
 import { Sparkles } from "lucide-react";
 import { ToolStatusChip } from "./tool-status";
-import { cn } from "@/lib/utils";
+import { isToolUIPart } from "ai";
 
-function TypingDots() {
-  return (
-    <span className="inline-flex items-center gap-1 py-1" aria-label="Assistant is typing">
-      {[0, 150, 300].map((delay) => (
-        <span
-          key={delay}
-          className="size-1.5 animate-bounce rounded-full bg-muted-foreground/60"
-          style={{ animationDelay: `${delay}ms` }}
-        />
-      ))}
-    </span>
-  );
+/** Friendly verbs for the tool-status chips. */
+const TOOL_LABELS: Record<string, string> = {
+  list_templates: "Browsing templates",
+  get_themes: "Checking themes",
+  get_part_names: "Checking parts",
+  find_my_drafts: "Searching drafts",
+  find_my_selections: "Searching selections",
+  read_draft: "Reading draft",
+  read_selection: "Reading selection",
+  create_draft: "Creating draft",
+  update_draft: "Updating draft",
+  save_selection: "Saving selection",
+  update_selection: "Updating selection",
+  delete_draft: "Deleting draft",
+  delete_selection: "Deleting selection",
+};
+
+type ToolPart = Extract<
+  SelectionUIMessage["parts"][number],
+  { toolCallId: string }
+>;
+
+function toToolStatus(part: ToolPart): ToolStatus {
+  const name = part.type.replace(/^tool-/, "");
+  const label = TOOL_LABELS[name] ?? name;
+  let state: ToolStatus["state"] = "running";
+  if (part.state === "output-error") {
+    state = "error";
+  } else if (part.state === "output-available") {
+    const output = part.output as { ok?: boolean } | undefined;
+    state = output?.ok === false ? "error" : "done";
+  }
+  return { id: part.toolCallId, label, state };
 }
 
-export function MessageBubble({ message }: Readonly<{ message: AssistantMessage }>) {
-  const isUser = message.role === "user";
-
-  if (isUser) {
+export function MessageBubble({
+  message,
+}: Readonly<{ message: SelectionUIMessage }>) {
+  if (message.role === "user") {
+    const text = message.parts
+      .filter((p) => p.type === "text")
+      .map((p) => p.text)
+      .join("");
     return (
       <div className="flex justify-end">
-        <div className="primary-gradient max-w-[85%] rounded-2xl rounded-br-sm px-4 py-2.5 text-sm whitespace-pre-wrap break-words">
-          {message.content}
+        <div className="primary-gradient max-w-[85%] rounded-2xl rounded-br-sm px-4 py-2.5 text-sm wrap-break-word whitespace-pre-wrap">
+          {text}
         </div>
       </div>
     );
@@ -38,31 +66,35 @@ export function MessageBubble({ message }: Readonly<{ message: AssistantMessage 
       </span>
 
       <div className="flex min-w-0 flex-1 flex-col gap-2">
-        {message.content ? (
-          <div className="bg-muted text-foreground w-fit max-w-[90%] rounded-2xl rounded-tl-sm px-4 py-2.5 text-sm whitespace-pre-wrap break-words">
-            {message.content}
-          </div>
-        ) : message.pending ? (
-          <div className="bg-muted w-fit rounded-2xl rounded-tl-sm px-4 py-1.5">
-            <TypingDots />
-          </div>
-        ) : null}
+        {message.parts.map((part, i) => {
+          if (part.type === "text") {
+            return part.text ? (
+              <div
+                key={`text-${i}`}
+                className="bg-muted text-foreground w-fit max-w-[90%] rounded-2xl rounded-tl-sm px-4 py-2.5"
+              >
+                <Markdown>{part.text}</Markdown>
+              </div>
+            ) : null;
+          }
 
-        {message.tools && message.tools.length > 0 && (
-          <div className={cn("flex flex-wrap gap-1.5", message.content && "pl-1")}>
-            {message.tools.map((tool) => (
-              <ToolStatusChip key={tool.id} tool={tool} />
-            ))}
-          </div>
-        )}
+          if (isToolUIPart(part)) {
+            const output =
+              part.state === "output-available"
+                ? (part.output as { entity?: EntityRef } | undefined)
+                : undefined;
+            if (output?.entity) {
+              return (
+                <EntityCard key={part.toolCallId} entity={output.entity} />
+              );
+            }
+            return (
+              <ToolStatusChip key={part.toolCallId} tool={toToolStatus(part)} />
+            );
+          }
 
-        {message.entities && message.entities.length > 0 && (
-          <div className="flex flex-col gap-2">
-            {message.entities.map((entity) => (
-              <EntityCard key={`${entity.type}-${entity.id}`} entity={entity} />
-            ))}
-          </div>
-        )}
+          return null;
+        })}
       </div>
     </div>
   );

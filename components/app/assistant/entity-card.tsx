@@ -1,6 +1,7 @@
-import { BookOpen, Download, ExternalLink } from "lucide-react";
+import { BookOpen, ExternalLink } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import DownloadButton from "@/components/app/mass-selections/download-button";
 import { EntityRef } from "@/types/assistant";
 import Link from "next/link";
 import { cn } from "../../../lib/utils";
@@ -36,10 +37,12 @@ export function EntityCard({ entity }: Readonly<{ entity: EntityRef }>) {
 
       <div className="flex shrink-0 items-center gap-1">
         {isSelection && (
-          // TODO(download): wire to the existing pdf-lib export.
-          <Button variant="ghost" size="icon" aria-label="Download">
-            <Download className="size-4" />
-          </Button>
+          <DownloadButton
+            selectionId={entity.id}
+            variant="ghost"
+            size="sm"
+            className="gap-1.5"
+          />
         )}
         <Button variant="outline" size="sm" asChild>
           <Link href={href}>
