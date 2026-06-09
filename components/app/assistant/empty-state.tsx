@@ -1,4 +1,4 @@
-import { Sparkles } from "lucide-react";
+import { AssistantIcon } from "./assistant-icon";
 
 const SUGGESTIONS = [
   "Create a selection for next Sunday",
@@ -11,8 +11,8 @@ export function EmptyState({
 }: Readonly<{ onSuggestion: (text: string) => void }>) {
   return (
     <div className="flex h-full flex-col items-center justify-center gap-5 px-6 text-center">
-      <span className="primary-gradient flex size-14 items-center justify-center rounded-2xl">
-        <Sparkles className="size-7" aria-hidden />
+      <span className="bg-muted flex size-14 items-center justify-center rounded-2xl">
+        <AssistantIcon className="size-8" />
       </span>
 
       <div className="space-y-1.5">

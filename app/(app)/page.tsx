@@ -1,4 +1,4 @@
-import { ArrowRight, ListMusic, Share2, Sparkles } from "lucide-react";
+import { ArrowRight, BookOpen, ListMusic, Share2 } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -20,7 +20,7 @@ import { liturgyTemplates } from "@/lib/constants";
 
 const STEPS = [
   {
-    icon: Sparkles,
+    icon: BookOpen,
     title: "Start in seconds",
     description:
       "Ask Ìpínayò AI to draft a selection from a description, or begin from a template or cloned selection.",

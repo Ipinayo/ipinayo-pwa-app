@@ -1,9 +1,9 @@
 import { EntityRef, ToolStatus } from "@/types/assistant";
 
+import { AssistantIcon } from "./assistant-icon";
 import { EntityCard } from "./entity-card";
 import { Markdown } from "./markdown";
 import type { SelectionUIMessage } from "@/lib/agent/selection-agent";
-import { Sparkles } from "lucide-react";
 import { ToolStatusChip } from "./tool-status";
 import { isToolUIPart } from "ai";
 
@@ -61,8 +61,8 @@ export function MessageBubble({
 
   return (
     <div className="flex gap-2.5">
-      <span className="bg-muted text-primary flex size-7 shrink-0 items-center justify-center rounded-full">
-        <Sparkles className="size-3.5" aria-hidden />
+      <span className="bg-muted flex size-7 shrink-0 items-center justify-center rounded-full">
+        <AssistantIcon className="size-4" />
       </span>
 
       <div className="flex min-w-0 flex-1 flex-col gap-2">

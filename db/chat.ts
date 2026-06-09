@@ -57,6 +57,21 @@ export async function saveChatMessages(
   ]);
 }
 
+/** List a user's conversations, most-recently-updated first. */
+export async function listChatSessions(userId: string) {
+  const sessions = await prisma.chatSession.findMany({
+    where: { userId },
+    orderBy: { updatedAt: "desc" },
+    take: 50,
+    select: { id: true, title: true, updatedAt: true },
+  });
+  return sessions.map((s) => ({
+    id: s.id,
+    title: s.title,
+    updatedAt: s.updatedAt.toISOString(),
+  }));
+}
+
 /** Load a session's messages in UIMessage format (for resuming a conversation). */
 export async function loadChatMessages(
   chatId: string,
