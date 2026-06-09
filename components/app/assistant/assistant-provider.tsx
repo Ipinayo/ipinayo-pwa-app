@@ -10,7 +10,8 @@ import {
 
 import { DefaultChatTransport } from "ai";
 import type { SelectionUIMessage } from "@/lib/agent/selection-agent";
-import { getChatMessages } from "@/lib/actions/chat";
+import { deleteChat, getChatMessages, renameChat } from "@/lib/actions/chat";
+
 import { useChat } from "@ai-sdk/react";
 
 type ChatStatus = "submitted" | "streaming" | "ready" | "error";
@@ -32,10 +33,16 @@ type AssistantContextValue = {
   sendMessage: (text: string) => void;
   stop: () => void;
   newConversation: () => void;
-  /** Resume a past conversation by id. */
-  loadConversation: (chatId: string) => Promise<void>;
+  /** Resume a past conversation by id (and its stored title, if known). */
+  loadConversation: (chatId: string, title?: string | null) => Promise<void>;
+  /** Rename a conversation; keeps the active title in sync. */
+  renameConversation: (chatId: string, title: string) => Promise<void>;
+  /** Delete a conversation; resets to a new chat if it's the active one. */
+  deleteConversation: (chatId: string) => Promise<void>;
   /** The active conversation id. */
   chatId: string;
+  /** The active conversation's title, if it has one. */
+  activeTitle: string | null;
 };
 
 const AssistantContext = createContext<AssistantContextValue | null>(null);
@@ -52,6 +59,7 @@ export function AssistantProvider({
   const [initialMessages, setInitialMessages] = useState<SelectionUIMessage[]>(
     [],
   );
+  const [activeTitle, setActiveTitle] = useState<string | null>(null);
 
   const transport = useMemo(
     () =>
@@ -85,18 +93,36 @@ export function AssistantProvider({
   const newConversation = useCallback(() => {
     stop();
     setInitialMessages([]);
+    setActiveTitle(null);
     setChatId(crypto.randomUUID());
   }, [stop]);
 
   const loadConversation = useCallback(
-    async (id: string) => {
+    async (id: string, title?: string | null) => {
       if (id === chatId) return;
       stop();
       const loaded = await getChatMessages(id);
       setInitialMessages(loaded);
+      setActiveTitle(title ?? null);
       setChatId(id);
     },
     [chatId, stop],
+  );
+
+  const renameConversation = useCallback(
+    async (id: string, title: string) => {
+      if (id === chatId) setActiveTitle(title.trim() || null);
+      await renameChat(id, title);
+    },
+    [chatId],
+  );
+
+  const deleteConversation = useCallback(
+    async (id: string) => {
+      await deleteChat(id);
+      if (id === chatId) newConversation();
+    },
+    [chatId, newConversation],
   );
 
   const value = useMemo<AssistantContextValue>(
@@ -113,7 +139,10 @@ export function AssistantProvider({
       stop,
       newConversation,
       loadConversation,
+      renameConversation,
+      deleteConversation,
       chatId,
+      activeTitle,
     }),
     [
       isOpen,
@@ -127,7 +156,10 @@ export function AssistantProvider({
       stop,
       newConversation,
       loadConversation,
+      renameConversation,
+      deleteConversation,
       chatId,
+      activeTitle,
     ],
   );
 

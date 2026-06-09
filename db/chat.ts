@@ -57,10 +57,15 @@ export async function saveChatMessages(
   ]);
 }
 
-/** List a user's conversations, most-recently-updated first. */
-export async function listChatSessions(userId: string) {
+/** List a user's conversations, most-recently-updated first; optional title search. */
+export async function listChatSessions(userId: string, query?: string) {
   const sessions = await prisma.chatSession.findMany({
-    where: { userId },
+    where: {
+      userId,
+      ...(query?.trim()
+        ? { title: { contains: query.trim(), mode: "insensitive" } }
+        : {}),
+    },
     orderBy: { updatedAt: "desc" },
     take: 50,
     select: { id: true, title: true, updatedAt: true },
@@ -70,6 +75,34 @@ export async function listChatSessions(userId: string) {
     title: s.title,
     updatedAt: s.updatedAt.toISOString(),
   }));
+}
+
+/** Rename a conversation (ownership-scoped). */
+export async function renameChatSession(
+  userId: string,
+  chatId: string,
+  title: string,
+) {
+  const trimmed = title.trim().slice(0, 120);
+  await prisma.chatSession.updateMany({
+    where: { id: chatId, userId },
+    data: { title: trimmed || null },
+  });
+}
+
+/** Delete a conversation (ownership-scoped; messages cascade). */
+export async function deleteChatSession(userId: string, chatId: string) {
+  await prisma.chatSession.deleteMany({ where: { id: chatId, userId } });
+}
+
+/** Purge conversations untouched for more than 20 days. Returns the count. */
+export async function deleteOldChatSessions() {
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - 20);
+  const { count } = await prisma.chatSession.deleteMany({
+    where: { updatedAt: { lt: cutoff } },
+  });
+  return count;
 }
 
 /** Load a session's messages in UIMessage format (for resuming a conversation). */

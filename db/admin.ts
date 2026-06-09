@@ -314,6 +314,14 @@ export async function findAllAdminUserIds(): Promise<string[]> {
     return users.map((u) => u.id);
 }
 
+export async function findSuperAdminUserIds(): Promise<string[]> {
+    const users = await prisma.user.findMany({
+        where: { userRole: UserRole.SUPERADMIN },
+        select: { id: true },
+    });
+    return users.map((u) => u.id);
+}
+
 export async function findAllUsersForSelect() {
     return await prisma.user.findMany({
         select: { id: true, name: true, email: true },

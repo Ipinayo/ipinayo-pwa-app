@@ -1,4 +1,4 @@
-import { Activity, BookOpen, Megaphone, User } from "lucide-react";
+import { Activity, BookOpen, Megaphone, User, Wrench } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
@@ -35,6 +35,8 @@ export default function ActivityIcon({
       return <BookOpen className={cn("text-amber-500", className)} />;
     case "system.announcement":
       return <Megaphone className={className} />;
+    case "system.maintenance":
+      return <Wrench className={className} />;
     default:
       return <Activity className={className} />;
   }

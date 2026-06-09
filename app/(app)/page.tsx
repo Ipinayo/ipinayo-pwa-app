@@ -79,18 +79,10 @@ export default async function HomePage() {
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          {user ? (
-            <>
-              <AssistantTrigger />
-              <Button size="lg" variant="outline" asChild>
-                <Link href="/liturgical-selections/new">Create manually</Link>
-              </Button>
-            </>
-          ) : (
-            <Button size="lg" asChild>
-              <Link href="/liturgical-selections/new">Get started</Link>
-            </Button>
-          )}
+          <AssistantTrigger />
+          <Button size="lg" variant="outline" asChild>
+            <Link href="/liturgical-selections/new">Create manually</Link>
+          </Button>
           <Button size="lg" variant="ghost" asChild>
             <Link href="/liturgical-selections">
               Browse community
@@ -165,7 +157,7 @@ export default async function HomePage() {
           <div>
             <h2 className="font-display text-2xl">Popular templates</h2>
             <p className="text-muted-foreground mt-1 text-sm">
-              Pre-filled parts for common liturgies — tweak and go.
+              Pre-filled parts for common liturgies — tweak and go!
             </p>
           </div>
           <Button variant="ghost" size="sm" asChild className="shrink-0">

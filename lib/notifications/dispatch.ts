@@ -205,6 +205,10 @@ function getTitle<K extends keyof ActivityEventMap>(
             const data = metadata as ActivityEventMap["system.announcement"]["metadata"];
             return data.title;
         }
+        case "system.maintenance": {
+            const data = metadata as ActivityEventMap["system.maintenance"]["metadata"];
+            return data.title;
+        }
         default:
             return "You have a new notification";
     }
@@ -274,6 +278,10 @@ function getMessage<K extends keyof ActivityEventMap>(
             }
         case "system.announcement": {
             const data = metadata as ActivityEventMap["system.announcement"]["metadata"];
+            return data.message;
+        }
+        case "system.maintenance": {
+            const data = metadata as ActivityEventMap["system.maintenance"]["metadata"];
             return data.message;
         }
         default:
