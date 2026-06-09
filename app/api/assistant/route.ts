@@ -35,9 +35,17 @@ export async function POST(req: Request) {
 
   await ensureChatSession(userId, chatId, firstUserText(uiMessages));
 
+  const now = new Date();
+  const today = `${
+    ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][
+      now.getUTCDay()
+    ]
+  }, ${now.toISOString().slice(0, 10)}`;
+
   return createAgentUIStreamResponse({
     agent: selectionAgent,
     uiMessages,
+    options: { today },
     originalMessages: uiMessages,
     // Stable server-side ids so persisted messages round-trip on resume.
     generateMessageId: () => `msg_${crypto.randomUUID()}`,

@@ -18,12 +18,14 @@ import {
   deleteSelection,
   getAllPartNames,
   getSelectionById,
+  getSelections,
   getThemes,
   getUserSelections,
   updateSelection,
 } from "@/lib/actions/mass-selections";
 
 import { DraftMassSelection } from "@/types/schemas/mass-selections";
+import { getLiturgicalDay } from "@/lib/liturgy/calendar";
 import { liturgyTemplates } from "@/lib/constants";
 import { normalizeDate } from "@/lib/utils";
 import { tool } from "ai";
@@ -152,6 +154,58 @@ export const selectionTools = {
     execute: async () => {
       try {
         return { partNames: await getAllPartNames() };
+      } catch (e) {
+        return fail(e);
+      }
+    },
+  }),
+
+  get_liturgical_day: tool({
+    description:
+      "Resolve a calendar date to the proper of the day from the General Roman Calendar: its proper name (e.g. 'Third Sunday in Ordinary Time'), rank (Solemnity/Feast/Memorial/Sunday/Weekday), season, Sunday cycle (Year A/B/C), liturgical colour, whether it's a holy day of obligation, and any other celebrations that fall on the same day (e.g. optional memorials). Use this after working out the date the user means (e.g. 'next Sunday') to ground the title, themes, and song suggestions. Always present the day's identity (name + any solemnity/feast) to the user. Omit `date` for today.",
+    inputSchema: z.object({
+      date: z.string().describe("ISO calendar date YYYY-MM-DD").nullish(),
+    }),
+    execute: async ({ date }) => {
+      try {
+        const d = date ? new Date(date) : new Date();
+        if (Number.isNaN(d.getTime())) {
+          return { ok: false as const, error: "Invalid date." };
+        }
+        return { ok: true as const, ...(await getLiturgicalDay(d)) };
+      } catch (e) {
+        return fail(e);
+      }
+    },
+  }),
+
+  find_public_selections: tool({
+    description:
+      "Search selections the community has shared publicly, to see what themes and songs others used for a similar time. Filter by liturgical season and/or Year cycle (from get_liturgical_day) and an optional keyword. Read a promising one with read_selection to see its actual songs and keys. Prefer this over guessing; only fall back to your own knowledge when the community has nothing suitable.",
+    inputSchema: z.object({
+      query: z.string().nullish(),
+      season: z.enum(LiturgicalSeason).nullish(),
+      year: z.enum(LiturgicalYear).nullish(),
+    }),
+    execute: async ({ query, season, year }) => {
+      try {
+        const { selections } = await getSelections({
+          isPublic: true,
+          query: query ?? "",
+          season: season ?? undefined,
+          year: year ?? undefined,
+          limit: 8,
+        });
+        return {
+          selections: selections.map((s) => ({
+            id: s.id,
+            title: s.title,
+            date: isoDate(s.date),
+            season: s.liturgicalSeason,
+            year: s.liturgicalYear,
+            themes: s.themes.map((t) => t.name),
+          })),
+        };
       } catch (e) {
         return fail(e);
       }
