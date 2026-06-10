@@ -60,8 +60,9 @@ function WelcomeSignIn() {
         <div className="flex min-w-0 flex-col gap-3">
           <div className="bg-muted text-foreground w-fit max-w-[90%] rounded-2xl rounded-tl-sm px-4 py-2.5 text-sm">
             Hi! I&apos;m Ìpínayò&apos;s AI assistant. I can create, edit, and
-            organise your liturgical selections — just describe the liturgy and
-            I&apos;ll build it for you. Sign in to get started.
+            organize your liturgical selections — just describe the liturgy and
+            songs you want, I&apos;ll draft them for you and we can build it
+            together. Sign in to get started.
           </div>
           <Button asChild className="w-fit">
             <Link href="/signin">Sign in</Link>
