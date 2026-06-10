@@ -11,6 +11,7 @@ import {
 } from "@/db/chat";
 
 import { auth } from "@/auth";
+import { findUserParishAndChoirInfo } from "@/db/user";
 import { selectionTools } from "@/lib/agent/tools";
 
 export const maxDuration = 60;
@@ -94,7 +95,10 @@ export async function POST(req: Request) {
       tools: selectionTools,
     })) as SelectionUIMessage[];
 
-    await ensureChatSession(userId, chatId, firstUserText(uiMessages));
+    const [, profile] = await Promise.all([
+      ensureChatSession(userId, chatId, firstUserText(uiMessages)),
+      findUserParishAndChoirInfo(userId),
+    ]);
 
     const now = new Date();
     const today = `${
@@ -112,7 +116,11 @@ export async function POST(req: Request) {
     return await createAgentUIStreamResponse({
       agent: selectionAgent,
       uiMessages,
-      options: { today },
+      options: {
+        today,
+        parishName: profile?.parishName ?? null,
+        choirName: profile?.choirName ?? null,
+      },
       originalMessages: uiMessages,
       // Stable server-side ids so persisted messages round-trip on resume.
       generateMessageId: () => `msg_${crypto.randomUUID()}`,

@@ -16,12 +16,21 @@ export const selectionAgent = new ToolLoopAgent({
   instructions: SELECTION_AGENT_INSTRUCTIONS,
   tools: selectionTools,
   stopWhen: stepCountIs(16),
-  // Per-request context: today's date so the agent can resolve "next Sunday" etc.
-  callOptionsSchema: z.object({ today: z.string() }),
-  prepareCall: ({ options, ...settings }) => ({
-    ...settings,
-    instructions: `${SELECTION_AGENT_INSTRUCTIONS}\n\nToday is ${options.today}.`,
+  callOptionsSchema: z.object({
+    today: z.string(),
+    parishName: z.string().nullish(),
+    choirName: z.string().nullish(),
   }),
+  prepareCall: ({ options, ...settings }) => {
+    const profile = [
+      options.parishName ? `their parish is "${options.parishName}"` : 'their parish is unknown',
+      options.choirName ? `their choir is "${options.choirName}"` : 'their choir is unknown',
+    ].filter(Boolean);
+    return {
+      ...settings,
+      instructions: `${SELECTION_AGENT_INSTRUCTIONS}\n\nToday is ${options.today}.${profile.join(" and ")}.`,
+    };
+  },
 });
 
 /** End-to-end-typed UI message for this agent — import as a type on the client. */

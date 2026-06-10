@@ -12,6 +12,7 @@ import Link from "next/link";
 import { MessageBubble } from "./message-bubble";
 import type { SelectionUIMessage } from "@/lib/agent/selection-agent";
 import { cn } from "@/lib/utils";
+import { isToolUIPart } from "ai";
 import { useAssistant } from "./assistant-provider";
 
 /** A conversation's name derived from its opening line, or undefined if empty. */
@@ -72,6 +73,44 @@ function WelcomeSignIn() {
   );
 }
 
+/** An error shown in-thread as the assistant's turn, with a Retry if recoverable. */
+function ErrorBubble({
+  message,
+  retryable,
+  onRetry,
+}: Readonly<{ message: string; retryable: boolean; onRetry: () => void }>) {
+  return (
+    <div className="flex gap-2.5">
+      <Avatar />
+      <div className="flex min-w-0 flex-col items-start gap-2">
+        <div className="bg-destructive/10 text-destructive w-fit max-w-[90%] rounded-2xl rounded-tl-sm px-4 py-2.5 text-sm">
+          {message}
+        </div>
+        {retryable && (
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-8 gap-1.5 text-xs"
+            onClick={onRetry}
+          >
+            <RotateCcw className="size-3.5" />
+            Retry
+          </Button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/** Whether the latest assistant turn has rendered anything visible yet (text or a tool chip). */
+function assistantHasVisibleContent(messages: SelectionUIMessage[]): boolean {
+  const last = messages[messages.length - 1];
+  if (last?.role !== "assistant") return false;
+  return last.parts.some(
+    (p) => (p.type === "text" && p.text.trim().length > 0) || isToolUIPart(p),
+  );
+}
+
 /**
  * The chat surface — header, message list (or history), composer. Shared by the
  * desktop dock and the mobile sheet; only the container differs.
@@ -97,11 +136,10 @@ export function Conversation({
     if (showHistory) return;
     const el = scrollRef.current;
     if (el) el.scrollTop = el.scrollHeight;
-  }, [messages, isBusy, showHistory]);
+  }, [messages, isBusy, error, showHistory]);
 
   const hasMessages = messages.length > 0;
-  const awaitingReply =
-    isBusy && messages[messages.length - 1]?.role === "user";
+  const awaitingReply = isBusy && !assistantHasVisibleContent(messages);
   const title = activeTitle ?? conversationTitle(messages) ?? "Ìpínayò AI";
 
   return (
@@ -184,6 +222,13 @@ export function Conversation({
                 <MessageBubble key={message.id} message={message} />
               ))}
               {awaitingReply && <TypingIndicator />}
+              {error && (
+                <ErrorBubble
+                  message={error.message}
+                  retryable={error.retryable}
+                  onRetry={retry}
+                />
+              )}
             </div>
           ) : (
             <EmptyState onSuggestion={sendMessage} />
@@ -195,25 +240,7 @@ export function Conversation({
 
       {/* Composer — only when signed in and not browsing history */}
       {isAuthenticated && !showHistory && (
-        <>
-          <Composer onSend={sendMessage} disabled={isBusy} />
-          {error && (
-            <div className="flex items-center justify-between gap-2 px-4 pb-2">
-              <p className="text-destructive text-xs">{error.message}</p>
-              {error.retryable && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-destructive hover:text-destructive h-7 shrink-0 px-2 text-xs"
-                  onClick={retry}
-                >
-                  <RotateCcw className="size-3.5" />
-                  Retry
-                </Button>
-              )}
-            </div>
-          )}
-        </>
+        <Composer onSend={sendMessage} disabled={isBusy} />
       )}
     </div>
   );
