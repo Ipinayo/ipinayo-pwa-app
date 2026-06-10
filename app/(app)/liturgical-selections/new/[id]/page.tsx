@@ -47,7 +47,9 @@ export default async function CreateMassSelectionPage(props: {
         </div>
       </div>
 
+      {/* Key by updatedAt to ensure refresh */}
       <CreateForm
+        key={String(draft.updatedAt)}
         themes={themes}
         partNames={partNames}
         draftSelection={draft}
