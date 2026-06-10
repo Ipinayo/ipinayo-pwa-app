@@ -2,8 +2,8 @@ import { AssistantIcon } from "./assistant-icon";
 
 const SUGGESTIONS = [
   "Create a selection for next Sunday",
-  "Edit my Pentecost draft",
-  "Create a selection for this week from a clone of last week",
+  "Edit my most recent draft",
+  "Suggest some songs appropriate for today's liturgy",
 ];
 
 export function EmptyState({
