@@ -30,6 +30,11 @@ type AssistantContextValue = {
   /** True while a request is in flight (submitted or streaming). */
   isBusy: boolean;
 
+  /** The last request error, if any — with whether retrying it is worthwhile. */
+  error: { message: string; retryable: boolean } | null;
+  /** Retry the last failed request. */
+  retry: () => void;
+
   sendMessage: (text: string) => void;
   stop: () => void;
   newConversation: () => void;
@@ -72,11 +77,34 @@ export function AssistantProvider({
     [],
   );
 
-  const { messages, sendMessage, status, stop } = useChat<SelectionUIMessage>({
-    id: chatId,
-    messages: initialMessages,
-    transport,
-  });
+  const { messages, sendMessage, status, stop, error, regenerate } =
+    useChat<SelectionUIMessage>({
+      id: chatId,
+      messages: initialMessages,
+      transport,
+    });
+
+  // The route encodes errors as JSON `{ message, retryable }`; fall back to a
+  // generic, retryable message if it's a plain (e.g. network) error.
+  const parsedError = useMemo(() => {
+    if (!error) return null;
+    try {
+      const parsed = JSON.parse(error.message) as {
+        message?: string;
+        retryable?: boolean;
+      };
+      return {
+        message: parsed.message ?? "Something went wrong.",
+        retryable: parsed.retryable ?? true,
+      };
+    } catch {
+      return { message: "Something went wrong.", retryable: true };
+    }
+  }, [error]);
+
+  const retry = useCallback(() => {
+    void regenerate();
+  }, [regenerate]);
 
   const open = useCallback(() => setIsOpen(true), []);
   const close = useCallback(() => setIsOpen(false), []);
@@ -135,6 +163,8 @@ export function AssistantProvider({
       messages,
       status: status as ChatStatus,
       isBusy: status === "submitted" || status === "streaming",
+      error: parsedError,
+      retry,
       sendMessage: send,
       stop,
       newConversation,
@@ -152,6 +182,8 @@ export function AssistantProvider({
       isAuthenticated,
       messages,
       status,
+      parsedError,
+      retry,
       send,
       stop,
       newConversation,

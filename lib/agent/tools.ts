@@ -46,10 +46,10 @@ import { z } from "zod";
 const partInput = z.object({
   partName: z
     .string()
-    .describe("e.g. Entrance, Kyrie, Gloria, Responsorial Psalm, Communion"),
+    .describe("e.g. Entrance 1, Kyrie, Gloria, Responsorial Psalm, Communion"),
   songTitle: z.string(),
   keySignature: z.enum(KeySignature).nullish(),
-  notes: z.string().nullish(),
+  notes: z.string().nullish().describe("Anything else the user mentioned about the song or that you know, e.g. upbeat, hymn verses, composer, lyricist, arranger, etc. "),
 });
 type PartInput = z.infer<typeof partInput>;
 
@@ -64,8 +64,8 @@ const selectionFields = {
     .max(10)
     .describe("Short theme tags, 3–50 chars each")
     .nullish(),
-  pastoralFocus: z.string().nullish(),
-  isPublic: z.boolean().nullish(),
+  pastoralFocus: z.string().describe("Any other pastoral focus of the day when applicable e.g Harvest, Celebrations, Special Events etc, should also be considered in the selection process").nullish(),
+  isPublic: z.boolean().describe("Whether the selection is publicly shared with the community or private, public by default").nullish(),
   parishName: z.string().nullish(),
   choirName: z.string().nullish(),
   parts: z.array(partInput).nullish(),

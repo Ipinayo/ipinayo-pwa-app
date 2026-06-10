@@ -11,6 +11,24 @@ import prisma from "@/lib/prisma";
  * round-trip back into `useChat` on resume.
  */
 
+/** A part that carries real content — not a bare step boundary or empty text. */
+function isContentfulPart(part: UIMessage["parts"][number]): boolean {
+  if (part.type === "step-start") return false;
+  if (part.type === "text") return Boolean(part.text?.trim());
+  return true; // tool calls, reasoning, files, etc.
+}
+
+/**
+ * Drop contentless turns (e.g. an assistant message saved with empty `parts`
+ * after an interrupted or failed stream). The AI SDK's `validateUIMessages`
+ * rejects a message whose `parts` array is empty, which would otherwise make
+ * the whole conversation un-resumable. Used on save, load, and the live
+ * request path so both new and already-poisoned histories stay valid.
+ */
+export function dropEmptyMessages<T extends UIMessage>(messages: T[]): T[] {
+  return messages.filter((m) => (m.parts ?? []).some(isContentfulPart));
+}
+
 /** Create the session if absent; reject if it exists under another user. */
 export async function ensureChatSession(
   userId: string,
@@ -47,7 +65,7 @@ export async function saveChatMessages(
   await prisma.$transaction([
     prisma.chatMessage.deleteMany({ where: { sessionId: chatId } }),
     prisma.chatMessage.createMany({
-      data: messages.map((m) => ({
+      data: dropEmptyMessages(messages).map((m) => ({
         id: m.id,
         sessionId: chatId,
         role: m.role,
@@ -122,5 +140,5 @@ export async function loadChatMessages(
     select: { content: true },
   });
 
-  return rows.map((r) => r.content as unknown as UIMessage);
+  return dropEmptyMessages(rows.map((r) => r.content as unknown as UIMessage));
 }

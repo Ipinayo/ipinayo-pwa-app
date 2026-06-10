@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, History, Plus, X } from "lucide-react";
+import { ArrowLeft, History, Plus, RotateCcw, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 import { AssistantIcon } from "./assistant-icon";
@@ -84,7 +84,8 @@ export function Conversation({
     isAuthenticated,
     messages,
     isBusy,
-    status,
+    error,
+    retry,
     sendMessage,
     newConversation,
     activeTitle,
@@ -196,10 +197,21 @@ export function Conversation({
       {isAuthenticated && !showHistory && (
         <>
           <Composer onSend={sendMessage} disabled={isBusy} />
-          {status === "error" && (
-            <p className="text-destructive px-4 pb-2 text-xs">
-              Something went wrong. Please try again.
-            </p>
+          {error && (
+            <div className="flex items-center justify-between gap-2 px-4 pb-2">
+              <p className="text-destructive text-xs">{error.message}</p>
+              {error.retryable && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-destructive hover:text-destructive h-7 shrink-0 px-2 text-xs"
+                  onClick={retry}
+                >
+                  <RotateCcw className="size-3.5" />
+                  Retry
+                </Button>
+              )}
+            </div>
           )}
         </>
       )}
