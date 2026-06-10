@@ -5,6 +5,7 @@ import { EntityCard } from "./entity-card";
 import { Markdown } from "./markdown";
 import type { SelectionUIMessage } from "@/lib/agent/selection-agent";
 import { ToolStatusChip } from "./tool-status";
+import { UserMessage } from "./user-message";
 import { isToolUIPart } from "ai";
 
 /** Friendly verbs for the tool-status chips. */
@@ -52,9 +53,7 @@ export function MessageBubble({
       .join("");
     return (
       <div className="flex justify-end">
-        <div className="primary-gradient max-w-[85%] rounded-2xl rounded-br-sm px-4 py-2.5 text-sm wrap-break-word whitespace-pre-wrap">
-          {text}
-        </div>
+        <UserMessage text={text} />
       </div>
     );
   }
