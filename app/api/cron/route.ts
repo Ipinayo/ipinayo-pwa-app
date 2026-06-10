@@ -22,12 +22,20 @@ export async function GET(request: NextRequest) {
   // a super admin specifically (and shown only to them), falling back to a general admin if there is none.
   const [systemActorId] = await findAllAdminUserIds();
   const [superAdminId] = await findSuperAdminUserIds();
+  const actorId = superAdminId ?? systemActorId;
+
+  if (!actorId) {
+    return NextResponse.json(
+      { error: "No admin user to attribute system activity to" },
+      { status: 500 },
+    );
+  }
 
   try {
-    const expiringCount = await notifyExpiringDrafts(superAdminId ?? systemActorId);
-    const deletedDrafts = await purgeOldDrafts(superAdminId ?? systemActorId);
-    
-    const deletedChats = await purgeOldChats(superAdminId ?? systemActorId);
+    const expiringCount = await notifyExpiringDrafts(actorId);
+    const deletedDrafts = await purgeOldDrafts(actorId);
+
+    const deletedChats = await purgeOldChats(actorId);
 
     return NextResponse.json({
       ok: true,
