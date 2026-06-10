@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import MobileMenuTrigger from "./MobileMenuTrigger";
 import { NotificationBell } from "@/components/app/notifications/notification-bell";
+import RefreshButton from "./RefreshButton";
 import SignInButton from "./SignInButton";
 import SignoutButton from "./SignoutButton";
 import UserAvatar from "@/components/common/user-avatar";
@@ -38,6 +39,8 @@ export default async function Header({
             className="h-11 w-auto"
           />
         </Link>
+
+        <RefreshButton />
 
         <div className="ml-auto flex items-center space-x-4">
           {user ? (

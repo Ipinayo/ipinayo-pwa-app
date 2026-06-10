@@ -45,9 +45,13 @@ export function Composer({
           <ArrowUp className="size-4" />
         </Button>
       </div>
-      <p className="text-muted-foreground/70 mt-1.5 px-1 text-center text-[11px]">
-        Ìpínayò AI can create and edit your selections.
-      </p>
+      <div className="my-1.5 text-center text-[11px] text-muted-foreground/70 font-extrabold">
+        <p className="">Ìpínayò AI can create and edit your selections.</p>
+        <p>
+          Changes apply live — tap refresh in the top bar to see them on the
+          page.
+        </p>
+      </div>
     </div>
   );
 }
