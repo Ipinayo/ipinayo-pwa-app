@@ -8,10 +8,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import AdminAppToggle from "./AdminAppToggle";
+import { AssistantTrigger } from "@/components/app/assistant/assistant-trigger";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import MobileMenuTrigger from "./MobileMenuTrigger";
 import { NotificationBell } from "@/components/app/notifications/notification-bell";
+import RefreshButton from "./RefreshButton";
 import SignInButton from "./SignInButton";
 import SignoutButton from "./SignoutButton";
 import UserAvatar from "@/components/common/user-avatar";
@@ -27,7 +29,7 @@ export default async function Header({
 
   return (
     <div className="bg-background sticky top-0 z-40 w-full border-b">
-      <div className="flex h-16 items-center px-4 md:px-6">
+      <div className="flex h-14 items-center px-4 md:px-6">
         <MobileMenuTrigger adminNav={adminNav} />
 
         <Link href="/" className="flex items-center">
@@ -38,9 +40,12 @@ export default async function Header({
           />
         </Link>
 
+        <RefreshButton />
+
         <div className="ml-auto flex items-center space-x-4">
           {user ? (
             <div className="flex items-center gap-2">
+              <AssistantTrigger collapse label="Ìpínayò AI" />
               {isAdmin(user.userRole) && <AdminAppToggle />}
               <span className="hidden text-sm font-medium md:inline-block">
                 {user.name}

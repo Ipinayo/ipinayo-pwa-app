@@ -16,7 +16,7 @@ export default function DashboardLoading() {
 
       <StatisticsSkeleton />
 
-      <div className="grid gap-6 lg:grid-cols-3 mb-8">
+      <div className="grid gap-6 lg:grid-cols-3 mb-8 assistant-open:lg:grid-cols-1 assistant-open:xl:grid-cols-3">
         <div className="lg:col-span-2 space-y-6">
           <Skeleton className="h-10 w-full" />
           <SelectionsListSkeleton />

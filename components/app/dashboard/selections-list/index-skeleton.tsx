@@ -10,7 +10,7 @@ export default function SelectionsListSkeleton() {
       </div>
 
       <div className="space-y-4">
-        <div className="grid gap-4 sm:grid-cols-2 2xl:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 2xl:grid-cols-3 assistant-open:lg:grid-cols-1 assistant-open:xl:grid-cols-2">
           {[1, 2, 3, 4].map((i) => (
             <MassSelectionCardSkeleton key={`${i}`} />
           ))}

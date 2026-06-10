@@ -14,7 +14,9 @@ export default function AdminAppToggle() {
       <Link href="/">
         <Button variant={"outline"} className="truncate flex-1">
           <Home className="h-4 w-4" />
-          Back to App
+          <span className="hidden text-sm font-medium md:inline-block">
+            Back to App
+          </span>
         </Button>
       </Link>
     );
@@ -23,7 +25,9 @@ export default function AdminAppToggle() {
     <Link href="/admin">
       <Button variant={"outline"} className="truncate flex-1">
         <LayoutDashboard className="h-4 w-4" />
-        Admin Dashboard
+        <span className="hidden text-sm font-medium md:inline-block">
+          Admin Dashboard
+        </span>
       </Button>
     </Link>
   );

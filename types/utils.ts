@@ -171,4 +171,12 @@ export type ActivityEventMap = {
             message: string;
         };
     };
+
+    "system.maintenance": {
+        entityType: "system";
+        metadata: {
+            title: string;
+            message: string;
+        };
+    };
 }

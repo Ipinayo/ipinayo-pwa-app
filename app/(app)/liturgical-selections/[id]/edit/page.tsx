@@ -43,7 +43,13 @@ export default async function EditPage(props: { params: Params }) {
         </div>
       </div>
 
-      <EditForm selection={selection} themes={themes} partNames={partNames} />
+      {/* Key by updatedAt to ensure refresh */}
+      <EditForm
+        key={String(selection.updatedAt)}
+        selection={selection}
+        themes={themes}
+        partNames={partNames}
+      />
 
       <PushNotificationPrompt />
     </div>

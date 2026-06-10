@@ -1,14 +1,13 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { Music, Plus } from "lucide-react";
 import {
   getSelections,
   getUserSelections,
 } from "@/lib/actions/mass-selections";
 
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import CreateSelectionTrigger from "@/components/common/create-selection-trigger";
 import MassSelectionCard from "../mass-selection-card";
 import { MassSelectionFilter } from "@/types/utils";
+import { Music } from "lucide-react";
 import Pagination from "../pagination";
 import { cn } from "@/lib/utils";
 import { getUserSelections as getUserSelectionsAdmin } from "@/lib/actions/admin";
@@ -30,8 +29,8 @@ export default async function MassSelectionList({
   const selectionsResponse = userId
     ? await getUserSelectionsAdmin(userId, filter)
     : userOnly
-    ? await getUserSelections(filter)
-    : await getSelections(filter);
+      ? await getUserSelections(filter)
+      : await getSelections(filter);
 
   const selectionsPage = selectionsResponse.pagination;
   const selections = selectionsResponse.selections;
@@ -58,12 +57,7 @@ export default async function MassSelectionList({
             : "Try adjusting your search or filters to find what you're looking for."}
         </p>
 
-        <Button asChild size="lg" className="gap-2">
-          <Link href="/liturgical-selections/new">
-            <Plus className="h-5 w-5" />
-            Create Selection
-          </Link>
-        </Button>
+        <CreateSelectionTrigger className="justify-center" />
       </CardContent>
     </Card>
   ) : (
@@ -71,7 +65,10 @@ export default async function MassSelectionList({
       <div
         className={cn(
           className ??
-            "grid gap-6 lg:gap-3 xl:gap-6 md:grid-cols-2 lg:grid-cols-3"
+            "grid gap-6 lg:gap-3 xl:gap-6 md:grid-cols-2 lg:grid-cols-3",
+          userOnly
+            ? "assistant-open:lg:grid-cols-2"
+            : "assistant-open:lg:grid-cols-1 assistant-open:xl:grid-cols-2",
         )}
       >
         {selections.map((selection) => (

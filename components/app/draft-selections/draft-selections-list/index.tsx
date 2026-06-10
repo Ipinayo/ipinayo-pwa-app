@@ -1,10 +1,9 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { Music, Plus } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
+import CreateSelectionTrigger from "@/components/common/create-selection-trigger";
 import DraftCard from "@/components/app/draft-selections/draft-card";
 import { DraftSelectionFilter } from "@/types/utils";
-import Link from "next/link";
+import { Music } from "lucide-react";
 import { UrlPagination } from "@/components/common/url-pagination";
 import { cn } from "@/lib/utils";
 import { getAllDrafts } from "@/lib/actions/draft";
@@ -37,19 +36,15 @@ export default async function DraftSelectionsList({
             : "Try adjusting your search to find what you're looking for."}
         </p>
 
-        <Button asChild size="lg" className="gap-2">
-          <Link href="/liturgical-selections/new">
-            <Plus className="h-5 w-5" />
-            Create Selection
-          </Link>
-        </Button>
+        <CreateSelectionTrigger className="justify-center" />
       </CardContent>
     </Card>
   ) : (
     <>
       <div
         className={cn(
-          className ?? "grid gap-4 xs:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+          className ??
+            "grid gap-4 xs:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 assistant-open:lg:grid-cols-2 assistant-open:xl:grid-cols-3",
         )}
       >
         {drafts.map((draft) => (

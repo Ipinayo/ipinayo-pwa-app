@@ -314,6 +314,11 @@ export function getActivityEntity(
         const data = metadata as ActivityEventMap["system.announcement"]["metadata"];
         return `${data.title}`;
       }
+    case "system.maintenance":
+      {
+        const data = metadata as ActivityEventMap["system.maintenance"]["metadata"];
+        return `${data.title}`;
+      }
 
     default:
       return "";
@@ -350,6 +355,8 @@ export function getActivityEvent(event: string, admin?: boolean): string {
       return `Draft expiring soon`;
     case "system.announcement":
       return `Announcement`;
+    case "system.maintenance":
+      return `System maintenance`;
     default:
       return "New activity";
   }

@@ -8,7 +8,10 @@ export default function MassSelectionListSkeleton({
 }) {
   return (
     <div
-      className={cn(className ?? "grid gap-6 md:grid-cols-2 lg:grid-cols-3")}
+      className={cn(
+        className ??
+          "grid gap-6 md:grid-cols-2 lg:grid-cols-3 assistant-open:lg:grid-cols-2",
+      )}
     >
       {[1, 2, 3, 4, 5, 6].map((i) => (
         <MassSelectionCardSkeleton key={`${i}`} />

@@ -63,7 +63,7 @@ export default async function SelectLiturgyTemplatePage() {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 assistant-open:lg:grid-cols-2 assistant-open:xl:grid-cols-3">
             {drafts.map((draft) => (
               <DraftCard key={draft.id} draft={draft} />
             ))}
@@ -74,7 +74,7 @@ export default async function SelectLiturgyTemplatePage() {
 
       <div>
         <h2 className="text-xl font-semibold mb-4">Create from Template</h2>
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 assistant-open:lg:grid-cols-2 assistant-open:xl:grid-cols-3">
           {liturgyTemplates.map((template) => {
             const IconComponent = template.icon;
             return (
