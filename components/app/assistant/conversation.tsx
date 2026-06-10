@@ -101,6 +101,32 @@ function ErrorBubble({
   );
 }
 
+function LimitNotice({
+  text,
+  tone,
+  onNew,
+}: Readonly<{ text: string; tone: "warn" | "stop"; onNew: () => void }>) {
+  return (
+    <div
+      className={cn(
+        "flex flex-wrap flex-row mx-6 mb-1 items-center gap-2 px-4 py-3 border bg-background shadow-xs dark:bg-input/30 dark:border-input rounded-lg",
+        tone === "stop" && "border-t",
+      )}
+    >
+      <p className="text-muted-foreground text-xs">{text}</p>
+      <Button
+        variant={tone === "stop" ? "default" : "outline"}
+        size="sm"
+        className="h-8 gap-1.5 text-xs"
+        onClick={onNew}
+      >
+        <Plus className="size-3.5" />
+        New conversation
+      </Button>
+    </div>
+  );
+}
+
 /**
  * While a request is in flight, keep the typing indicator up unless the
  * assistant is actively rendering text. So it stays visible through "thinking",
@@ -133,6 +159,10 @@ export function Conversation({
     sendMessage,
     newConversation,
     activeTitle,
+    messageCount,
+    maxMessages,
+    atMessageLimit,
+    nearMessageLimit,
   } = useAssistant();
   const scrollRef = useRef<HTMLDivElement>(null);
   const [showHistory, setShowHistory] = useState(false);
@@ -244,9 +274,30 @@ export function Conversation({
       </div>
 
       {/* Composer — only when signed in and not browsing history */}
-      {isAuthenticated && !showHistory && (
-        <Composer onSend={sendMessage} disabled={isBusy} />
-      )}
+      {isAuthenticated &&
+        !showHistory &&
+        (atMessageLimit ? (
+          <LimitNotice
+            tone="stop"
+            onNew={newConversation}
+            text="You've reached this conversation's message limit. Start a new conversation to keep going."
+          />
+        ) : (
+          <>
+            {nearMessageLimit && (
+              <LimitNotice
+                tone="warn"
+                onNew={newConversation}
+                text={`This conversation is getting long — about ${
+                  maxMessages - messageCount
+                } ${
+                  maxMessages - messageCount === 1 ? "message" : "messages"
+                } left. Start a new one to keep replies fast.`}
+              />
+            )}
+            <Composer onSend={sendMessage} disabled={isBusy} />
+          </>
+        ))}
     </div>
   );
 }

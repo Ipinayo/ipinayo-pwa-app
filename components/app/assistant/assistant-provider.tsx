@@ -13,6 +13,7 @@ import type { SelectionUIMessage } from "@/lib/agent/selection-agent";
 import { deleteChat, getChatMessages, renameChat } from "@/lib/actions/chat";
 
 import { useChat } from "@ai-sdk/react";
+import { CHAT_WARN_THRESHOLD, MAX_CHAT_MESSAGES } from "@/lib/constants";
 
 type ChatStatus = "submitted" | "streaming" | "ready" | "error";
 
@@ -34,6 +35,15 @@ type AssistantContextValue = {
   error: { message: string; retryable: boolean } | null;
   /** Retry the last failed request. */
   retry: () => void;
+
+  /** Number of messages in the active conversation. */
+  messageCount: number;
+  /** The hard message cap for a conversation. */
+  maxMessages: number;
+  /** At the cap — no more messages can be sent in this conversation. */
+  atMessageLimit: boolean;
+  /** Approaching the cap — nudge the user to start a new conversation. */
+  nearMessageLimit: boolean;
 
   sendMessage: (text: string) => void;
   stop: () => void;
@@ -110,12 +120,20 @@ export function AssistantProvider({
   const close = useCallback(() => setIsOpen(false), []);
   const toggle = useCallback(() => setIsOpen((v) => !v), []);
 
+  const messageCount = messages.length;
+  const atMessageLimit = messageCount >= MAX_CHAT_MESSAGES;
+  const nearMessageLimit =
+    !atMessageLimit && messageCount >= CHAT_WARN_THRESHOLD;
+
   const send = useCallback(
     (text: string) => {
       const trimmed = text.trim();
-      if (trimmed) sendMessage({ text: trimmed });
+      // Guard the cap here too, so no caller can exceed it.
+      if (trimmed && messages.length < MAX_CHAT_MESSAGES) {
+        sendMessage({ text: trimmed });
+      }
     },
-    [sendMessage],
+    [sendMessage, messages.length],
   );
 
   const newConversation = useCallback(() => {
@@ -165,6 +183,10 @@ export function AssistantProvider({
       isBusy: status === "submitted" || status === "streaming",
       error: parsedError,
       retry,
+      messageCount,
+      maxMessages: MAX_CHAT_MESSAGES,
+      atMessageLimit,
+      nearMessageLimit,
       sendMessage: send,
       stop,
       newConversation,
@@ -184,6 +206,9 @@ export function AssistantProvider({
       status,
       parsedError,
       retry,
+      messageCount,
+      atMessageLimit,
+      nearMessageLimit,
       send,
       stop,
       newConversation,

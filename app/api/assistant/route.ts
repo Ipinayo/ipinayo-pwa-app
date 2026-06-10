@@ -1,15 +1,16 @@
-import { SelectionUIMessage, selectionAgent } from "@/lib/agent/selection-agent";
 import {
   APICallError,
   createAgentUIStreamResponse,
   validateUIMessages,
 } from "ai";
+import { SelectionUIMessage, selectionAgent } from "@/lib/agent/selection-agent";
 import {
   dropEmptyMessages,
   ensureChatSession,
   saveChatMessages,
 } from "@/db/chat";
 
+import { MAX_CHAT_MESSAGES } from "@/lib/constants";
 import { auth } from "@/auth";
 import { findUserParishAndChoirInfo } from "@/db/user";
 import { selectionTools } from "@/lib/agent/tools";
@@ -95,14 +96,23 @@ export async function POST(req: Request) {
       tools: selectionTools,
     })) as SelectionUIMessage[];
 
+    // Bound conversation length (cost + latency). The client blocks at the cap
+    // too; this is the server-side backstop.
+    if (uiMessages.length > MAX_CHAT_MESSAGES) {
+      return errorResponse(
+        "This conversation has reached its message limit. Start a new conversation to continue.",
+        400,
+        false,
+      );
+    }
+
     const [, profile] = await Promise.all([
       ensureChatSession(userId, chatId, firstUserText(uiMessages)),
       findUserParishAndChoirInfo(userId),
     ]);
 
     const now = new Date();
-    const today = `${
-      [
+    const today = `${[
         "Sunday",
         "Monday",
         "Tuesday",
@@ -111,7 +121,7 @@ export async function POST(req: Request) {
         "Friday",
         "Saturday",
       ][now.getUTCDay()]
-    }, ${now.toISOString().slice(0, 10)}`;
+      }, ${now.toISOString().slice(0, 10)}`;
 
     return await createAgentUIStreamResponse({
       agent: selectionAgent,
