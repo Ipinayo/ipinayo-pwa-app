@@ -1,7 +1,8 @@
-import { Box, Plus } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
+import { Box } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import CreateSelectionTrigger from "@/components/common/create-selection-trigger";
 import DraftCard from "@/components/app/draft-selections/draft-card";
 import Link from "next/link";
 import { getAllDrafts } from "@/lib/actions/draft";
@@ -35,12 +36,7 @@ export default async function DraftList() {
                 continue later.
               </p>
 
-              <Button asChild size="lg" className="gap-2">
-                <Link href="/liturgical-selections/new">
-                  <Plus className="h-5 w-5" />
-                  Create Selection
-                </Link>
-              </Button>
+              <CreateSelectionTrigger className="justify-center" />
             </CardContent>
           </Card>
         ) : (

@@ -1,12 +1,10 @@
-import { Activity, BookOpen, Plus } from "lucide-react";
+import { Activity, BookOpen } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-import { AssistantTrigger } from "@/components/app/assistant/assistant-trigger";
-import { Button } from "@/components/ui/button";
+import CreateSelectionTrigger from "@/components/common/create-selection-trigger";
 import DraftList from "@/components/app/dashboard/draft-list";
 import DraftListSkeleton from "@/components/app/dashboard/draft-list/index-skeleton";
-import Link from "next/link";
 import { PushNotificationPrompt } from "@/components/push-notification-prompt";
 import RecentActivities from "@/components/app/dashboard/recent-activities";
 import RecentActivitiesSkeleton from "@/components/app/dashboard/recent-activities/index-skeleton";
@@ -32,15 +30,7 @@ export default async function DashboardPage() {
             Plan and organize your liturgical music.
           </p>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <AssistantTrigger />
-          <Button size="lg" className="gap-2" asChild>
-            <Link href="/liturgical-selections/new">
-              <Plus className="h-5 w-5" />
-              Create Selection
-            </Link>
-          </Button>
-        </div>
+        <CreateSelectionTrigger />
       </div>
 
       <Suspense fallback={<StatisticsSkeleton />}>

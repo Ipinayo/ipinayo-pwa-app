@@ -8,8 +8,8 @@ import {
 } from "@/components/ui/card";
 import { SortBy, SortOrder } from "@/types/utils";
 
-import { AssistantTrigger } from "@/components/app/assistant/assistant-trigger";
 import { Button } from "@/components/ui/button";
+import CreateSelectionTrigger from "@/components/common/create-selection-trigger";
 import { Fragment } from "react";
 import Link from "next/link";
 import MassSelectionCard from "@/components/app/mass-selections/mass-selection-card";
@@ -72,17 +72,13 @@ export default async function HomePage() {
             Plan and Share the Music for Every Liturgy.
           </h1>
           <p className="text-muted-foreground md:text-lg">
-            From Sunday liturgies to weddings and funerals, shape the selection
-            part by part — then share it with your choir and the wider
-            community.
+            From Sunday liturgies to weddings and funerals, shape your music
+            selection and share it with your choir and the wider community.
           </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          <AssistantTrigger />
-          <Button size="lg" variant="outline" asChild>
-            <Link href="/liturgical-selections/new">Create manually</Link>
-          </Button>
+          <CreateSelectionTrigger />
           <Button size="lg" variant="ghost" asChild>
             <Link href="/liturgical-selections">
               Browse community

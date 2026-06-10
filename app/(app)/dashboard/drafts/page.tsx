@@ -1,10 +1,7 @@
-import { AssistantTrigger } from "@/components/app/assistant/assistant-trigger";
 import BackButton from "@/components/common/back-button";
-import { Button } from "@/components/ui/button";
+import CreateSelectionTrigger from "@/components/common/create-selection-trigger";
 import DraftSelectionListSkeleton from "@/components/app/draft-selections/draft-selections-list/index-skeleton";
 import DraftSelectionsList from "@/components/app/draft-selections/draft-selections-list";
-import Link from "next/link";
-import { Plus } from "lucide-react";
 import SearchBar from "@/components/common/search-bar";
 import { SearchParams } from "@/types/utils";
 import { Suspense } from "react";
@@ -29,15 +26,7 @@ export default async function DraftsPage(props: {
         <div>
           <h2 className="text-3xl font-display text-foreground">My Drafts</h2>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <AssistantTrigger />
-          <Link href="/liturgical-selections/new">
-            <Button size="lg" className="gap-2">
-              <Plus className="h-5 w-5" />
-              Create Selection
-            </Button>
-          </Link>
-        </div>
+        <CreateSelectionTrigger />
       </div>
 
       {/* Filters */}

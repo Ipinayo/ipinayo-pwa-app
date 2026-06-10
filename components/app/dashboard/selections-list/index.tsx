@@ -1,9 +1,10 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { Music, Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import CreateSelectionTrigger from "@/components/common/create-selection-trigger";
 import Link from "next/link";
 import MassSelectionCard from "../../mass-selections/mass-selection-card";
+import { Music } from "lucide-react";
 import { SortBy } from "@/types/utils";
 import { getUserSelections } from "@/lib/actions/mass-selections";
 
@@ -38,12 +39,7 @@ export default async function SelectionsList() {
               planning.
             </p>
 
-            <Button asChild size="lg" className="gap-2">
-              <Link href="/liturgical-selections/new">
-                <Plus className="h-5 w-5" />
-                Create Selection
-              </Link>
-            </Button>
+            <CreateSelectionTrigger className="justify-center" />
           </CardContent>
         </Card>
       ) : (

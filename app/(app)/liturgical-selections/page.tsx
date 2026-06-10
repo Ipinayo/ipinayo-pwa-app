@@ -5,12 +5,9 @@ import {
 import { SearchParams, SortBy, SortOrder } from "@/types/utils";
 import { seasonsFilter, yearsFilter } from "@/lib/constants";
 
-import { AssistantTrigger } from "@/components/app/assistant/assistant-trigger";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import CreateSelectionTrigger from "@/components/common/create-selection-trigger";
 import MassSelectionList from "@/components/app/mass-selections/mass-selection-list";
 import MassSelectionListSkeleton from "@/components/app/mass-selections/mass-selection-list/index-skeleton";
-import { Plus } from "lucide-react";
 import QueryFilter from "@/components/common/query-filter";
 import Search from "@/components/app/mass-selections/search";
 import SortFilter from "@/components/app/mass-selections/sort-filter";
@@ -56,15 +53,7 @@ export default async function MassSelectionsPage(props: {
             Plan and organize liturgical music with ease
           </p>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <AssistantTrigger />
-          <Link href="/liturgical-selections/new">
-            <Button size="lg" className="gap-2">
-              <Plus className="h-5 w-5" />
-              Create Selection
-            </Button>
-          </Link>
-        </div>
+        <CreateSelectionTrigger />
       </div>
 
       {/* Filters */}
