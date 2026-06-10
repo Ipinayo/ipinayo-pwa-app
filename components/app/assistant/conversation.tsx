@@ -12,7 +12,6 @@ import Link from "next/link";
 import { MessageBubble } from "./message-bubble";
 import type { SelectionUIMessage } from "@/lib/agent/selection-agent";
 import { cn } from "@/lib/utils";
-import { isToolUIPart } from "ai";
 import { useAssistant } from "./assistant-provider";
 
 /** A conversation's name derived from its opening line, or undefined if empty. */
@@ -102,13 +101,19 @@ function ErrorBubble({
   );
 }
 
-/** Whether the latest assistant turn has rendered anything visible yet (text or a tool chip). */
-function assistantHasVisibleContent(messages: SelectionUIMessage[]): boolean {
+/**
+ * While a request is in flight, keep the typing indicator up unless the
+ * assistant is actively rendering text. So it stays visible through "thinking",
+ * tool execution, and the lulls between steps — only the streaming-text moment
+ * (where the words themselves signal progress) hides it.
+ */
+function isWorkingSilently(messages: SelectionUIMessage[]): boolean {
   const last = messages[messages.length - 1];
-  if (last?.role !== "assistant") return false;
-  return last.parts.some(
-    (p) => (p.type === "text" && p.text.trim().length > 0) || isToolUIPart(p),
-  );
+  if (last?.role !== "assistant") return true; // submitted, awaiting first output
+  const lastPart = last.parts[last.parts.length - 1];
+  if (!lastPart) return true;
+  if (lastPart.type === "text") return lastPart.text.trim().length === 0;
+  return true; // a tool call/result, reasoning, or step boundary is the tail
 }
 
 /**
@@ -139,7 +144,7 @@ export function Conversation({
   }, [messages, isBusy, error, showHistory]);
 
   const hasMessages = messages.length > 0;
-  const awaitingReply = isBusy && !assistantHasVisibleContent(messages);
+  const awaitingReply = isBusy && isWorkingSilently(messages);
   const title = activeTitle ?? conversationTitle(messages) ?? "Ìpínayò AI";
 
   return (
