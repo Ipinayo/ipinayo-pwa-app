@@ -3,6 +3,28 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/**
+ * Active when the docked assistant is open (set on the content wrapper as
+ * `data-assistant-open="true"`).
+ */
+@custom-variant assistant-open (&:is([data-assistant-open="true"] *));
+
+@keyframes assistant-gradient {
+
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@utility animate-assistant-gradient {
+  animation: assistant-gradient 10s ease infinite;
+}
+
 :root {
   --background: oklch(1 0 0);
   --foreground: oklch(0.18 0.0604 261.83);

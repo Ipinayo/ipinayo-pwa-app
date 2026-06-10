@@ -1,105 +1,192 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { Download, FileText, Music, Users } from "lucide-react";
+import { ArrowRight, BookOpen, ListMusic, Share2 } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { SortBy, SortOrder } from "@/types/utils";
 
 import { Button } from "@/components/ui/button";
+import CreateSelectionTrigger from "@/components/common/create-selection-trigger";
+import { Fragment } from "react";
 import Link from "next/link";
+import MassSelectionCard from "@/components/app/mass-selections/mass-selection-card";
+import SelectTemplateButton from "@/components/app/draft-selections/select-template-button";
+import { getSelections } from "@/lib/actions/mass-selections";
+import { getUser } from "@/lib/actions/user";
+import { liturgyTemplates } from "@/lib/constants";
 
-export default function HomePage() {
+const STEPS = [
+  {
+    icon: BookOpen,
+    title: "Start in seconds",
+    description:
+      "Ask Ìpínayò AI to draft a selection from a description, or begin from a template or cloned selection.",
+  },
+  {
+    icon: ListMusic,
+    title: "Build the selection parts",
+    description:
+      "Set each part of the liturgy — entrance, psalm, offertory, communion — with songs, keys, and notes.",
+  },
+  {
+    icon: Share2,
+    title: "Share & export",
+    description:
+      "Publish for your community to view and clone, or export a clean PDF for your choir.",
+  },
+];
+
+export default async function HomePage() {
+  const user = await getUser().catch(() => null);
+
+  let featured: Awaited<ReturnType<typeof getSelections>>["selections"] = [];
+  try {
+    const community = await getSelections({
+      isPublic: true,
+      limit: 3,
+      sortBy: SortBy.UPDATED_AT,
+      sortOrder: SortOrder.DESC,
+    });
+    featured = community.selections;
+  } catch {
+    featured = [];
+  }
+
+  const firstName = user?.name?.split(" ")[0] || user?.email?.split("@")[0];
+  const quickTemplates = liturgyTemplates.slice(0, 3);
+
   return (
-    <div>
-      {/* Hero Section */}
-      <section>
-        <div className="from-primary-light to-primary relative overflow-hidden rounded-2xl bg-linear-to-r p-4 text-white md:p-6">
-          {/* Animated background elements */}
-          <div className="absolute right-0 top-0 h-24 w-24 rounded-full bg-white/20 md:h-32 md:w-32" />
-          <div className="absolute -bottom-12 -left-12 h-32 w-32 rounded-full bg-white/10 md:h-48 md:w-48" />
-
-          {/* Content */}
-          <div className="relative max-w-2xl">
-            <h1 className="font-pattaya mb-2 text-2xl md:text-3xl">
-              Sharing Joy Through Music
-            </h1>
-            <p className="mb-3 text-sm md:text-base">
-              Create and share liturgical selections with ease. From Sunday Mass
-              to special liturgies, organize your musical selections
-              beautifully.
+    <div className="w-full max-w-full space-y-14 md:space-y-20">
+      {/* Intro */}
+      <section className="space-y-6">
+        <div className="max-w-2xl space-y-3">
+          {firstName && (
+            <p className="text-muted-foreground text-sm font-medium">
+              Welcome back, {firstName}
             </p>
-            <div>
-              <Button size="sm" variant="secondary" asChild>
-                <Link href="/liturgical-selections">
-                  Browse Liturgical Selections
-                </Link>
-              </Button>
-            </div>
-          </div>
+          )}
+          <h1 className="font-display text-3xl leading-tight md:text-4xl">
+            Plan and Share the Music for Every Liturgy.
+          </h1>
+          <p className="text-muted-foreground md:text-lg">
+            From Sunday liturgies to weddings and funerals, shape your music
+            selection and share it with your choir and the wider community.
+          </p>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2">
+          <CreateSelectionTrigger />
+          <Button size="lg" variant="ghost" asChild>
+            <Link href="/liturgical-selections">
+              Browse community
+              <ArrowRight className="size-4" />
+            </Link>
+          </Button>
         </div>
       </section>
 
-      {/* Features Grid */}
-      <section className="mt-24 grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="border-0 bg-card/50 backdrop-blur-sm">
-          <CardContent className="p-6 text-center space-y-4">
-            <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mx-auto">
-              <Music className="w-6 h-6 text-primary" />
+      {/* Recently shared by the community */}
+      {featured.length > 0 && (
+        <section className="space-y-5">
+          <div className="flex items-end justify-between gap-4">
+            <div>
+              <h2 className="font-display text-2xl">
+                Recently shared by the community
+              </h2>
+              <p className="text-muted-foreground mt-1 text-sm">
+                Real selections from other choirs — view, download, or clone to
+                make your own.
+              </p>
             </div>
-            <h3 className="font-display text-lg">Liturgical Templates</h3>
-            <p className="text-sm text-muted-foreground">
-              Choose from Sunday Mass, Wedding, Funeral, and more pre-configured
-              templates.
-            </p>
-          </CardContent>
-        </Card>
+            <Button variant="ghost" size="sm" asChild className="shrink-0">
+              <Link href="/liturgical-selections">
+                See all
+                <ArrowRight className="size-4" />
+              </Link>
+            </Button>
+          </div>
 
-        <Card className="border-0 bg-card/50 backdrop-blur-sm">
-          <CardContent className="p-6 text-center space-y-4">
-            <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mx-auto">
-              <Users className="w-6 h-6 text-primary" />
-            </div>
-            <h3 className="font-display text-lg">Share & Collaborate</h3>
-            <p className="text-sm text-muted-foreground">
-              Make selections public for others to view and clone for their own
-              use.
-            </p>
-          </CardContent>
-        </Card>
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 assistant-open:lg:grid-cols-1 assistant-open:xl:grid-cols-2">
+            {featured.map((selection) => (
+              <MassSelectionCard key={selection.id} selection={selection} />
+            ))}
+          </div>
+        </section>
+      )}
 
-        <Card className="border-0 bg-card/50 backdrop-blur-sm">
-          <CardContent className="p-6 text-center space-y-4">
-            <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mx-auto">
-              <FileText className="w-6 h-6 text-primary" />
-            </div>
-            <h3 className="font-display text-lg">Organized Planning</h3>
-            <p className="text-sm text-muted-foreground">
-              Track liturgical year, seasons, themes, and pastoral focus for
-              each Liturgy.
-            </p>
-          </CardContent>
-        </Card>
+      {/* How it works */}
+      <section className="space-y-6">
+        <h2 className="font-display text-2xl">How it works</h2>
 
-        <Card className="border-0 bg-card/50 backdrop-blur-sm">
-          <CardContent className="p-6 text-center space-y-4">
-            <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mx-auto">
-              <Download className="w-6 h-6 text-primary" />
-            </div>
-            <h3 className="font-display text-lg">PDF Export</h3>
-            <p className="text-sm text-muted-foreground">
-              Generate professional PDFs of your selections for printing and
-              sharing.
-            </p>
-          </CardContent>
-        </Card>
+        <div className="flex flex-col items-stretch gap-4 sm:flex-row sm:items-center">
+          {STEPS.map((step, index) => (
+            <Fragment key={step.title}>
+              <div className="flex flex-1 flex-col gap-2 rounded-xl p-5">
+                <div className="flex items-center gap-2.5">
+                  <span className="bg-primary/10 text-primary flex size-9 items-center justify-center rounded-lg">
+                    <step.icon className="size-4" />
+                  </span>
+                  <span className="text-muted-foreground text-xs font-medium">
+                    Step {index + 1}
+                  </span>
+                </div>
+                <h3 className="font-display text-lg">{step.title}</h3>
+                <p className="text-muted-foreground text-sm">
+                  {step.description}
+                </p>
+              </div>
+
+              {index < STEPS.length - 1 && (
+                <ArrowRight className="text-muted-foreground mx-auto size-5 shrink-0 rotate-90 sm:rotate-0" />
+              )}
+            </Fragment>
+          ))}
+        </div>
       </section>
 
-      <section className="mb-8 py-8 text-center">
-        <h2 className="font-pattaya mb-4 text-2xl">
-          Ready to create and share your Liturgical selections?
-        </h2>
-        <p className="text-muted-foreground mx-auto mb-6 max-w-md">
-          Join our community and share your selections with the world.
-        </p>
-        <Button asChild>
-          <Link href="/liturgical-selections/new">Create Selection</Link>
-        </Button>
+      {/* Popular templates */}
+      <section className="space-y-5">
+        <div className="flex items-end justify-between gap-4">
+          <div>
+            <h2 className="font-display text-2xl">Popular templates</h2>
+            <p className="text-muted-foreground mt-1 text-sm">
+              Pre-filled parts for common liturgies — tweak and go!
+            </p>
+          </div>
+          <Button variant="ghost" size="sm" asChild className="shrink-0">
+            <Link href="/liturgical-selections/new">
+              All templates
+              <ArrowRight className="size-4" />
+            </Link>
+          </Button>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 assistant-open:lg:grid-cols-2">
+          {quickTemplates.map((template) => {
+            const Icon = template.icon;
+            return (
+              <Card key={template.id} className="flex flex-col">
+                <CardHeader>
+                  <div className="bg-primary/10 mb-2 flex size-11 items-center justify-center rounded-full">
+                    <Icon className="text-primary size-5" />
+                  </div>
+                  <CardTitle className="text-lg">{template.name}</CardTitle>
+                  <CardDescription>{template.description}</CardDescription>
+                </CardHeader>
+                <CardContent className="mt-auto">
+                  <SelectTemplateButton
+                    templateId={template.id}
+                    variant="outline"
+                    className="w-full"
+                  />
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
       </section>
     </div>
   );

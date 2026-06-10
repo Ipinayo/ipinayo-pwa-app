@@ -477,3 +477,9 @@ export const userNotificationEvents: Partial<Record<keyof ActivityEventMap, { la
         default: { inApp: true, email: true, push: true },
     }
 }
+
+/** Hard cap on messages (user + assistant) in one conversation. */
+export const MAX_CHAT_MESSAGES = 25;
+
+/** Start nudging the user to begin a new conversation at this many messages. */
+export const CHAT_WARN_THRESHOLD = 20;

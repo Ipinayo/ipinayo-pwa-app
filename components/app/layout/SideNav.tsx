@@ -18,7 +18,7 @@ export default function SideNav({
       <div
         className={cn(
           " h-full ",
-          isMobileMenuOpen ? "flex flex-col py-10" : "hidden"
+          isMobileMenuOpen ? "flex flex-col py-10" : "hidden",
         )}
       >
         <NavLinks adminNav={adminNav} />
@@ -29,7 +29,7 @@ export default function SideNav({
       </div>
 
       {/* Desktop Navigation - Static with hover expand */}
-      <div className="bg-background group fixed bottom-0 left-0 top-16 z-30 hidden w-16 border-r transition-all duration-300 ease-in-out hover:w-64 md:block">
+      <div className="bg-background group fixed bottom-0 left-0 top-14 z-30 hidden w-16 border-r transition-all duration-300 ease-in-out hover:w-64 md:block">
         <div className="flex h-full flex-col py-4">
           <NavLinks
             adminNav={adminNav}

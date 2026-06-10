@@ -1,4 +1,4 @@
-import { Activity, Clock, Plus } from "lucide-react";
+import { Activity, Clock } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   formatDateFromNow,
@@ -10,8 +10,7 @@ import {
 import ActivityIcon from "@/components/common/activity-icon";
 import BackButton from "@/components/common/back-button";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import CreateSelectionTrigger from "@/components/common/create-selection-trigger";
 import { PushNotificationPrompt } from "@/components/push-notification-prompt";
 import { SearchParams } from "@/types/utils";
 import { UrlPagination } from "@/components/common/url-pagination";
@@ -58,13 +57,7 @@ export default async function ActivitiesPage(props: {
                   Your activities will appear here as you create and manage your
                   Liturgical selections
                 </p>
-                <Button size="lg" className="gap-2" asChild>
-                  <Link href="/liturgical-selections/new">
-                    {" "}
-                    <Plus className="h-5 w-5" />
-                    Create Your First Selection
-                  </Link>
-                </Button>
+                <CreateSelectionTrigger />
               </>
             ) : (
               <>

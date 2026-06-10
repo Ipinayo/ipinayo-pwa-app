@@ -4,11 +4,9 @@ import { getCallbackUrl, getEnumByValue, stringToBoolean } from "@/lib/utils";
 import { seasonsFilter, typesFilter, yearsFilter } from "@/lib/constants";
 
 import BackButton from "@/components/common/back-button";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import CreateSelectionTrigger from "@/components/common/create-selection-trigger";
 import MassSelectionList from "@/components/app/mass-selections/mass-selection-list";
 import MassSelectionListSkeleton from "@/components/app/mass-selections/mass-selection-list/index-skeleton";
-import { Plus } from "lucide-react";
 import QueryFilter from "@/components/common/query-filter";
 import Search from "@/components/app/mass-selections/search";
 import SortFilter from "@/components/app/mass-selections/sort-filter";
@@ -51,18 +49,13 @@ export default async function MassSelectionsPage(props: {
   return (
     <div className="max-w-full w-full">
       <BackButton to="/dashboard" backText="Back to dashboard" />
-      <div className="mb-8 flex items-center justify-between">
+      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between assistant-open:lg:flex-col assistant-open:xl:flex-row">
         <div>
           <h2 className="text-3xl font-display text-foreground">
             My Liturgical Selections
           </h2>
         </div>
-        <Link href="/liturgical-selections/new">
-          <Button size="lg" className="gap-2">
-            <Plus className="h-5 w-5" />
-            Create Selection
-          </Button>
-        </Link>
+        <CreateSelectionTrigger />
       </div>
 
       {/* Filters */}
