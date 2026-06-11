@@ -45,7 +45,7 @@ export default async function Header({
         <div className="ml-auto flex items-center space-x-4">
           {user ? (
             <div className="flex items-center gap-2">
-              <AssistantTrigger collapse label="Ìpínayò AI" />
+              {!adminNav && <AssistantTrigger collapse label="Ìpínayò AI" />}
               {isAdmin(user.userRole) && <AdminAppToggle />}
               <span className="hidden text-sm font-medium md:inline-block">
                 {user.name}
