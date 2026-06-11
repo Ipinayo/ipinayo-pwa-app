@@ -1,7 +1,7 @@
 import { AdminDashboardStats, DraftStats, SelectionsStats, UserRole, UsersStats } from "@/types/models";
 import { DraftSelectionFilter, SortDraftsBy, SortOrder } from "@/types/utils";
 
-import { Prisma } from "@/lib/generated/prisma";
+import { Prisma } from "@/lib/generated/prisma/client";
 import prisma from "@/lib/prisma";
 
 export async function findAdminDashboardStats(): Promise<AdminDashboardStats> {

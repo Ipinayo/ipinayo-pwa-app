@@ -1,4 +1,4 @@
-import { LiturgicalSeason, LiturgicalYear } from "@/lib/generated/prisma/index";
+import { LiturgicalSeason, LiturgicalYear } from "@/lib/generated/prisma/client";
 import { Params, SearchParams, SortBy, SortOrder } from "@/types/utils";
 import { seasonsFilter, typesFilter, yearsFilter } from "@/lib/constants";
 

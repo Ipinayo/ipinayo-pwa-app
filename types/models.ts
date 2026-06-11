@@ -1,4 +1,4 @@
-import { Prisma, } from "@/lib/generated/prisma";
+import { Prisma, } from "@/lib/generated/prisma/client";
 
 export type GenerateMassSelection = Prisma.MassSelectionGetPayload<{
     include: {
@@ -227,4 +227,4 @@ export type Announcement = Prisma.AnnouncementGetPayload<{
     }
 }>;
 
-export { KeySignature, LiturgicalSeason, LiturgicalYear, UserRole, NotificationStatus } from "@/lib/generated/prisma";
+export { KeySignature, LiturgicalSeason, LiturgicalYear, UserRole, NotificationStatus } from "@/lib/generated/prisma/client";

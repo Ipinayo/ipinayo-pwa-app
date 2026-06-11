@@ -1,8 +1,12 @@
-import { KeySignature, LiturgicalSeason, LiturgicalYear, Prisma, PrismaClient } from '@/lib/generated/prisma'
+import 'dotenv/config'
 
+import { KeySignature, LiturgicalSeason, LiturgicalYear, Prisma, PrismaClient } from '@/lib/generated/prisma/client'
+
+import { PrismaPg } from '@prisma/adapter-pg'
 import { capitalize } from '@/lib/utils'
 
-const prisma = new PrismaClient()
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! })
+const prisma = new PrismaClient({ adapter })
 
 export type NewMassSelection = Omit<Prisma.MassSelectionCreateInput, 'id' | 'updatedAt' | 'createdBy' | 'themes' | 'parishLocation'> & {
     themes: string[]
@@ -38,7 +42,7 @@ export async function saveSelection(selection: NewMassSelection, userId: string)
         },
     }
 
-    if (parishLocation && parishLocation.country) {
+    if (parishLocation?.country) {
         data.parishLocation = {
             connectOrCreate: {
                 where: {
@@ -169,7 +173,6 @@ async function main() {
 
     // Helper function to get random future Sundays for different liturgical seasons
     const getSeasonDates = () => {
-        const now = new Date()
         return {
             advent: new Date(2024, 11, 8), // December 8, 2024 (2nd Sunday of Advent)
             christmas: new Date(2024, 11, 29), // December 29, 2024 (Holy Family)
@@ -506,10 +509,7 @@ async function main() {
                 { partName: 'Recessional', songTitle: 'For All the Saints', keySignature: KeySignature.G_MAJOR, notes: 'Vaughan Williams arrangement with descant' }
             ]
         }, users[2].id)
-    )
-
-    // Carlos's Mass Selections (Bilingual/Hispanic Community)
-    massSelections.push(
+        ,
         // Bilingual Community Mass - Public
         await saveSelection({
             title: 'Domingo de la Sagrada Familia / Holy Family Sunday',

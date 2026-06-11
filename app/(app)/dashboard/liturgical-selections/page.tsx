@@ -1,4 +1,4 @@
-import { LiturgicalSeason, LiturgicalYear } from "@/lib/generated/prisma/index";
+import { LiturgicalSeason, LiturgicalYear } from "@/lib/generated/prisma/client";
 import { SearchParams, SortBy, SortOrder } from "@/types/utils";
 import { getCallbackUrl, getEnumByValue, stringToBoolean } from "@/lib/utils";
 import { seasonsFilter, typesFilter, yearsFilter } from "@/lib/constants";

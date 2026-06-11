@@ -1,6 +1,6 @@
 import "server-only";
 
-import { Prisma } from "@/lib/generated/prisma";
+import { Prisma } from "@/lib/generated/prisma/client";
 import type { UIMessage } from "ai";
 import prisma from "@/lib/prisma";
 
