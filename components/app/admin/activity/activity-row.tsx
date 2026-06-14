@@ -17,7 +17,7 @@ import {
 import ActivityIcon from "@/components/common/activity-icon";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { JsonValue } from "@/lib/generated/prisma/internal/prismaNamespace";
+import { Prisma } from "@/lib/generated/prisma";
 import { useState } from "react";
 
 type ActivityUser = { id: string; name: string | null; email: string };
@@ -25,7 +25,7 @@ type ActivityUser = { id: string; name: string | null; email: string };
 type ActivityRecipientItem = {
   user: ActivityUser;
   entityId: string | null;
-  metadata: JsonValue;
+  metadata: Prisma.JsonValue;
 };
 
 export type AdminActivityItem = {
@@ -33,7 +33,7 @@ export type AdminActivityItem = {
   event: string;
   entityType: string;
   entityId: string;
-  metadata: JsonValue;
+  metadata: Prisma.JsonValue;
   createdAt: Date;
   actor: ActivityUser | null;
   recipients: ActivityRecipientItem[];

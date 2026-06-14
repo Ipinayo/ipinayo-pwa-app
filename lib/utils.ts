@@ -6,7 +6,7 @@ import { formatInTimeZone } from 'date-fns-tz';
 import { Location, UserRole } from "@/types/models";
 import { SelectOption } from "@/types/components/select";
 import { formatDistanceToNow } from "date-fns";
-import { JsonValue } from "@/lib/generated/prisma/internal/prismaNamespace";
+import { Prisma } from "@/lib/generated/prisma";
 import { ActivityEventMap } from "@/types/utils";
 
 export function cn(...inputs: ClassValue[]) {
@@ -247,7 +247,7 @@ export function getCallbackUrl(path: string, filters: {
 
 export function getActivityEntity(
   event: string,
-  metadata: JsonValue
+  metadata: Prisma.JsonValue
 ) {
   switch (event) {
     case "selection.created_by_self":
