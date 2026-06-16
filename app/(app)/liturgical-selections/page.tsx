@@ -1,7 +1,7 @@
 import {
   LiturgicalSeason,
   LiturgicalYear,
-} from "../../../lib/generated/prisma/index";
+} from "../../../lib/generated/prisma/client";
 import { SearchParams, SortBy, SortOrder } from "@/types/utils";
 import { seasonsFilter, yearsFilter } from "@/lib/constants";
 

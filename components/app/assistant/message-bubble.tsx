@@ -12,9 +12,9 @@ import { isToolUIPart } from "ai";
 const TOOL_LABELS: Record<string, string> = {
   list_templates: "Browsing templates",
   get_themes: "Checking themes",
-  get_part_names: "Checking parts",
-  find_my_drafts: "Searching drafts",
-  find_my_selections: "Searching selections",
+  get_part_names: "Getting suitable part names",
+  find_my_drafts: "Searching your drafts",
+  find_my_selections: "Searching your selections",
   read_draft: "Reading draft",
   read_selection: "Reading selection",
   create_draft: "Creating draft",
@@ -23,6 +23,8 @@ const TOOL_LABELS: Record<string, string> = {
   update_selection: "Updating selection",
   delete_draft: "Deleting draft",
   delete_selection: "Deleting selection",
+  get_liturgical_day: "Checking liturgical calendar",
+  find_public_selections: "Searching selections",
 };
 
 type ToolPart = Extract<

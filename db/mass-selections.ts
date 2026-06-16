@@ -1,7 +1,7 @@
 import { MassSelectionFilter, SortBy, SortOrder } from "@/types/utils";
 import { MassSelectionStats, NewMassSelection, NewMassSelectionPart, SingleMassSelectionWithParts } from "@/types/models";
 
-import { Prisma } from "@/lib/generated/prisma";
+import { Prisma } from "@/lib/generated/prisma/client";
 import { addParishAndChoirInfoToUserProfile } from "./user";
 import { capitalize } from "@/lib/utils";
 import prisma from "@/lib/prisma";

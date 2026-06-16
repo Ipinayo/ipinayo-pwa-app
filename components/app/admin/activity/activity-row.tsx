@@ -17,15 +17,15 @@ import {
 import ActivityIcon from "@/components/common/activity-icon";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { JsonValue } from "@prisma/client/runtime/library";
 import { useState } from "react";
+import { Json } from "@/types/models";
 
 type ActivityUser = { id: string; name: string | null; email: string };
 
 type ActivityRecipientItem = {
   user: ActivityUser;
   entityId: string | null;
-  metadata: JsonValue;
+  metadata: Json;
 };
 
 export type AdminActivityItem = {
@@ -33,7 +33,7 @@ export type AdminActivityItem = {
   event: string;
   entityType: string;
   entityId: string;
-  metadata: JsonValue;
+  metadata: Json;
   createdAt: Date;
   actor: ActivityUser | null;
   recipients: ActivityRecipientItem[];

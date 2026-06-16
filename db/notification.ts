@@ -1,4 +1,4 @@
-import { NotificationStatus, Prisma } from "@/lib/generated/prisma";
+import { NotificationStatus, Prisma } from "@/lib/generated/prisma/client";
 
 import { CreateNotification } from "@/types/models";
 import prisma from "@/lib/prisma";

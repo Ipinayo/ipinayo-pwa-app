@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { User } from "@/types/models";
 import UserAvatar from "@/components/common/user-avatar";
-import { isAdmin } from "../../../../../lib/utils";
+import { isAdmin } from "@/lib/utils";
 
 export default function UserCard({ user }: { user: User }) {
   return (
@@ -22,9 +22,6 @@ export default function UserCard({ user }: { user: User }) {
                 Admin
               </Badge>
             )}
-            {/* {user.status === "disabled" && (
-              <Badge variant="destructive">Disabled</Badge>
-            )} */}
           </div>
           <p className="text-sm text-muted-foreground truncate">{user.email}</p>
         </div>

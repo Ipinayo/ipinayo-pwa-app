@@ -1,6 +1,6 @@
 import { SortOrder, SortUsersBy, UpdateUserProfile, UsersFilter } from "@/types/utils";
 
-import { Prisma } from "@/lib/generated/prisma";
+import { Prisma } from "@/lib/generated/prisma/client";
 import { capitalize } from "@/lib/utils";
 import prisma from "@/lib/prisma";
 
