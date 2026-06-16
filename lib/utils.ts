@@ -6,7 +6,7 @@ import { formatInTimeZone } from 'date-fns-tz';
 import { Location, UserRole } from "@/types/models";
 import { SelectOption } from "@/types/components/select";
 import { formatDistanceToNow } from "date-fns";
-import { Prisma } from "@/lib/generated/prisma";
+import { Prisma } from "@/lib/generated/prisma/browser";
 import { ActivityEventMap } from "@/types/utils";
 
 export function cn(...inputs: ClassValue[]) {

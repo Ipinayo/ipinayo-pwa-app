@@ -17,7 +17,7 @@ import {
 import ActivityIcon from "@/components/common/activity-icon";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { Prisma } from "@/lib/generated/prisma";
+import { Prisma } from "@/lib/generated/prisma/browser";
 import { useState } from "react";
 
 type ActivityUser = { id: string; name: string | null; email: string };
