@@ -1,6 +1,6 @@
 import { DraftMassSelection } from "@/types/schemas/mass-selections";
 import { DraftSelectionFilter } from "@/types/utils";
-import { Prisma } from "@/lib/generated/prisma";
+import { Prisma } from "@/lib/generated/prisma/client";
 import prisma from "@/lib/prisma";
 
 export default async function findDraftsByUserId({

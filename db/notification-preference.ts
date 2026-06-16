@@ -1,4 +1,4 @@
-import { Prisma } from "@/lib/generated/prisma";
+import { Prisma } from "@/lib/generated/prisma/client";
 import prisma from "@/lib/prisma";
 
 export async function createNotificationPreference(

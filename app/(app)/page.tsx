@@ -88,35 +88,6 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Recently shared by the community */}
-      {featured.length > 0 && (
-        <section className="space-y-5">
-          <div className="flex items-end justify-between gap-4">
-            <div>
-              <h2 className="font-display text-2xl">
-                Recently shared by the community
-              </h2>
-              <p className="text-muted-foreground mt-1 text-sm">
-                Real selections from other choirs — view, download, or clone to
-                make your own.
-              </p>
-            </div>
-            <Button variant="ghost" size="sm" asChild className="shrink-0">
-              <Link href="/liturgical-selections">
-                See all
-                <ArrowRight className="size-4" />
-              </Link>
-            </Button>
-          </div>
-
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 assistant-open:lg:grid-cols-1 assistant-open:xl:grid-cols-2">
-            {featured.map((selection) => (
-              <MassSelectionCard key={selection.id} selection={selection} />
-            ))}
-          </div>
-        </section>
-      )}
-
       {/* How it works */}
       <section className="space-y-6">
         <h2 className="font-display text-2xl">How it works</h2>
@@ -146,6 +117,35 @@ export default async function HomePage() {
           ))}
         </div>
       </section>
+
+      {/* Recently shared by the community */}
+      {featured.length > 0 && (
+        <section className="space-y-5">
+          <div className="flex items-end justify-between gap-4">
+            <div>
+              <h2 className="font-display text-2xl">
+                Recently shared by the community
+              </h2>
+              <p className="text-muted-foreground mt-1 text-sm">
+                Real selections from other choirs — view, download, or clone to
+                make your own.
+              </p>
+            </div>
+            <Button variant="ghost" size="sm" asChild className="shrink-0">
+              <Link href="/liturgical-selections">
+                See all
+                <ArrowRight className="size-4" />
+              </Link>
+            </Button>
+          </div>
+
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 assistant-open:lg:grid-cols-1 assistant-open:xl:grid-cols-2">
+            {featured.map((selection) => (
+              <MassSelectionCard key={selection.id} selection={selection} />
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Popular templates */}
       <section className="space-y-5">

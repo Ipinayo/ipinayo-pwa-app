@@ -1,9 +1,10 @@
 "use client";
 
-import { ArrowLeft, History, Plus, RotateCcw, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, History, Plus, RotateCcw, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 import { AssistantIcon } from "./assistant-icon";
+import { isToolUIPart } from "ai";
 import { Button } from "@/components/ui/button";
 import { ChatHistory } from "./chat-history";
 import { Composer } from "./composer";
@@ -73,12 +74,23 @@ function WelcomeSignIn() {
   );
 }
 
-/** An error shown in-thread as the assistant's turn, with a Retry if recoverable. */
+/**
+ * An error shown in-thread as the assistant's turn. When recoverable it offers
+ * an action: "Continue" if the assistant had already streamed some output
+ * (resume from where it stopped), otherwise "Retry" (re-run the request).
+ */
 function ErrorBubble({
   message,
   retryable,
-  onRetry,
-}: Readonly<{ message: string; retryable: boolean; onRetry: () => void }>) {
+  actionLabel,
+  onAction,
+}: Readonly<{
+  message: string;
+  retryable: boolean;
+  actionLabel: "Continue" | "Retry";
+  onAction: () => void;
+}>) {
+  const Icon = actionLabel === "Continue" ? ArrowRight : RotateCcw;
   return (
     <div className="flex gap-2.5">
       <Avatar />
@@ -91,10 +103,10 @@ function ErrorBubble({
             variant="outline"
             size="sm"
             className="h-8 gap-1.5 text-xs"
-            onClick={onRetry}
+            onClick={onAction}
           >
-            <RotateCcw className="size-3.5" />
-            Retry
+            <Icon className="size-3.5" />
+            {actionLabel}
           </Button>
         )}
       </div>
@@ -144,6 +156,19 @@ function isWorkingSilently(messages: SelectionUIMessage[]): boolean {
 }
 
 /**
+ * True when the last turn is a partial assistant message — i.e. the assistant
+ * had already streamed some output (text or a tool call) before the error. In
+ * that case we offer "Continue" so it resumes instead of starting over.
+ */
+function hasPartialAssistantOutput(messages: SelectionUIMessage[]): boolean {
+  const last = messages[messages.length - 1];
+  if (last?.role !== "assistant") return false;
+  return last.parts.some(
+    (p) => (p.type === "text" && p.text.trim().length > 0) || isToolUIPart(p),
+  );
+}
+
+/**
  * The chat surface — header, message list (or history), composer. Shared by the
  * desktop dock and the mobile sheet; only the container differs.
  */
@@ -177,6 +202,9 @@ export function Conversation({
   const hasMessages = messages.length > 0;
   const awaitingReply = isBusy && isWorkingSilently(messages);
   const title = activeTitle ?? conversationTitle(messages) ?? "Ìpínayò AI";
+  // Mid-stream error (some output already produced) → resume with "continue";
+  // otherwise re-run the request from the last user message.
+  const canContinue = !!error?.retryable && hasPartialAssistantOutput(messages);
 
   return (
     <div className="flex h-full flex-col">
@@ -262,7 +290,8 @@ export function Conversation({
                 <ErrorBubble
                   message={error.message}
                   retryable={error.retryable}
-                  onRetry={retry}
+                  actionLabel={canContinue ? "Continue" : "Retry"}
+                  onAction={canContinue ? () => sendMessage("continue") : retry}
                 />
               )}
             </div>

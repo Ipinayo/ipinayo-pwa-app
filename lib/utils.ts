@@ -3,10 +3,9 @@ import { ReadonlyURLSearchParams } from "next/navigation";
 import { twMerge } from "tailwind-merge"
 import { enGB } from "date-fns/locale";
 import { formatInTimeZone } from 'date-fns-tz';
-import { Location, UserRole } from "@/types/models";
+import { Json, Location, UserRole } from "@/types/models";
 import { SelectOption } from "@/types/components/select";
 import { formatDistanceToNow } from "date-fns";
-import { JsonValue } from "@prisma/client/runtime/library";
 import { ActivityEventMap } from "@/types/utils";
 
 export function cn(...inputs: ClassValue[]) {
@@ -247,7 +246,7 @@ export function getCallbackUrl(path: string, filters: {
 
 export function getActivityEntity(
   event: string,
-  metadata: JsonValue
+  metadata: Json
 ) {
   switch (event) {
     case "selection.created_by_self":
