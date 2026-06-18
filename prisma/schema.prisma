@@ -34,6 +34,8 @@ model User {
   announcements           Announcement[]           @relation("AnnouncementCreator")
   pushSubscriptions       PushSubscription[]
   chatSessions            ChatSession[]
+  selectionCollaborations SelectionCollaborator[]
+  draftCollaborations     DraftCollaborator[]
 }
 
 model Account {
@@ -112,6 +114,7 @@ model MassSelection {
   createdBy        User              @relation(fields: [createdById], references: [id], onDelete: Cascade)
   parts            MassPart[]
   parishLocation   Location?         @relation(fields: [parishLocationId], references: [id], onDelete: SetNull)
+  collaborators    SelectionCollaborator[]
 
   @@index([createdById])
   @@index([isPublic])
@@ -176,8 +179,45 @@ model MassSelectionDraft {
   createdBy        User              @relation(fields: [createdById], references: [id], onDelete: Cascade)
   parts            Json              @default("[]")
   parishLocation   Json?
+  collaborators    DraftCollaborator[]
 
   @@index([createdById])
+}
+
+/// A user granted access to someone else's selection (the creator is the
+/// implicit OWNER and has no row here). Role governs view/comment/edit/manage.
+model SelectionCollaborator {
+  id          String           @id @default(cuid())
+  selectionId String
+  selection   MassSelection    @relation(fields: [selectionId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role        CollaboratorRole @default(VIEWER)
+  invitedById String?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@unique([selectionId, userId])
+  @@index([selectionId])
+  @@index([userId])
+}
+
+/// A user granted access to someone else's draft (the creator is the implicit
+/// OWNER and has no row here).
+model DraftCollaborator {
+  id          String             @id @default(cuid())
+  draftId     String
+  draft       MassSelectionDraft @relation(fields: [draftId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role        CollaboratorRole   @default(VIEWER)
+  invitedById String?
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+
+  @@unique([draftId, userId])
+  @@index([draftId])
+  @@index([userId])
 }
 
 model Activity {
@@ -318,6 +358,13 @@ enum UserRole {
   USER
   ADMIN
   SUPERADMIN
+}
+
+enum CollaboratorRole {
+  OWNER
+  EDITOR
+  COMMENTER
+  VIEWER
 }
 
 enum NotificationStatus {
