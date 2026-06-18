@@ -151,6 +151,40 @@ const notificationEmails: {
       />
     ),
   },
+  "selection.shared": {
+    subject: (m) => `${m.actorName} shared "${m.title}" with you`,
+    render: (m, url) => (
+      <GenericNotificationEmail
+        preview={`${m.actorName} shared a selection with you`}
+        heading="A selection was shared with you"
+        message={
+          <span>
+            {m.actorName} shared the selection <strong>{m.title}</strong> with
+            you as {m.role.toLowerCase()}.
+          </span>
+        }
+        actionUrl={url}
+        actionLabel={url ? "View Selection" : undefined}
+      />
+    ),
+  },
+  "draft.shared": {
+    subject: (m) => `${m.actorName} shared the draft "${m.title}" with you`,
+    render: (m, url) => (
+      <GenericNotificationEmail
+        preview={`${m.actorName} shared a draft with you`}
+        heading="A draft was shared with you"
+        message={
+          <span>
+            {m.actorName} shared the draft <strong>{m.title}</strong> with you as{" "}
+            {m.role.toLowerCase()}.
+          </span>
+        }
+        actionUrl={url}
+        actionLabel={url ? "Open Draft" : undefined}
+      />
+    ),
+  },
   "draft.created_by_self": {
     subject: () => "Draft created",
     render: (_, url) => (

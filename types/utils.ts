@@ -109,6 +109,15 @@ export type ActivityEventMap = {
         };
     };
 
+    "selection.shared": {
+        entityType: "selection";
+        metadata: {
+            title: string;
+            role: string;
+            actorName: string;
+        };
+    };
+
     "user.registered": {
         entityType: "user";
         metadata: {
@@ -151,6 +160,15 @@ export type ActivityEventMap = {
         entityType: "draft";
         metadata: {
             title: string;
+        };
+    };
+
+    "draft.shared": {
+        entityType: "draft";
+        metadata: {
+            title: string;
+            role: string;
+            actorName: string;
         };
     };
 

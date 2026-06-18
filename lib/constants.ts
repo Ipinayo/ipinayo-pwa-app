@@ -441,6 +441,16 @@ export const userNotificationEvents: Partial<Record<keyof ActivityEventMap, { la
         description: "These are notifications for when you delete a selection",
         default: { inApp: true, email: false, push: false },
     },
+    "selection.shared": {
+        label: "Selection Shared With You",
+        description: "These are notifications for when someone shares a selection with you",
+        default: { inApp: true, email: true, push: true },
+    },
+    "draft.shared": {
+        label: "Draft Shared With You",
+        description: "These are notifications for when someone shares a draft with you",
+        default: { inApp: true, email: true, push: true },
+    },
     "draft.created_by_self": {
         label: "Draft Created",
         description: "These are notifications for when you create a new draft",

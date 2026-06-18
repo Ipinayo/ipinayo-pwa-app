@@ -172,6 +172,13 @@ const resolveChannel = async <E extends keyof ActivityEventMap>(userId: string, 
     return channels
 }
 
+/** "an editor" / "a viewer" — a humanized collaborator role with its article. */
+function roleArticle(role: string) {
+    const label = role.toLowerCase();
+    const article = /^[aeiou]/.test(label) ? "an" : "a";
+    return `${article} ${label}`;
+}
+
 function getTitle<K extends keyof ActivityEventMap>(
     event: K,
     metadata: ActivityEventMap[K]["metadata"],
@@ -187,6 +194,10 @@ function getTitle<K extends keyof ActivityEventMap>(
             return `Selection updated`;
         case "selection.deleted_by_self":
             return `Selection deleted`;
+        case "selection.shared":
+            return `A selection was shared with you`;
+        case "draft.shared":
+            return `A draft was shared with you`;
         case "user.registered":
             return `Welcome to Ìpínayò`;
         case "draft.created_by_self":
@@ -243,6 +254,16 @@ function getMessage<K extends keyof ActivityEventMap>(
             {
                 const data = metadata as ActivityEventMap["selection.deleted_by_self"]["metadata"];
                 return `Your selection "${data.title}" has been deleted successfully.`;
+            }
+        case "selection.shared":
+            {
+                const data = metadata as ActivityEventMap["selection.shared"]["metadata"];
+                return `${data.actorName} shared "${data.title}" with you as ${roleArticle(data.role)}.`;
+            }
+        case "draft.shared":
+            {
+                const data = metadata as ActivityEventMap["draft.shared"]["metadata"];
+                return `${data.actorName} shared the draft "${data.title}" with you as ${roleArticle(data.role)}.`;
             }
         case "user.registered":
             {
@@ -302,6 +323,12 @@ function getActionURL<K extends keyof ActivityEventMap>(
         case "draft.deleted_by_other":
             return `/dashboard`;
 
+        case "selection.shared":
+            return `/liturgical-selections/${entityId}`;
+
+        case "draft.shared":
+            return `/liturgical-selections/new/${entityId}`;
+
         default:
             return undefined;
     }
@@ -328,11 +355,15 @@ function getPath<K extends keyof ActivityEventMap>(
         case "selection.cloned_by_other":
             return `/liturgical-selections/${entityId}`;
 
+        case "selection.shared":
+            return `/liturgical-selections/${entityId}`;
+
         case "selection.deleted_by_self":
             return `/dashboard`;
 
         case "draft.created_by_self":
         case "draft.updated_by_self":
+        case "draft.shared":
             return `/liturgical-selections/new/${entityId}`;
 
         case "draft.deleted_by_self":
