@@ -16,6 +16,50 @@ export async function findUserByEmail(email: string) {
   });
 }
 
+export async function searchUsers(
+  query: string,
+  excludeIds: string[] = [],
+  limit = 8,
+) {
+  return prisma.user.findMany({
+    where: {
+      id: { notIn: excludeIds },
+      OR: [
+        { name: { contains: query, mode: "insensitive" } },
+        { email: { contains: query, mode: "insensitive" } },
+      ],
+    },
+    select: { id: true, name: true, email: true, image: true },
+    take: limit,
+  });
+}
+
+export async function findSelectionAccessList(selectionId: string) {
+  return prisma.massSelection.findUnique({
+    where: { id: selectionId },
+    select: {
+      createdBy: collaboratorUser,
+      collaborators: {
+        include: { user: collaboratorUser },
+        orderBy: { createdAt: "asc" },
+      },
+    },
+  });
+}
+
+export async function findDraftAccessList(draftId: string) {
+  return prisma.massSelectionDraft.findUnique({
+    where: { id: draftId },
+    select: {
+      createdBy: collaboratorUser,
+      collaborators: {
+        include: { user: collaboratorUser },
+        orderBy: { createdAt: "asc" },
+      },
+    },
+  });
+}
+
 export async function findSelectionAccessRecord(
   selectionId: string,
   userId?: string | null,
