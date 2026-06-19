@@ -361,7 +361,7 @@ enum UserRole {
 }
 
 enum CollaboratorRole {
-  OWNER
+  MANAGER
   EDITOR
   COMMENTER
   VIEWER
