@@ -27,6 +27,15 @@ export type Access = {
   permissions: readonly Permission[];
 };
 
+export type AccessPerson = {
+  id: string;
+  name: string | null;
+  email: string;
+  image: string | null;
+  role: CollaboratorRole | "OWNER";
+  isOwner: boolean;
+};
+
 /** A role is a named bundle of permissions. */
 export const ROLE_PERMISSIONS: Record<CollaboratorRole, readonly Permission[]> = {
   MANAGER: [Permission.View, Permission.Comment, Permission.Edit, Permission.Manage],

@@ -206,6 +206,10 @@ function getTitle<K extends keyof ActivityEventMap>(
             return `A shared selection was updated`;
         case "selection.deleted_by_other":
             return `A shared selection was deleted`;
+        case "selection.access_revoked":
+            return `Your access was removed`;
+        case "draft.access_revoked":
+            return `Your access was removed`;
         case "draft.shared_with_other":
             return `A draft was shared with you`;
         case "draft.shared_by_other":
@@ -303,6 +307,16 @@ function getMessage<K extends keyof ActivityEventMap>(
                 const data = metadata as ActivityEventMap["selection.deleted_by_other"]["metadata"];
                 return `${data.actorName} deleted the selection "${data.title}".`;
             }
+        case "selection.access_revoked":
+            {
+                const data = metadata as ActivityEventMap["selection.access_revoked"]["metadata"];
+                return `${data.actorName} revoked your access to the selection "${data.title}".`;
+            }
+        case "draft.access_revoked":
+            {
+                const data = metadata as ActivityEventMap["draft.access_revoked"]["metadata"];
+                return `${data.actorName} revoked your access to the draft "${data.title}".`;
+            }
         case "draft.shared_with_other":
             {
                 const data = metadata as ActivityEventMap["draft.shared_with_other"]["metadata"];
@@ -385,6 +399,8 @@ function getActionURL<K extends keyof ActivityEventMap>(
         case "draft.expired":
         case "draft.deleted_by_other":
         case "selection.deleted_by_other":
+        case "selection.access_revoked":
+        case "draft.access_revoked":
             return `/dashboard`;
 
         case "selection.shared_with_other":
@@ -434,6 +450,8 @@ function getPath<K extends keyof ActivityEventMap>(
 
         case "selection.deleted_by_self":
         case "selection.deleted_by_other":
+        case "selection.access_revoked":
+        case "draft.access_revoked":
             return `/dashboard`;
 
         case "draft.created_by_self":

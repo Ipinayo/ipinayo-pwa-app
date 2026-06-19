@@ -467,9 +467,19 @@ export const userNotificationEvents: Partial<Record<keyof ActivityEventMap, { la
         default: { inApp: true, email: false, push: true },
     },
     "selection.deleted_by_other": {
-        label: "Shared Selection Deleted",
-        description: "These are notifications for when someone deletes a selection shared with you",
+        label: "Selection Deleted",
+        description: "These are notifications for when someone deletes your selection or one shared with you",
         default: { inApp: true, email: true, push: true },
+    },
+    "selection.access_revoked": {
+        label: "Selection Access Removed",
+        description: "These are notifications for when your access to a  selection is removed",
+        default: { inApp: true, email: false, push: true },
+    },
+    "draft.access_revoked": {
+        label: "Draft Access Removed",
+        description: "These are notifications for when your access to a  draft is removed",
+        default: { inApp: true, email: false, push: true },
     },
     "draft.shared_with_other": {
         label: "Draft Shared With You",
@@ -478,7 +488,7 @@ export const userNotificationEvents: Partial<Record<keyof ActivityEventMap, { la
     },
     "draft.shared_by_other": {
         label: "Your Draft Shared",
-        description: "These are notifications for when someone with access shares your draft with others",
+        description: "These are notifications for when someone shares your draft with others",
         default: { inApp: true, email: false, push: true },
     },
     "draft.shared_by_self": {

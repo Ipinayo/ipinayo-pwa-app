@@ -304,6 +304,16 @@ export function getActivityEntity(
         const data = metadata as ActivityEventMap["selection.deleted_by_other"]["metadata"];
         return `${data.title}`;
       }
+    case "selection.access_revoked":
+      {
+        const data = metadata as ActivityEventMap["selection.access_revoked"]["metadata"];
+        return `${data.title}`;
+      }
+    case "draft.access_revoked":
+      {
+        const data = metadata as ActivityEventMap["draft.access_revoked"]["metadata"];
+        return `${data.title}`;
+      }
     case "draft.shared_with_other":
       {
         const data = metadata as ActivityEventMap["draft.shared_with_other"]["metadata"];
@@ -403,6 +413,9 @@ export function getActivityEvent(event: string, admin?: boolean): string {
       return admin ? `Shared selection updated` : `A shared selection was updated`;
     case "selection.deleted_by_other":
       return admin ? `Shared selection deleted` : `A shared selection was deleted`;
+    case "selection.access_revoked":
+    case "draft.access_revoked":
+      return `Your access was removed`;
     case "draft.shared_with_other":
       return admin ? `Draft shared with a user` : `A draft was shared with you`;
     case "draft.shared_by_other":

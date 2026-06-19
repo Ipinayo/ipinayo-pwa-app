@@ -7,10 +7,15 @@ export const collaboratorRoleSchema = z.enum([
     "VIEWER",
 ]);
 
+export const recipientSchema = z.object({
+    userId: z.string().nonempty(),
+    role: collaboratorRoleSchema,
+});
+
 export const shareSchema = z.object({
     id: z.string().nonempty(),
-    email: z.email("Enter a valid email address."),
-    role: collaboratorRoleSchema,
+    recipients: z.array(recipientSchema).min(1, "Add at least one person."),
+    message: z.string().trim().max(500).optional(),
 });
 
 export const changeRoleSchema = z.object({
@@ -25,6 +30,7 @@ export const removeAccessSchema = z.object({
 });
 
 export type ShareableRole = z.infer<typeof collaboratorRoleSchema>;
+export type Recipient = z.infer<typeof recipientSchema>;
 export type ShareInput = z.infer<typeof shareSchema>;
 export type ChangeRoleInput = z.infer<typeof changeRoleSchema>;
 export type RemoveAccessInput = z.infer<typeof removeAccessSchema>;

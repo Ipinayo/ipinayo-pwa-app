@@ -123,6 +123,15 @@ export type ActivityEventMap = {
             title: string;
             role: string;
             actorName: string;
+            message?: string;
+        };
+    };
+
+    "selection.access_revoked": {
+        entityType: "selection";
+        metadata: {
+            title: string;
+            actorName: string;
         };
     };
 
@@ -210,6 +219,15 @@ export type ActivityEventMap = {
         metadata: {
             title: string;
             role: string;
+            actorName: string;
+            message?: string;
+        };
+    };
+
+    "draft.access_revoked": {
+        entityType: "draft";
+        metadata: {
+            title: string;
             actorName: string;
         };
     };
