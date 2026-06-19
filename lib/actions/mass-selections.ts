@@ -1,6 +1,7 @@
 'use server'
 
 import { MassSelectionFilter, SortBy, SortOrder } from "@/types/utils";
+import { Permission, can } from "@/lib/collaboration-utils";
 import { createMassSelectionSchema, updateMassSelectionSchema } from "@/types/schemas/mass-selections";
 import {
     findAllPartNames,
@@ -10,16 +11,17 @@ import {
     findMassSelectionStats,
     findSelection,
     findSelectionWithParts,
-    findUserSelection,
     removeSelection,
     saveSelection,
     updateSelection as updateSelectionDb
 } from "@/db/mass-selections";
+import { getDraftAccess, getSelectionAccess } from "@/lib/actions/collaboration";
 
 import { NewMassSelection } from "@/types/models";
 import { auth } from "@/auth";
 import { createActivity } from "@/lib/notifications/dispatch";
 import { createDraft } from "@/db/draft";
+import { findSelectionStakeholderIds } from "@/db/collaborators";
 import { findUserParishAndChoirInfo } from "@/db/user";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { redirect } from "next/navigation";
@@ -113,6 +115,13 @@ export async function getSelectionById(id: string) {
         if (!selection) {
             throw new Error("Mass selection not found");
         }
+
+        const session = await auth();
+        const access = await getSelectionAccess(id, session?.user?.id);
+        if (!can(access, Permission.View)) {
+            throw new Error("Unauthorized");
+        }
+
         return selection;
     } catch (error: any) {
         console.error("Error fetching mass selection:", error);
@@ -128,6 +137,12 @@ export async function createSelection(data: NewMassSelection, draftId: string) {
             throw new Error("Unauthorized");
         }
 
+        // Only someone with manage access on the draft can promote it.
+        const draftAccess = await getDraftAccess(draftId, session.user.id);
+        if (!can(draftAccess, Permission.Manage)) {
+            throw new Error("You don't have permission to save this draft as a selection");
+        }
+
         // Validate data
         const validationResult = createMassSelectionSchema.safeParse(data);
         if (!validationResult.success) {
@@ -137,7 +152,7 @@ export async function createSelection(data: NewMassSelection, draftId: string) {
         const result = await saveSelection(validationResult.data, session.user.id, draftId);
 
         createActivity({
-            targetUsers: [session.user.id],
+            targetUsers: [result.createdById],
             event: "selection.created_by_self",
             entityId: result.id,
             metadata: { title: result.title },
@@ -164,8 +179,12 @@ export async function updateSelection(id: string, data: Partial<NewMassSelection
             throw new Error("Unauthorized");
         }
 
-        // Check ownership
-        const existingSelection = await findUserSelection(id, session.user.id);
+        const access = await getSelectionAccess(id, session.user.id);
+        if (!can(access, Permission.Edit)) {
+            throw new Error("You don't have edit access to this selection");
+        }
+
+        const existingSelection = await findSelection(id);
         if (!existingSelection) {
             throw new Error("Mass selection not found");
         }
@@ -178,13 +197,29 @@ export async function updateSelection(id: string, data: Partial<NewMassSelection
 
         const result = await updateSelectionDb(validationResult.data, id);
 
+        const title = data.title || existingSelection.title;
+
+        // The actor's own feed record.
         createActivity({
             targetUsers: [session.user.id],
             event: "selection.updated_by_self",
             entityId: existingSelection.id,
-            metadata: { title: data.title || existingSelection.title },
+            metadata: { title },
             actorId: session.user.id,
         })
+
+        // Notify everyone else with access that a shared selection changed.
+        const stakeholders = await findSelectionStakeholderIds(id);
+        const others = stakeholders.filter((uid) => uid !== session.user.id);
+        if (others.length > 0) {
+            createActivity({
+                targetUsers: others,
+                event: "selection.updated_by_other",
+                entityId: existingSelection.id,
+                metadata: { title, actorName: session.user.name || session.user.email || "Someone" },
+                actorId: session.user.id,
+            })
+        }
 
         revalidatePath('/liturgical-selections');
         revalidatePath(`/liturgical-selections/${id}`);
@@ -205,11 +240,18 @@ export async function deleteSelection(id: string) {
             throw new Error("Unauthorized");
         }
 
-        // Check ownership
-        const existingSelection = await findUserSelection(id, session.user.id);
+        const access = await getSelectionAccess(id, session.user.id);
+        if (!can(access, Permission.Manage)) {
+            throw new Error("You don't have permission to delete this selection");
+        }
+
+        const existingSelection = await findSelection(id);
         if (!existingSelection) {
             throw new Error("Mass selection not found");
         }
+
+        // Capture everyone with access before the cascade delete removes the rows.
+        const stakeholders = await findSelectionStakeholderIds(id);
 
         await removeSelection(id);
 
@@ -220,6 +262,18 @@ export async function deleteSelection(id: string) {
             metadata: { title: existingSelection.title },
             actorId: session.user.id,
         });
+
+        // Notify everyone else with access that the shared selection was deleted.
+        const others = stakeholders.filter((uid) => uid !== session.user.id);
+        if (others.length > 0) {
+            createActivity({
+                targetUsers: others,
+                event: "selection.deleted_by_other",
+                entityId: existingSelection.id,
+                metadata: { title: existingSelection.title, actorName: session.user.name || session.user.email || "Someone" },
+                actorId: session.user.id,
+            });
+        }
 
         revalidatePath('/liturgical-selections');
         revalidatePath('/dashboard');
@@ -244,8 +298,9 @@ export async function cloneSelection(selectionId: string) {
             throw new Error("Mass selection not found");
         }
 
-        // Check access: owner or public selection
-        if (originalSelection.createdById !== session.user.id && !originalSelection.isPublic) {
+        // Anyone with any access (owner, collaborator, or a public selection) can clone.
+        const access = await getSelectionAccess(selectionId, session.user.id);
+        if (!can(access, Permission.View)) {
             throw new Error("Access denied");
         }
 
@@ -271,6 +326,7 @@ export async function cloneSelection(selectionId: string) {
                 metadata: { title: originalSelection.title },
                 actorId: session.user.id,
             });
+
         else {
             createActivity({
                 targetUsers: [session.user.id],

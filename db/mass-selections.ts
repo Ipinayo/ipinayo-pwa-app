@@ -2,7 +2,6 @@ import { MassSelectionFilter, SortBy, SortOrder } from "@/types/utils";
 import { MassSelectionStats, NewMassSelection, NewMassSelectionPart, SingleMassSelectionWithParts } from "@/types/models";
 
 import { Prisma } from "@/lib/generated/prisma/client";
-import { addParishAndChoirInfoToUserProfile } from "./user";
 import { capitalize } from "@/lib/utils";
 import prisma from "@/lib/prisma";
 
@@ -222,6 +221,14 @@ export async function saveSelection(selection: NewMassSelection, userId: string,
 
     const { parts, date, themes, parishLocation, ...rest } = selection
 
+    // Ownership stays with the draft's creator, even when a manage-level
+    // collaborator is the one promoting it.
+    const draft = await prisma.massSelectionDraft.findUnique({
+        where: { id: draftId },
+        select: { createdById: true },
+    })
+    const ownerId = draft?.createdById ?? userId
+
     const data: Prisma.MassSelectionCreateInput = {
         ...rest,
         date: date,
@@ -242,7 +249,7 @@ export async function saveSelection(selection: NewMassSelection, userId: string,
                 })) || [],
         },
         createdBy: {
-            connect: { id: userId }
+            connect: { id: ownerId }
         },
     }
 
@@ -274,16 +281,31 @@ export async function saveSelection(selection: NewMassSelection, userId: string,
         const selection = await tx.massSelection.create({
             data
         })
+
+
+        const draftCollaborators = await tx.draftCollaborator.findMany({
+            where: { draftId },
+            select: { userId: true, role: true, invitedById: true },
+        })
+        if (draftCollaborators.length > 0) {
+            await tx.selectionCollaborator.createMany({
+                data: draftCollaborators.map((collaborator) => ({
+                    selectionId: selection.id,
+                    userId: collaborator.userId,
+                    role: collaborator.role,
+                    invitedById: collaborator.invitedById,
+                })),
+                skipDuplicates: true,
+            })
+        }
+
         await tx.massSelectionDraft.delete({
-            where: { id: draftId, createdById: userId }
+            where: { id: draftId }
         })
 
         return selection;
 
     });
-
-    // Attempt update of user profile with parish and choir info if not already set
-    addParishAndChoirInfoToUserProfile(userId, createdSelection.parishLocationId, createdSelection.choirName, createdSelection.parishName);
 
     return createdSelection;
 }

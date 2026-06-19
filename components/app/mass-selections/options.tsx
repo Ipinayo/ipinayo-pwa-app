@@ -6,7 +6,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Edit, Eye, MoreVertical } from "lucide-react";
+import { Edit, Eye, MoreVertical, Users } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import CloneButton from "./clone-button";
@@ -18,11 +18,16 @@ import { useSession } from "next-auth/react";
 
 export default function Options({
   selection,
+  access,
 }: {
   selection: SingleMassSelection;
+  access?: { canEdit: boolean; canManage: boolean };
 }) {
   const { data: session } = useSession();
+
   const isOwner = selection.createdById === session?.user?.id;
+  const canEdit = access?.canEdit ?? isOwner;
+  const canManage = access?.canManage ?? isOwner;
 
   return (
     <DropdownMenu>
@@ -38,11 +43,19 @@ export default function Options({
             View
           </Link>
         </DropdownMenuItem>
-        {isOwner && (
+        {canEdit && (
           <DropdownMenuItem title="Make changes to this selection" asChild>
             <Link href={`/liturgical-selections/${selection.id}/edit`}>
               <Edit className="mr-2 h-4 w-4" />
               Edit
+            </Link>
+          </DropdownMenuItem>
+        )}
+        {canManage && (
+          <DropdownMenuItem title="Add and manage collaborators" asChild>
+            <Link href={`/liturgical-selections/${selection.id}/collaborators`}>
+              <Users className="mr-2 h-4 w-4" />
+              Collaborators
             </Link>
           </DropdownMenuItem>
         )}
@@ -60,7 +73,7 @@ export default function Options({
             selectionId={selection.id}
           />
         </DropdownMenuItem>
-        {isOwner && (
+        {canManage && (
           <DropdownMenuItem asChild>
             <DeleteButton
               variant="ghost"

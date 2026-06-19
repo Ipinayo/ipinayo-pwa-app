@@ -1,5 +1,11 @@
+import { Permission, can } from "@/lib/collaboration-utils";
 import { getAllPartNames, getThemes } from "@/lib/actions/mass-selections";
+import {
+  getDraftAccess,
+  getDraftAccessPeople,
+} from "@/lib/actions/collaboration";
 
+import { AccessAvatarGroup } from "@/components/app/collaboration/access-avatar-group";
 import BackButton from "@/components/common/back-button";
 import CreateForm from "@/components/app/draft-selections/create-form";
 import { Params } from "@/types/utils";
@@ -11,9 +17,13 @@ export default async function CreateMassSelectionPage(props: {
 }) {
   const params = await props.params;
 
-  await requireAuth(`/liturgical-selections/new/${params.id}`);
+  const session = await requireAuth(`/liturgical-selections/new/${params.id}`);
 
   const draft = await getDraftById(params.id);
+  const access = await getDraftAccess(draft.id, session.user.id);
+  const canEdit = can(access, Permission.Edit);
+  const hasAccess = access.isOwner || access.role !== null;
+  const accessPeople = hasAccess ? await getDraftAccessPeople(draft.id) : [];
 
   const [themes, partNames] = await Promise.all([
     getThemes(),
@@ -22,28 +32,35 @@ export default async function CreateMassSelectionPage(props: {
 
   return (
     <div className="mx-auto max-w-4xl w-full">
-      <div className="flex items-center justify-between gap-4 mb-8">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+      <div className="flex flex-col items-start w-full gap-4 mb-8">
+        <div className="flex items-center gap-2 justify-between w-full">
           <BackButton to="/liturgical-selections/new" />
-          <div>
-            <h2 className="text-3xl font-display text-foreground">
-              Create Liturgical Selection
-            </h2>
-            <p className="text-muted-foreground mt-1">
-              Using template:{" "}
-              <span className="font-medium">
-                {draft.template || "Custom Template"}
+          <div className="flex items-center gap-2">
+            {hasAccess && (
+              <AccessAvatarGroup
+                people={accessPeople}
+                hasAccess={hasAccess}
+                manageHref={`/liturgical-selections/new/${draft.id}/collaborators`}
+              />
+            )}
+            <div className="inline-flex items-center gap-2 px-4 py-1 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-full">
+              <div className="w-2 h-2 bg-amber-500 rounded-full"></div>
+              <span className="text-xs font-medium text-amber-700 dark:text-amber-400">
+                Draft
               </span>
-            </p>
+            </div>
           </div>
         </div>
-        <div className="flex items-end gap-2">
-          <div className="inline-flex items-center gap-2 px-4 py-1 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-full">
-            <div className="w-2 h-2 bg-amber-500 rounded-full"></div>
-            <span className="text-xs font-medium text-amber-700 dark:text-amber-400">
-              Draft
+        <div>
+          <h2 className="text-3xl font-display text-foreground">
+            Create Liturgical Selection
+          </h2>
+          <p className="text-muted-foreground mt-1">
+            Using template:{" "}
+            <span className="font-medium">
+              {draft.template || "Custom Template"}
             </span>
-          </div>
+          </p>
         </div>
       </div>
 
@@ -53,6 +70,7 @@ export default async function CreateMassSelectionPage(props: {
         themes={themes}
         partNames={partNames}
         draftSelection={draft}
+        canEdit={canEdit}
       />
     </div>
   );

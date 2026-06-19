@@ -172,6 +172,13 @@ const resolveChannel = async <E extends keyof ActivityEventMap>(userId: string, 
     return channels
 }
 
+/** "an editor" / "a viewer" — a humanized collaborator role with its article. */
+function roleArticle(role: string) {
+    const label = role.toLowerCase();
+    const article = /^[aeiou]/.test(label) ? "an" : "a";
+    return `${article} ${label}`;
+}
+
 function getTitle<K extends keyof ActivityEventMap>(
     event: K,
     metadata: ActivityEventMap[K]["metadata"],
@@ -187,6 +194,32 @@ function getTitle<K extends keyof ActivityEventMap>(
             return `Selection updated`;
         case "selection.deleted_by_self":
             return `Selection deleted`;
+        case "selection.shared_with_other":
+            return `A selection was shared with you`;
+        case "selection.shared_by_other":
+            return `Your selection was shared`;
+        case "selection.shared_by_self":
+            return `Selection shared`;
+        case "selection.role_updated":
+            return `Your access changed`;
+        case "selection.updated_by_other":
+            return `A shared selection was updated`;
+        case "selection.deleted_by_other":
+            return `A shared selection was deleted`;
+        case "selection.access_revoked":
+            return `Your access was removed`;
+        case "draft.access_revoked":
+            return `Your access was removed`;
+        case "draft.shared_with_other":
+            return `A draft was shared with you`;
+        case "draft.shared_by_other":
+            return `Your draft was shared`;
+        case "draft.shared_by_self":
+            return `Draft shared`;
+        case "draft.role_updated":
+            return `Your access changed`;
+        case "draft.updated_by_other":
+            return `A shared draft was updated`;
         case "user.registered":
             return `Welcome to Ìpínayò`;
         case "draft.created_by_self":
@@ -244,6 +277,71 @@ function getMessage<K extends keyof ActivityEventMap>(
                 const data = metadata as ActivityEventMap["selection.deleted_by_self"]["metadata"];
                 return `Your selection "${data.title}" has been deleted successfully.`;
             }
+        case "selection.shared_with_other":
+            {
+                const data = metadata as ActivityEventMap["selection.shared_with_other"]["metadata"];
+                return `${data.actorName} invited you to the selection - "${data.title}" as ${roleArticle(data.role)}.`;
+            }
+        case "selection.shared_by_other":
+            {
+                const data = metadata as ActivityEventMap["selection.shared_by_other"]["metadata"];
+                return `${data.actorName} shared your selection "${data.title}" with ${data.count} ${data.count === 1 ? "person" : "people"}.`;
+            }
+        case "selection.shared_by_self":
+            {
+                const data = metadata as ActivityEventMap["selection.shared_by_self"]["metadata"];
+                return `You shared "${data.title}" with ${data.count} ${data.count === 1 ? "person" : "people"}.`;
+            }
+        case "selection.role_updated":
+            {
+                const data = metadata as ActivityEventMap["selection.role_updated"]["metadata"];
+                return `${data.actorName} changed your access to "${data.title}" to ${roleArticle(data.role)}.`;
+            }
+        case "selection.updated_by_other":
+            {
+                const data = metadata as ActivityEventMap["selection.updated_by_other"]["metadata"];
+                return `${data.actorName} updated the selection "${data.title}".`;
+            }
+        case "selection.deleted_by_other":
+            {
+                const data = metadata as ActivityEventMap["selection.deleted_by_other"]["metadata"];
+                return `${data.actorName} deleted the selection "${data.title}".`;
+            }
+        case "selection.access_revoked":
+            {
+                const data = metadata as ActivityEventMap["selection.access_revoked"]["metadata"];
+                return `${data.actorName} revoked your access to the selection "${data.title}".`;
+            }
+        case "draft.access_revoked":
+            {
+                const data = metadata as ActivityEventMap["draft.access_revoked"]["metadata"];
+                return `${data.actorName} revoked your access to the draft "${data.title}".`;
+            }
+        case "draft.shared_with_other":
+            {
+                const data = metadata as ActivityEventMap["draft.shared_with_other"]["metadata"];
+                return `${data.actorName} invited you to the draft - "${data.title}" as ${roleArticle(data.role)}.`;
+            }
+        case "draft.shared_by_other":
+            {
+                const data = metadata as ActivityEventMap["draft.shared_by_other"]["metadata"];
+                return `${data.actorName} shared your selection draft "${data.title}" with ${data.count} ${data.count === 1 ? "person" : "people"}.`;
+            }
+        case "draft.shared_by_self":
+            {
+                const data = metadata as ActivityEventMap["draft.shared_by_self"]["metadata"];
+                return `You shared the draft "${data.title}" with ${data.count} ${data.count === 1 ? "person" : "people"}.`;
+            }
+        case "draft.role_updated":
+            {
+                const data = metadata as ActivityEventMap["draft.role_updated"]["metadata"];
+                return `${data.actorName} changed your access to the draft "${data.title}" to ${roleArticle(data.role)}.`;
+            }
+        case "draft.updated_by_other":
+            {
+                const data = metadata as ActivityEventMap["draft.updated_by_other"]["metadata"];
+                return `${data.actorName} updated the draft "${data.title}".`;
+            }
         case "user.registered":
             {
                 const data = metadata as ActivityEventMap["user.registered"]["metadata"];
@@ -300,7 +398,22 @@ function getActionURL<K extends keyof ActivityEventMap>(
 
         case "draft.expired":
         case "draft.deleted_by_other":
+        case "selection.deleted_by_other":
+        case "selection.access_revoked":
+        case "draft.access_revoked":
             return `/dashboard`;
+
+        case "selection.shared_with_other":
+        case "selection.shared_by_other":
+        case "selection.role_updated":
+        case "selection.updated_by_other":
+            return `/liturgical-selections/${entityId}`;
+
+        case "draft.shared_with_other":
+        case "draft.shared_by_other":
+        case "draft.role_updated":
+        case "draft.updated_by_other":
+            return `/liturgical-selections/new/${entityId}`;
 
         default:
             return undefined;
@@ -328,11 +441,26 @@ function getPath<K extends keyof ActivityEventMap>(
         case "selection.cloned_by_other":
             return `/liturgical-selections/${entityId}`;
 
+        case "selection.shared_with_other":
+        case "selection.shared_by_other":
+        case "selection.shared_by_self":
+        case "selection.role_updated":
+        case "selection.updated_by_other":
+            return `/liturgical-selections/${entityId}`;
+
         case "selection.deleted_by_self":
+        case "selection.deleted_by_other":
+        case "selection.access_revoked":
+        case "draft.access_revoked":
             return `/dashboard`;
 
         case "draft.created_by_self":
         case "draft.updated_by_self":
+        case "draft.shared_with_other":
+        case "draft.shared_by_other":
+        case "draft.shared_by_self":
+        case "draft.role_updated":
+        case "draft.updated_by_other":
             return `/liturgical-selections/new/${entityId}`;
 
         case "draft.deleted_by_self":

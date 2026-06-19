@@ -1,5 +1,6 @@
 import { Calendar, Globe, Lock, Music } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Permission, can } from "@/lib/collaboration-utils";
 import {
   Table,
   TableBody,
@@ -14,8 +15,13 @@ import {
   formatParishInfo,
   getLabelForValue,
 } from "@/lib/utils";
+import {
+  getSelectionAccess,
+  getSelectionAccessPeople,
+} from "@/lib/actions/collaboration";
 import { keySignatureItems, liturgicalSeasonItems } from "@/lib/constants";
 
+import { AccessAvatarGroup } from "@/components/app/collaboration/access-avatar-group";
 import BackButton from "@/components/common/back-button";
 import { Badge } from "@/components/ui/badge";
 import Options from "@/components/app/mass-selections/options";
@@ -31,18 +37,31 @@ export default async function LiturgicalSelectionPage(props: {
 
   const selection = await getSelectionById(params.id);
 
-  // TODO: Implement admin override with collaboration
-  if (!selection.isPublic) {
-    if (!session?.user?.id || selection.createdById !== session.user.id) {
-      throw new Error("Unauthorized");
-    }
+  const access = await getSelectionAccess(selection.id, session?.user?.id);
+  if (!can(access, Permission.View)) {
+    throw new Error("Unauthorized");
   }
+
+  const hasAccess = access.isOwner || access.role !== null;
+  const accessPeople = hasAccess
+    ? await getSelectionAccessPeople(selection.id)
+    : [];
 
   return (
     <div className="mx-auto max-w-6xl w-full">
-      <div className="mb-8 flex flex-col sm:flex-row items-start sm:items-center gap-4">
-        <BackButton fallback="/liturgical-selections" />
-        <div className="flex-1">
+      <div className="flex flex-col items-start w-full gap-4 mb-8">
+        <div className="flex items-center gap-2 justify-between w-full">
+          <BackButton fallback="/liturgical-selections" />
+          {hasAccess && (
+            <AccessAvatarGroup
+              people={accessPeople}
+              hasAccess={hasAccess}
+              manageHref={`/liturgical-selections/${selection.id}/collaborators`}
+            />
+          )}
+        </div>
+
+        <div>
           <div className="flex items-center gap-3 mb-2">
             <h2 className="text-3xl font-display text-foreground">
               {selection.title}
@@ -58,8 +77,15 @@ export default async function LiturgicalSelectionPage(props: {
                 Private
               </Badge>
             )}
-            <Options selection={selection} />
+            <Options
+              selection={selection}
+              access={{
+                canEdit: can(access, Permission.Edit),
+                canManage: can(access, Permission.Manage),
+              }}
+            />
           </div>
+          
           <div className="flex flex-wrap w-full items-center gap-4 text-muted-foreground">
             <div className="flex items-center gap-1">
               <Calendar className="h-4 w-4" />

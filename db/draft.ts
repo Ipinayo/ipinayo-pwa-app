@@ -66,9 +66,9 @@ export async function createDraft(selection: DraftMassSelection, userId: string)
     });
 }
 
-export async function updateDraftById(draftId: string, selection: DraftMassSelection, userId: string) {
+export async function updateDraftById(draftId: string, selection: DraftMassSelection) {
     return await prisma.massSelectionDraft.update({
-        where: { id: draftId, createdById: userId },
+        where: { id: draftId },
         data: {
             ...selection,
             parishLocation: selection.parishLocation || undefined,
@@ -76,8 +76,8 @@ export async function updateDraftById(draftId: string, selection: DraftMassSelec
     });
 }
 
-export async function deleteDraftById(draftId: string, userId: string) {
+export async function deleteDraftById(draftId: string) {
     return await prisma.massSelectionDraft.delete({
-        where: { id: draftId, createdById: userId },
+        where: { id: draftId },
     })
 }

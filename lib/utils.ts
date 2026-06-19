@@ -274,6 +274,71 @@ export function getActivityEntity(
         const data = metadata as ActivityEventMap["selection.deleted_by_self"]["metadata"];
         return `${data.title}`;
       }
+    case "selection.shared_with_other":
+      {
+        const data = metadata as ActivityEventMap["selection.shared_with_other"]["metadata"];
+        return `${data.title}`;
+      }
+    case "selection.shared_by_other":
+      {
+        const data = metadata as ActivityEventMap["selection.shared_by_other"]["metadata"];
+        return `${data.title}`;
+      }
+    case "selection.shared_by_self":
+      {
+        const data = metadata as ActivityEventMap["selection.shared_by_self"]["metadata"];
+        return `${data.title}`;
+      }
+    case "selection.role_updated":
+      {
+        const data = metadata as ActivityEventMap["selection.role_updated"]["metadata"];
+        return `${data.title}`;
+      }
+    case "selection.updated_by_other":
+      {
+        const data = metadata as ActivityEventMap["selection.updated_by_other"]["metadata"];
+        return `${data.title}`;
+      }
+    case "selection.deleted_by_other":
+      {
+        const data = metadata as ActivityEventMap["selection.deleted_by_other"]["metadata"];
+        return `${data.title}`;
+      }
+    case "selection.access_revoked":
+      {
+        const data = metadata as ActivityEventMap["selection.access_revoked"]["metadata"];
+        return `${data.title}`;
+      }
+    case "draft.access_revoked":
+      {
+        const data = metadata as ActivityEventMap["draft.access_revoked"]["metadata"];
+        return `${data.title}`;
+      }
+    case "draft.shared_with_other":
+      {
+        const data = metadata as ActivityEventMap["draft.shared_with_other"]["metadata"];
+        return `${data.title}`;
+      }
+    case "draft.shared_by_other":
+      {
+        const data = metadata as ActivityEventMap["draft.shared_by_other"]["metadata"];
+        return `${data.title}`;
+      }
+    case "draft.shared_by_self":
+      {
+        const data = metadata as ActivityEventMap["draft.shared_by_self"]["metadata"];
+        return `${data.title}`;
+      }
+    case "draft.role_updated":
+      {
+        const data = metadata as ActivityEventMap["draft.role_updated"]["metadata"];
+        return `${data.title}`;
+      }
+    case "draft.updated_by_other":
+      {
+        const data = metadata as ActivityEventMap["draft.updated_by_other"]["metadata"];
+        return `${data.title}`;
+      }
     case "user.registered":
       {
         const data = metadata as ActivityEventMap["user.registered"]["metadata"];
@@ -336,6 +401,31 @@ export function getActivityEvent(event: string, admin?: boolean): string {
       return `Selection updated`;
     case "selection.deleted_by_self":
       return `Selection deleted`;
+    case "selection.shared_with_other":
+      return admin ? `Selection shared with a user` : `A selection was shared with you`;
+    case "selection.shared_by_other":
+      return admin ? `Selection was shared by another user` : `Your selection was shared`;
+    case "selection.shared_by_self":
+      return admin ? `Selection shared` : `You shared a selection`;
+    case "selection.role_updated":
+      return admin ? `Selection access changed` : `Your access changed`;
+    case "selection.updated_by_other":
+      return admin ? `Shared selection updated` : `A shared selection was updated`;
+    case "selection.deleted_by_other":
+      return admin ? `Shared selection deleted` : `A shared selection was deleted`;
+    case "selection.access_revoked":
+    case "draft.access_revoked":
+      return `Your access was removed`;
+    case "draft.shared_with_other":
+      return admin ? `Draft shared with a user` : `A draft was shared with you`;
+    case "draft.shared_by_other":
+      return admin ? `Draft was shared by another user` : `Your draft was shared`;
+    case "draft.shared_by_self":
+      return admin ? `Draft shared` : `You shared a draft`;
+    case "draft.role_updated":
+      return admin ? `Draft access changed` : `Your access changed`;
+    case "draft.updated_by_other":
+      return admin ? `Shared draft updated` : `A shared draft was updated`;
     case "user.registered":
       return `Profile created`;
     case "user.updated":
