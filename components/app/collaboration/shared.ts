@@ -19,16 +19,16 @@ export const ROLE_OPTIONS: {
   label: string;
   description: string;
 }[] = [
-  { value: "MANAGER", label: "Manager", description: "Can edit and manage sharing" },
-  { value: "EDITOR", label: "Editor", description: "Can view and make changes" },
-  { value: "COMMENTER", label: "Commenter", description: "Can view and comment" },
-  { value: "VIEWER", label: "Viewer", description: "Can view only" },
-];
+    { value: "MANAGER", label: "Manager", description: "Can edit and manage sharing" },
+    { value: "EDITOR", label: "Editor", description: "Can view and make changes" },
+    // { value: "COMMENTER", label: "Commenter", description: "Can view and comment" },
+    { value: "VIEWER", label: "Viewer", description: "Can view only" },
+  ];
 
 export const ROLE_LABEL: Record<string, string> = {
   OWNER: "Owner",
   MANAGER: "Manager",
   EDITOR: "Editor",
-  COMMENTER: "Commenter",
+  // COMMENTER: "Commenter",
   VIEWER: "Viewer",
 };

@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2, Search, UserPlus, X } from "lucide-react";
+import { CircleX, Loader2, Search, UserPlus2 } from "lucide-react";
 import {
   Popover,
   PopoverContent,
@@ -214,7 +214,7 @@ export function CollaboratorsManager({
                             </p>
                           )}
                         </div>
-                        <UserPlus className="text-muted-foreground size-4" />
+                        <UserPlus2 className="text-muted-foreground size-4" />
                       </button>
                     ))
                   ) : (
@@ -257,7 +257,9 @@ export function CollaboratorsManager({
                       }
                     >
                       <SelectTrigger size="sm" className="h-8 w-28 text-xs">
-                        <SelectValue />
+                        <SelectValue>
+                          {ROLE_LABEL[s.role] ?? s.role}
+                        </SelectValue>
                       </SelectTrigger>
                       <SelectContent>
                         {ROLE_OPTIONS.map((r) => (
@@ -283,7 +285,7 @@ export function CollaboratorsManager({
                       }
                       aria-label="Remove recipient"
                     >
-                      <X className="size-4" />
+                      <CircleX />
                     </Button>
                   </div>
                 ))}
@@ -346,7 +348,9 @@ export function CollaboratorsManager({
                     disabled={pending}
                   >
                     <SelectTrigger size="sm" className="h-8 w-28 text-xs">
-                      <SelectValue />
+                      <SelectValue>
+                        {ROLE_LABEL[person.role] ?? person.role}
+                      </SelectValue>
                     </SelectTrigger>
                     <SelectContent>
                       {ROLE_OPTIONS.map((r) => (
