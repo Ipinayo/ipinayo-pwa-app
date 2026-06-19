@@ -109,11 +109,53 @@ export type ActivityEventMap = {
         };
     };
 
-    "selection.shared": {
+    "selection.deleted_by_other": {
+        entityType: "selection";
+        metadata: {
+            title: string;
+            actorName: string;
+        };
+    };
+
+    "selection.shared_with_other": {
         entityType: "selection";
         metadata: {
             title: string;
             role: string;
+            actorName: string;
+        };
+    };
+
+    "selection.shared_by_other": {
+        entityType: "selection";
+        metadata: {
+            title: string;
+            actorName: string;
+            count: number;
+        };
+    };
+
+    "selection.shared_by_self": {
+        entityType: "selection";
+        metadata: {
+            title: string;
+            count: number;
+        };
+    };
+
+    "selection.role_updated": {
+        entityType: "selection";
+        metadata: {
+            title: string;
+            role: string;
+            actorName: string;
+        };
+    };
+
+    "selection.updated_by_other": {
+        entityType: "selection";
+        metadata: {
+            title: string;
             actorName: string;
         };
     };
@@ -163,11 +205,45 @@ export type ActivityEventMap = {
         };
     };
 
-    "draft.shared": {
+    "draft.shared_with_other": {
         entityType: "draft";
         metadata: {
             title: string;
             role: string;
+            actorName: string;
+        };
+    };
+
+    "draft.shared_by_other": {
+        entityType: "draft";
+        metadata: {
+            title: string;
+            actorName: string;
+            count: number;
+        };
+    };
+
+    "draft.shared_by_self": {
+        entityType: "draft";
+        metadata: {
+            title: string;
+            count: number;
+        };
+    };
+
+    "draft.role_updated": {
+        entityType: "draft";
+        metadata: {
+            title: string;
+            role: string;
+            actorName: string;
+        };
+    };
+
+    "draft.updated_by_other": {
+        entityType: "draft";
+        metadata: {
+            title: string;
             actorName: string;
         };
     };

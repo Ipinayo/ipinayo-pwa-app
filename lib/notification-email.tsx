@@ -151,16 +151,16 @@ const notificationEmails: {
       />
     ),
   },
-  "selection.shared": {
-    subject: (m) => `${m.actorName} shared "${m.title}" with you`,
+  "selection.shared_with_other": {
+    subject: (m) => `${m.actorName} invited you to the selection "${m.title}"`,
     render: (m, url) => (
       <GenericNotificationEmail
-        preview={`${m.actorName} shared a selection with you`}
+        preview={`${m.actorName} invited you to a selection`}
         heading="A selection was shared with you"
         message={
           <span>
-            {m.actorName} shared the selection <strong>{m.title}</strong> with
-            you as {m.role.toLowerCase()}.
+            {m.actorName} invited you to the selection{" "}
+            <strong>{m.title}</strong> as {m.role.toLowerCase()}.
           </span>
         }
         actionUrl={url}
@@ -168,16 +168,98 @@ const notificationEmails: {
       />
     ),
   },
-  "draft.shared": {
-    subject: (m) => `${m.actorName} shared the draft "${m.title}" with you`,
+  "selection.deleted_by_other": {
+    subject: (m) => `"${m.title}" was deleted`,
     render: (m, url) => (
       <GenericNotificationEmail
-        preview={`${m.actorName} shared a draft with you`}
+        preview={`${m.actorName} deleted a shared selection`}
+        heading="A shared selection was deleted"
+        message={
+          <span>
+            {m.actorName} deleted the selection <strong>{m.title}</strong>
+          </span>
+        }
+        actionUrl={url}
+        actionLabel={url ? "Open Ìpínayò" : undefined}
+      />
+    ),
+  },
+  "selection.role_updated": {
+    subject: (m) => `Your access to "${m.title}" changed`,
+    render: (m, url) => (
+      <GenericNotificationEmail
+        preview="Your access changed"
+        heading="Your access changed"
+        message={
+          <span>
+            {m.actorName} changed your access to the selection{" "}
+            <strong>{m.title}</strong> to {m.role.toLowerCase()}.
+          </span>
+        }
+        actionUrl={url}
+        actionLabel={url ? "View Selection" : undefined}
+      />
+    ),
+  },
+  "selection.updated_by_other": {
+    subject: (m) => `"${m.title}" was updated`,
+    render: (m, url) => (
+      <GenericNotificationEmail
+        preview={`${m.actorName} updated a shared selection`}
+        heading="A shared selection was updated"
+        message={
+          <span>
+            {m.actorName} updated the selection <strong>{m.title}</strong>
+          </span>
+        }
+        actionUrl={url}
+        actionLabel={url ? "View Selection" : undefined}
+      />
+    ),
+  },
+  "draft.shared_with_other": {
+    subject: (m) => `${m.actorName} invited you to the draft "${m.title}"`,
+    render: (m, url) => (
+      <GenericNotificationEmail
+        preview={`${m.actorName} invited you to a draft`}
         heading="A draft was shared with you"
         message={
           <span>
-            {m.actorName} shared the draft <strong>{m.title}</strong> with you as{" "}
+            {m.actorName} invited you to the draft <strong>{m.title}</strong> as{" "}
             {m.role.toLowerCase()}.
+          </span>
+        }
+        actionUrl={url}
+        actionLabel={url ? "Open Draft" : undefined}
+      />
+    ),
+  },
+  "draft.role_updated": {
+    subject: (m) => `Your access to the draft "${m.title}" changed`,
+    render: (m, url) => (
+      <GenericNotificationEmail
+        preview="Your access changed"
+        heading="Your access changed"
+        message={
+          <span>
+            {m.actorName} changed your access to the draft{" "}
+            <strong>{m.title}</strong> to {m.role.toLowerCase()}.
+          </span>
+        }
+        actionUrl={url}
+        actionLabel={url ? "Open Draft" : undefined}
+      />
+    ),
+  },
+  "draft.updated_by_other": {
+    subject: (m) => `The draft "${m.title}" was updated`,
+    render: (m, url) => (
+      <GenericNotificationEmail
+        preview={`${m.actorName} updated a shared draft`}
+        heading="A shared draft was updated"
+        message={
+          <span>
+            {m.actorName} updated the draft <strong>{m.title}</strong>
           </span>
         }
         actionUrl={url}

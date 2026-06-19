@@ -441,15 +441,60 @@ export const userNotificationEvents: Partial<Record<keyof ActivityEventMap, { la
         description: "These are notifications for when you delete a selection",
         default: { inApp: true, email: false, push: false },
     },
-    "selection.shared": {
+    "selection.shared_with_other": {
         label: "Selection Shared With You",
         description: "These are notifications for when someone shares a selection with you",
         default: { inApp: true, email: true, push: true },
     },
-    "draft.shared": {
+    "selection.shared_by_other": {
+        label: "Your Selection Shared",
+        description: "These are notifications for when someone with access shares your selection with others",
+        default: { inApp: true, email: false, push: true },
+    },
+    "selection.shared_by_self": {
+        label: "Selection You Shared",
+        description: "These are notifications for when you share a selection with others",
+        default: { inApp: false, email: false, push: false },
+    },
+    "selection.role_updated": {
+        label: "Your Selection Access Changed",
+        description: "These are notifications for when your role on a shared selection changes",
+        default: { inApp: true, email: false, push: true },
+    },
+    "selection.updated_by_other": {
+        label: "Shared Selection Updated",
+        description: "These are notifications for when someone updates a selection shared with you",
+        default: { inApp: true, email: false, push: true },
+    },
+    "selection.deleted_by_other": {
+        label: "Shared Selection Deleted",
+        description: "These are notifications for when someone deletes a selection shared with you",
+        default: { inApp: true, email: true, push: true },
+    },
+    "draft.shared_with_other": {
         label: "Draft Shared With You",
         description: "These are notifications for when someone shares a draft with you",
         default: { inApp: true, email: true, push: true },
+    },
+    "draft.shared_by_other": {
+        label: "Your Draft Shared",
+        description: "These are notifications for when someone with access shares your draft with others",
+        default: { inApp: true, email: false, push: true },
+    },
+    "draft.shared_by_self": {
+        label: "Draft You Shared",
+        description: "These are notifications for when you share a draft with others",
+        default: { inApp: false, email: false, push: false },
+    },
+    "draft.role_updated": {
+        label: "Your Draft Access Changed",
+        description: "These are notifications for when your role on a shared draft changes",
+        default: { inApp: true, email: false, push: true },
+    },
+    "draft.updated_by_other": {
+        label: "Shared Draft Updated",
+        description: "These are notifications for when someone updates a draft shared with you",
+        default: { inApp: true, email: false, push: true },
     },
     "draft.created_by_self": {
         label: "Draft Created",
