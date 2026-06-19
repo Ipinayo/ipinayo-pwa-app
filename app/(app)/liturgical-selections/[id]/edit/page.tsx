@@ -8,6 +8,9 @@ import BackButton from "@/components/common/back-button";
 import EditForm from "@/components/app/mass-selections/edit-selection";
 import { Params } from "@/types/utils";
 import { PushNotificationPrompt } from "@/components/push-notification-prompt";
+import { Permission, can } from "@/lib/collaboration-utils";
+
+import { getSelectionAccess } from "@/lib/actions/collaboration";
 import { requireAuth } from "@/lib/auth";
 
 export default async function EditPage(props: { params: Params }) {
@@ -17,7 +20,8 @@ export default async function EditPage(props: { params: Params }) {
 
   const selection = await getSelectionById(params.id);
 
-  if (selection.createdById !== session.user.id) {
+  const access = await getSelectionAccess(selection.id, session.user.id);
+  if (!can(access, Permission.Edit)) {
     throw new Error("Unauthorized");
   }
 

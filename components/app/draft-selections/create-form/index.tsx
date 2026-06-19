@@ -76,6 +76,7 @@ type CreateFormProps = {
   draftSelection: MassSelectionDraft;
   themes: string[];
   partNames: string[];
+  canEdit?: boolean;
 };
 
 const getDefaultValues = (props: CreateFormProps): DraftMassSelection => {
@@ -188,6 +189,7 @@ export default function CreateForm(props: Readonly<CreateFormProps>) {
   const { save } = useDraftAutosave({
     draftId: props.draftSelection.id,
     form,
+    enableAutoSave: props.canEdit ?? false,
     onSaveSuccess: (isAutoSave) => {
       if (!isAutoSave) {
         toast.success("Successfully saved draft!");
