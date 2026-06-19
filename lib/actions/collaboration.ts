@@ -213,9 +213,14 @@ export async function changeSelectionRole(input: unknown) {
       throw new Error("You don't have permission to change roles.");
     }
 
+    const selection = await findSelectionMeta(id);
+    if (!selection) throw new Error("Selection not found.");
+    if (userId === selection.createdById) {
+      throw new Error("The owner's role can't be changed.");
+    }
+
     await updateSelectionCollaboratorRole(id, userId, role);
 
-    const selection = await findSelectionMeta(id);
     createActivity({
       targetUsers: [userId],
       event: "selection.role_updated",
@@ -251,10 +256,14 @@ export async function removeSelectionAccess(input: unknown) {
       throw new Error("You can't remove this collaborator.");
     }
 
+    const selection = await findSelectionMeta(id);
+    if (userId === selection?.createdById) {
+      throw new Error("The owner's access can't be removed.");
+    }
+
     await removeSelectionCollaborator(id, userId);
 
     if (userId !== session.user.id) {
-      const selection = await findSelectionMeta(id);
       createActivity({
         targetUsers: [userId],
         event: "selection.access_revoked",
@@ -379,9 +388,14 @@ export async function changeDraftRole(input: unknown) {
       throw new Error("You don't have permission to change roles.");
     }
 
+    const draft = await findDraftMeta(id);
+    if (!draft) throw new Error("Draft not found.");
+    if (userId === draft.createdById) {
+      throw new Error("The owner's role can't be changed.");
+    }
+
     await updateDraftCollaboratorRole(id, userId, role);
 
-    const draft = await findDraftMeta(id);
     createActivity({
       targetUsers: [userId],
       event: "draft.role_updated",
@@ -415,10 +429,14 @@ export async function removeDraftAccess(input: unknown) {
       throw new Error("You can't remove this collaborator.");
     }
 
+    const draft = await findDraftMeta(id);
+    if (userId === draft?.createdById) {
+      throw new Error("The owner's access can't be removed.");
+    }
+
     await removeDraftCollaborator(id, userId);
 
     if (userId !== session.user.id) {
-      const draft = await findDraftMeta(id);
       createActivity({
         targetUsers: [userId],
         event: "draft.access_revoked",

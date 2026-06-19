@@ -115,6 +115,13 @@ export async function getSelectionById(id: string) {
         if (!selection) {
             throw new Error("Mass selection not found");
         }
+
+        const session = await auth();
+        const access = await getSelectionAccess(id, session?.user?.id);
+        if (!can(access, Permission.View)) {
+            throw new Error("Unauthorized");
+        }
+
         return selection;
     } catch (error: any) {
         console.error("Error fetching mass selection:", error);
