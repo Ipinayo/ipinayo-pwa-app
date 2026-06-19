@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NotificationModal } from "./notification-modal";
+import { requestPushPrompt } from "@/lib/push-notification-utils";
 
 interface NotificationBellClientProps {
     initialCount: number;
@@ -21,7 +22,10 @@ export function NotificationBellClient({ initialCount }: NotificationBellClientP
                 variant="ghost"
                 size="icon"
                 className="relative"
-                onClick={() => setIsOpen(true)}
+                onClick={() => {
+                    setIsOpen(true);
+                    requestPushPrompt();
+                }}
                 title="Notifications"
             >
                 <Bell className="h-5 w-5" />

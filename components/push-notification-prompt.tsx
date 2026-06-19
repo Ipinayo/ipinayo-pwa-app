@@ -3,6 +3,7 @@
 import { Bell, X } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import {
+  PUSH_PROMPT_REQUEST_EVENT,
   dismissPushPrompt,
   shouldShowPushPrompt,
 } from "@/lib/push-notification-utils";
@@ -30,6 +31,28 @@ export function PushNotificationPrompt() {
     }, 5000);
 
     return () => clearTimeout(timer);
+  }, [state]);
+
+  // Allow an explicit trigger (e.g. clicking the notification bell) to show the
+  // prompt on demand, without the 5s delay. Still honours the dismiss cooldown
+  // and skips when unsupported/denied/already subscribed.
+  useEffect(() => {
+    const handler = () => {
+      if (
+        state === "loading" ||
+        state === "unsupported" ||
+        state === "denied"
+      ) {
+        return;
+      }
+      if (shouldShowPushPrompt(state === "subscribed")) {
+        setShowPrompt(true);
+      }
+    };
+
+    globalThis.addEventListener(PUSH_PROMPT_REQUEST_EVENT, handler);
+    return () =>
+      globalThis.removeEventListener(PUSH_PROMPT_REQUEST_EVENT, handler);
   }, [state]);
 
   const handleEnable = async () => {
