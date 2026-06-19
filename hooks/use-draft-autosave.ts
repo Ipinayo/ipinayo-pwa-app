@@ -42,6 +42,9 @@ export function useDraftAutosave({
     // Core save function
     const performSave = useCallback(
         async (isAutoSave = false): Promise<void> => {
+
+            if (!enableAutoSave) return;
+
             // Prevent concurrent saves
             if (isSavingRef.current) return;
 
@@ -87,7 +90,7 @@ export function useDraftAutosave({
                 isSavingRef.current = false;
             }
         },
-        [form, draftId, onSaveSuccess, onSaveError]
+        [form, draftId, enableAutoSave, onSaveSuccess, onSaveError]
     );
 
     // Manual save function
@@ -139,7 +142,6 @@ export function useDraftAutosave({
         const handleBeforeUnload = (e: BeforeUnloadEvent) => {
             if (hasUnsavedChanges) {
                 e.preventDefault();
-                e.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
             }
         };
 
