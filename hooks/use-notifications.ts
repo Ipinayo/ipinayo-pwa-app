@@ -4,9 +4,9 @@ import { useCallback, useRef, useState } from "react";
 
 import { Notification, NotificationStatus } from "@/types/models";
 import {
+    deleteAllNotificationsAction,
+    deleteNotificationAction,
     getMyNotificationsFeed,
-    markAllNotificationsAsReadAction,
-    markNotificationAsReadAction,
 } from "@/lib/actions/notification";
 
 interface UseNotificationsOptions {
@@ -52,37 +52,29 @@ export function useNotifications({ onUnreadUpdate }: UseNotificationsOptions = {
         }
     }, [hasMore, nextCursor, load]);
 
-    const markAsRead = useCallback(async (id: string) => {
+    // A notification is removed once viewed; the activity remains on the
+    // activities page.
+    const remove = useCallback(async (id: string) => {
         const prev = notifications;
-        const target = prev.find((n) => n.id === id);
-        if (!target || target.status !== NotificationStatus.UNREAD) return;
-
-        const updated = prev.map((n) =>
-            n.id === id ? { ...n, status: NotificationStatus.READ, readAt: new Date() } : n
-        );
+        const updated = prev.filter((n) => n.id !== id);
         setNotifications(updated);
         onUnreadUpdate?.(countUnread(updated));
 
         try {
-            await markNotificationAsReadAction(id);
+            await deleteNotificationAction(id);
         } catch {
             setNotifications(prev);
             onUnreadUpdate?.(countUnread(prev));
         }
     }, [notifications, onUnreadUpdate]);
 
-    const markAllAsRead = useCallback(async () => {
+    const clearAll = useCallback(async () => {
         const prev = notifications;
-        const updated = prev.map((n) => ({
-            ...n,
-            status: NotificationStatus.READ,
-            readAt: n.readAt ?? new Date(),
-        }));
-        setNotifications(updated);
+        setNotifications([]);
         onUnreadUpdate?.(0);
 
         try {
-            await markAllNotificationsAsReadAction();
+            await deleteAllNotificationsAction();
         } catch {
             setNotifications(prev);
             onUnreadUpdate?.(countUnread(prev));
@@ -95,7 +87,7 @@ export function useNotifications({ onUnreadUpdate }: UseNotificationsOptions = {
         hasMore,
         load,
         loadMore,
-        markAsRead,
-        markAllAsRead,
+        remove,
+        clearAll,
     };
 }

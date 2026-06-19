@@ -148,6 +148,18 @@ export async function deleteAllDismissedNotifications(userId: string) {
     });
 }
 
+export async function deleteNotification(notificationId: string, userId: string) {
+    return await prisma.notification.deleteMany({
+        where: { id: notificationId, userId },
+    });
+}
+
+export async function deleteAllNotifications(userId: string) {
+    return await prisma.notification.deleteMany({
+        where: { userId },
+    });
+}
+
 export async function findNotificationsByUserIdCursor(
     userId: string,
     { cursor, limit = 20 }: { cursor?: string; limit?: number }

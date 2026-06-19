@@ -31,8 +31,8 @@ export function NotificationModal({
     hasMore,
     load,
     loadMore,
-    markAsRead,
-    markAllAsRead,
+    remove,
+    clearAll,
   } = useNotifications({ onUnreadUpdate });
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -91,10 +91,10 @@ export function NotificationModal({
             <Button
               variant="ghost"
               size="sm"
-              onClick={markAllAsRead}
+              onClick={clearAll}
               className="h-6 px-2 text-xs"
             >
-              Mark all as read
+              Clear all
             </Button>
           </div>
 
@@ -102,7 +102,7 @@ export function NotificationModal({
           <div
             ref={scrollContainerRef}
             onScroll={handleScroll}
-            className="flex-1 overflow-y-auto min-h-[300px] px-2"
+            className="flex-1 overflow-y-auto min-h-75 px-2"
           >
             {notifications.length === 0 && !isLoading ? (
               <div className="flex flex-col items-center justify-center py-12 text-center">
@@ -120,7 +120,7 @@ export function NotificationModal({
                   <NotificationItem
                     key={notification.id}
                     notification={notification}
-                    onMarkAsRead={markAsRead}
+                    onView={remove}
                   />
                 ))}
 

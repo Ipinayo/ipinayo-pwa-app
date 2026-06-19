@@ -2,9 +2,9 @@
 
 import {
     countUnreadNotifications,
+    deleteAllNotifications,
+    deleteNotification,
     findNotificationsByUserIdCursor,
-    markAllNotificationsAsRead,
-    markNotificationAsRead,
 } from "@/db/notification";
 
 import { auth } from "@/auth";
@@ -23,31 +23,31 @@ export async function getMyUnreadNotificationsCount() {
     }
 }
 
-export async function markNotificationAsReadAction(notificationId: string) {
+export async function deleteNotificationAction(notificationId: string) {
     try {
         const session = await auth();
         if (!session?.user?.id) {
             throw new Error("Unauthorized");
         }
 
-        return await markNotificationAsRead(notificationId);
+        return await deleteNotification(notificationId, session.user.id);
     } catch (error: any) {
-        console.error("Error marking notification as read:", error);
-        throw new Error("Error marking notification as read: " + error?.message);
+        console.error("Error deleting notification:", error);
+        throw new Error("Error deleting notification: " + error?.message);
     }
 }
 
-export async function markAllNotificationsAsReadAction() {
+export async function deleteAllNotificationsAction() {
     try {
         const session = await auth();
         if (!session?.user?.id) {
             throw new Error("Unauthorized");
         }
 
-        return await markAllNotificationsAsRead(session.user.id);
+        return await deleteAllNotifications(session.user.id);
     } catch (error: any) {
-        console.error("Error marking all notifications as read:", error);
-        throw new Error("Error marking all notifications as read: " + error?.message);
+        console.error("Error deleting all notifications:", error);
+        throw new Error("Error deleting all notifications: " + error?.message);
     }
 }
 
