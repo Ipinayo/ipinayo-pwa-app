@@ -1,5 +1,7 @@
 'use server';
 
+import { Permission, can } from "@/lib/collaboration-utils";
+import { findDraftMeta, findDraftStakeholderIds } from "@/db/collaborators";
 import findDraftsByUserId, { createDraft, deleteDraftById, findDraftById, updateDraftById } from "@/db/draft";
 
 import { DraftMassSelection } from "@/types/schemas/mass-selections";
@@ -7,6 +9,7 @@ import { DraftSelectionFilter } from "@/types/utils";
 import { auth } from "@/auth";
 import { createActivity } from "@/lib/notifications/dispatch";
 import { findUserParishAndChoirInfo } from "@/db/user";
+import { getDraftAccess } from "@/lib/actions/collaboration";
 import { liturgyTemplates } from "../constants";
 import { revalidatePath } from "next/cache";
 
@@ -22,9 +25,12 @@ export async function getDraftById(id: string) {
         if (!draft) {
             throw new Error("Draft not found");
         }
-        if (draft.createdById !== session.user.id) {
+
+        const access = await getDraftAccess(id, session.user.id);
+        if (!can(access, Permission.View)) {
             throw new Error("Unauthorized");
         }
+
         return draft;
     } catch (error: any) {
         console.error("Error fetching draft:", error);
@@ -136,15 +142,36 @@ export async function updateDraft(id: string, selection: DraftMassSelection) {
             throw new Error("Unauthorized");
         }
 
-        const updatedDraft = await updateDraftById(id, selection, session.user.id);
+        const access = await getDraftAccess(id, session.user.id);
+        if (!can(access, Permission.Edit)) {
+            throw new Error("You don't have edit access to this draft");
+        }
 
+        const updatedDraft = await updateDraftById(id, selection);
+
+        const title = updatedDraft.title || "Untitled Draft";
+
+        // The actor's own feed record.
         createActivity({
             targetUsers: [session.user.id],
             event: "draft.updated_by_self",
             entityId: updatedDraft.id,
-            metadata: { title: updatedDraft.title || "Untitled Draft" },
+            metadata: { title },
             actorId: session.user.id,
         });
+
+        // Notify everyone else with access that a shared draft changed.
+        const stakeholders = await findDraftStakeholderIds(id);
+        const others = stakeholders.filter((uid) => uid !== session.user.id);
+        if (others.length > 0) {
+            createActivity({
+                targetUsers: others,
+                event: "draft.updated_by_other",
+                entityId: updatedDraft.id,
+                metadata: { title, actorName: session.user.name || session.user.email || "Someone" },
+                actorId: session.user.id,
+            });
+        }
 
         revalidatePath('/liturgical-selections/new');
         revalidatePath('/dashboard');
@@ -164,15 +191,38 @@ export async function deleteDraft(id: string) {
             throw new Error("Unauthorized");
         }
 
-        const deletedDraft = await deleteDraftById(id, session.user.id);
+        const access = await getDraftAccess(id, session.user.id);
+        if (!can(access, Permission.Manage)) {
+            throw new Error("You don't have permission to delete this draft");
+        }
+
+        const draft = await findDraftMeta(id);
+        const title = draft?.title || "Untitled Draft";
+
+        // Capture everyone with access before the cascade delete removes the rows.
+        const stakeholders = await findDraftStakeholderIds(id);
+
+        await deleteDraftById(id);
 
         createActivity({
             targetUsers: [session.user.id],
             event: "draft.deleted_by_self",
-            entityId: deletedDraft.id,
-            metadata: { title: deletedDraft.title || "Untitled Draft" },
+            entityId: id,
+            metadata: { title },
             actorId: session.user.id,
         });
+
+        // Notify everyone else with access that the shared draft was deleted.
+        const others = stakeholders.filter((uid) => uid !== session.user.id);
+        if (others.length > 0) {
+            createActivity({
+                targetUsers: others,
+                event: "draft.deleted_by_other",
+                entityId: id,
+                metadata: { title, actorName: session.user.name || session.user.email || "Someone", expired: false },
+                actorId: session.user.id,
+            });
+        }
 
         revalidatePath('/liturgical-selections/new');
         revalidatePath('/dashboard');

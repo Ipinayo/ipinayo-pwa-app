@@ -1,4 +1,4 @@
-import { Activity, BookOpen } from "lucide-react";
+import { Activity, BookOpen, Users } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -10,6 +10,7 @@ import RecentActivities from "@/components/app/dashboard/recent-activities";
 import RecentActivitiesSkeleton from "@/components/app/dashboard/recent-activities/index-skeleton";
 import SelectionsList from "@/components/app/dashboard/selections-list";
 import SelectionsListSkeleton from "@/components/app/dashboard/selections-list/index-skeleton";
+import SharedWithMe from "@/components/app/dashboard/shared-with-me";
 import Statistics from "@/components/app/dashboard/statistics";
 import StatisticsSkeleton from "@/components/app/dashboard/statistics/index-skeleton";
 import { Suspense } from "react";
@@ -42,7 +43,7 @@ export default async function DashboardPage() {
           defaultValue="selections"
           className="lg:col-span-2 space-y-6 min-w-0"
         >
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="selections" className="gap-2">
               <BookOpen className="h-4 w-4" />
               My Selections
@@ -50,6 +51,10 @@ export default async function DashboardPage() {
             <TabsTrigger value="drafts" className="gap-2">
               <BookOpen className="h-4 w-4 text-amber-500" />
               My Drafts
+            </TabsTrigger>
+            <TabsTrigger value="shared" className="gap-2">
+              <Users className="h-4 w-4" />
+              Shared
             </TabsTrigger>
           </TabsList>
 
@@ -62,6 +67,12 @@ export default async function DashboardPage() {
           <TabsContent value="drafts" className="space-y-4">
             <Suspense fallback={<DraftListSkeleton />}>
               <DraftList />
+            </Suspense>
+          </TabsContent>
+
+          <TabsContent value="shared" className="space-y-4">
+            <Suspense fallback={<SelectionsListSkeleton />}>
+              <SharedWithMe />
             </Suspense>
           </TabsContent>
         </Tabs>
