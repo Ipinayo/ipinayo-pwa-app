@@ -229,4 +229,4 @@ export type Announcement = Prisma.AnnouncementGetPayload<{
 
 export type Json = Prisma.JsonValue;
 
-export { KeySignature, LiturgicalSeason, LiturgicalYear, UserRole, NotificationStatus } from "@/lib/generated/prisma/enums";
+export { KeySignature, LiturgicalSeason, LiturgicalYear, UserRole, NotificationStatus, CollaboratorRole } from "@/lib/generated/prisma/enums";
