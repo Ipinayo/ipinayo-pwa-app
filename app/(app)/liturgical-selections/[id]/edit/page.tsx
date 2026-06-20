@@ -7,7 +7,6 @@ import {
 import BackButton from "@/components/common/back-button";
 import EditForm from "@/components/app/mass-selections/edit-selection";
 import { Params } from "@/types/utils";
-import { PushNotificationPrompt } from "@/components/push-notification-prompt";
 import { Permission, can } from "@/lib/collaboration-utils";
 
 import { getSelectionAccess } from "@/lib/actions/collaboration";
@@ -54,8 +53,6 @@ export default async function EditPage(props: { params: Params }) {
         themes={themes}
         partNames={partNames}
       />
-
-      <PushNotificationPrompt />
     </div>
   );
 }

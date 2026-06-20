@@ -5,7 +5,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import CreateSelectionTrigger from "@/components/common/create-selection-trigger";
 import DraftList from "@/components/app/dashboard/draft-list";
 import DraftListSkeleton from "@/components/app/dashboard/draft-list/index-skeleton";
-import { PushNotificationPrompt } from "@/components/push-notification-prompt";
 import RecentActivities from "@/components/app/dashboard/recent-activities";
 import RecentActivitiesSkeleton from "@/components/app/dashboard/recent-activities/index-skeleton";
 import SelectionsList from "@/components/app/dashboard/selections-list";
@@ -91,8 +90,6 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
       </div>
-
-      <PushNotificationPrompt />
     </div>
   );
 }

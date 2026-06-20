@@ -4,6 +4,7 @@ import { AssistantProvider } from "@/components/app/assistant/assistant-provider
 import Footer from "@/components/common/footer";
 import Header from "@/components/app/layout/Header";
 import HeaderSkeleton from "@/components/app/layout/HeaderSkeleton";
+import { PushNotificationPrompt } from "@/components/push-notification-prompt";
 import SideNav from "@/components/app/layout/SideNav";
 import { Suspense } from "react";
 import { auth } from "@/auth";
@@ -34,6 +35,7 @@ export default async function AppLayout({
         </div>
       </AppShell>
       <Assistant />
+      {session?.user && <PushNotificationPrompt />}
     </AssistantProvider>
   );
 }
