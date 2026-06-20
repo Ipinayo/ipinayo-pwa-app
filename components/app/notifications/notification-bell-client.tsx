@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NotificationModal } from "./notification-modal";
-import { requestPushPrompt } from "@/lib/push-notification-utils";
+import { usePushPrompt } from "@/contexts/PushPromptContext";
 
 interface NotificationBellClientProps {
     initialCount: number;
@@ -15,6 +15,7 @@ interface NotificationBellClientProps {
 export function NotificationBellClient({ initialCount }: NotificationBellClientProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [unreadCount, setUnreadCount] = useState(initialCount);
+    const { requestPrompt } = usePushPrompt();
 
     return (
         <>
@@ -24,7 +25,7 @@ export function NotificationBellClient({ initialCount }: NotificationBellClientP
                 className="relative"
                 onClick={() => {
                     setIsOpen(true);
-                    requestPushPrompt();
+                    requestPrompt();
                 }}
                 title="Notifications"
             >

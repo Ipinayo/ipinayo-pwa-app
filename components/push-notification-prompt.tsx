@@ -3,7 +3,6 @@
 import { Bell, X } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import {
-  PUSH_PROMPT_REQUEST_EVENT,
   dismissPushPrompt,
   shouldShowPushPrompt,
 } from "@/lib/push-notification-utils";
@@ -11,10 +10,12 @@ import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { usePushPrompt } from "@/contexts/PushPromptContext";
 import { usePushSubscription } from "@/hooks/use-push-subscription";
 
 export function PushNotificationPrompt() {
   const { state, subscribe } = usePushSubscription();
+  const { requestCount } = usePushPrompt();
   const [showPrompt, setShowPrompt] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -35,25 +36,21 @@ export function PushNotificationPrompt() {
 
   // Allow an explicit trigger (e.g. clicking the notification bell) to show the
   // prompt on demand, without the 5s delay. Still honours the dismiss cooldown
-  // and skips when unsupported/denied/already subscribed.
+  // and skips when unsupported/denied/already subscribed. Re-runs when `state`
+  // resolves so a click made while still "loading" shows once it's known.
   useEffect(() => {
-    const handler = () => {
-      if (
-        state === "loading" ||
-        state === "unsupported" ||
-        state === "denied"
-      ) {
-        return;
-      }
-      if (shouldShowPushPrompt(state === "subscribed")) {
-        setShowPrompt(true);
-      }
-    };
-
-    globalThis.addEventListener(PUSH_PROMPT_REQUEST_EVENT, handler);
-    return () =>
-      globalThis.removeEventListener(PUSH_PROMPT_REQUEST_EVENT, handler);
-  }, [state]);
+    console.log("PushNotificationPrompt: requestCount changed", {
+      requestCount,
+      state,
+    });
+    if (requestCount === 0) return;
+    if (state === "loading" || state === "unsupported" || state === "denied") {
+      return;
+    }
+    if (shouldShowPushPrompt(state === "subscribed")) {
+      setShowPrompt(true);
+    }
+  }, [requestCount, state]);
 
   const handleEnable = async () => {
     setIsLoading(true);

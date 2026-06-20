@@ -4,7 +4,7 @@ import type { Metadata, Viewport } from "next";
 import { geistMono, pattaya, playfairDisplay, sourceSans } from "./ui/fonts";
 
 import { Analytics } from "@vercel/analytics/next";
-import { AppNavigationProvider } from "@/contexts/AppNavigationContext";
+import AppContextProvider from "@/contexts/AppContextProvider";
 import { OfflineIndicator } from "@/components/offline-indicator";
 import { PWAInstallPrompt } from "@/components/pwa-install-prompt";
 import { SerwistProvider } from "./serwist";
@@ -485,7 +485,7 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <SessionProvider>
-              <AppNavigationProvider>
+              <AppContextProvider>
                 {children}
                 <Toaster
                   duration={5000}
@@ -496,7 +496,7 @@ export default function RootLayout({
                 />
                 <PWAInstallPrompt />
                 <OfflineIndicator />
-              </AppNavigationProvider>
+              </AppContextProvider>
             </SessionProvider>
           </ThemeProvider>
           <Analytics />
