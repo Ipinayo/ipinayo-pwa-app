@@ -37,7 +37,7 @@ export type NewLocation = Omit<Prisma.LocationCreateInput, 'id' | 'massSelection
     country?: string
 };
 
-export type NewMassSelection = Omit<Prisma.MassSelectionCreateInput, 'id' | 'createdAt' | 'updatedAt' | 'createdBy' | 'themes' | 'parishLocation' | 'date'> & {
+export type NewMassSelection = Omit<Prisma.MassSelectionCreateInput, 'id' | 'createdAt' | 'updatedAt' | 'createdBy' | 'collaborators' | 'themes' | 'parishLocation' | 'date'> & {
     date: Date
     themes: string[]
     parts: NewMassSelectionPart[]
