@@ -3,8 +3,8 @@
 import {
     countUnreadNotifications,
     deleteAllNotifications,
-    deleteNotification,
     findNotificationsByUserIdCursor,
+    markNotificationAsRead,
 } from "@/db/notification";
 
 import { auth } from "@/auth";
@@ -23,17 +23,17 @@ export async function getMyUnreadNotificationsCount() {
     }
 }
 
-export async function deleteNotificationAction(notificationId: string) {
+export async function markNotificationAsReadAction(notificationId: string) {
     try {
         const session = await auth();
         if (!session?.user?.id) {
             throw new Error("Unauthorized");
         }
 
-        return await deleteNotification(notificationId, session.user.id);
+        return await markNotificationAsRead(notificationId);
     } catch (error: any) {
-        console.error("Error deleting notification:", error);
-        throw new Error("Error deleting notification: " + error?.message);
+        console.error("Error marking notification as read:", error);
+        throw new Error("Error marking notification as read: " + error?.message);
     }
 }
 

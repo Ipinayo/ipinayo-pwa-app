@@ -8,17 +8,19 @@ import { useRouter } from "next/navigation";
 
 interface NotificationItemProps {
   notification: Notification;
-  onView?: (id: string) => void;
+  onMarkAsRead?: (id: string) => void;
 }
 
 export function NotificationItem({
   notification,
-  onView,
+  onMarkAsRead,
 }: Readonly<NotificationItemProps>) {
   const router = useRouter();
 
   const handleClick = () => {
-    onView?.(notification.id);
+    if (notification.status === NotificationStatus.UNREAD) {
+      onMarkAsRead?.(notification.id);
+    }
     if (notification.actionUrl) {
       router.push(notification.actionUrl);
     }

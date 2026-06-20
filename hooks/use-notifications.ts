@@ -1,13 +1,12 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
-
 import { Notification, NotificationStatus } from "@/types/models";
 import {
     deleteAllNotificationsAction,
-    deleteNotificationAction,
     getMyNotificationsFeed,
+    markNotificationAsReadAction,
 } from "@/lib/actions/notification";
+import { useCallback, useRef, useState } from "react";
 
 interface UseNotificationsOptions {
     onUnreadUpdate?: (count: number) => void;
@@ -52,34 +51,39 @@ export function useNotifications({ onUnreadUpdate }: UseNotificationsOptions = {
         }
     }, [hasMore, nextCursor, load]);
 
-    // A notification is removed once viewed; the activity remains on the
-    // activities page.
-    const remove = useCallback(async (id: string) => {
-        const prev = notifications;
-        const updated = prev.filter((n) => n.id !== id);
-        setNotifications(updated);
-        onUnreadUpdate?.(countUnread(updated));
+    // Viewing a notification marks it read. 
+    const markAsRead = useCallback(async (id: string) => {
+        setNotifications((prev) => {
+            const updated = prev.map((n) =>
+                n.id === id && n.status === NotificationStatus.UNREAD
+                    ? { ...n, status: NotificationStatus.READ, readAt: new Date() }
+                    : n
+            );
+            onUnreadUpdate?.(countUnread(updated));
+            return updated;
+        });
 
         try {
-            await deleteNotificationAction(id);
-        } catch {
-            setNotifications(prev);
-            onUnreadUpdate?.(countUnread(prev));
+            await markNotificationAsReadAction(id);
+        } catch (error) {
+            console.error("Failed to mark notification as read:", error);
+            // The update didn't persist — re-sync from the server rather than
+            // trusting a (possibly stale) local snapshot.
+            load();
         }
-    }, [notifications, onUnreadUpdate]);
+    }, [onUnreadUpdate, load]);
 
     const clearAll = useCallback(async () => {
-        const prev = notifications;
         setNotifications([]);
         onUnreadUpdate?.(0);
 
         try {
             await deleteAllNotificationsAction();
-        } catch {
-            setNotifications(prev);
-            onUnreadUpdate?.(countUnread(prev));
+        } catch (error) {
+            console.error("Failed to clear notifications:", error);
+            load();
         }
-    }, [notifications, onUnreadUpdate]);
+    }, [onUnreadUpdate, load]);
 
     return {
         notifications,
@@ -87,7 +91,7 @@ export function useNotifications({ onUnreadUpdate }: UseNotificationsOptions = {
         hasMore,
         load,
         loadMore,
-        remove,
+        markAsRead,
         clearAll,
     };
 }

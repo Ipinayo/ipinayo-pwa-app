@@ -27,7 +27,7 @@ export function NotificationModal({
     hasMore,
     load,
     loadMore,
-    remove,
+    markAsRead,
     clearAll,
   } = useNotifications({ onUnreadUpdate });
 
@@ -107,7 +107,7 @@ export function NotificationModal({
                 <NotificationItem
                   key={notification.id}
                   notification={notification}
-                  onView={remove}
+                  onMarkAsRead={markAsRead}
                 />
               ))}
 
