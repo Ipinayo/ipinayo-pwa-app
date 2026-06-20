@@ -2,7 +2,6 @@
 
 import { AppNavigationProvider } from "./AppNavigationContext";
 import { PushPromptProvider } from "./PushPromptContext";
-import React from "react";
 
 export default function AppContextProvider({
   children,
