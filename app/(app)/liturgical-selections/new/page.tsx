@@ -11,7 +11,6 @@ import { Box } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import DraftCard from "@/components/app/draft-selections/draft-card";
 import Link from "next/link";
-import { PushNotificationPrompt } from "@/components/push-notification-prompt";
 import SelectTemplateButton from "@/components/app/draft-selections/select-template-button";
 import { getAllDrafts } from "@/lib/actions/draft";
 import { liturgyTemplates } from "@/lib/constants";
@@ -133,8 +132,6 @@ export default async function SelectLiturgyTemplatePage() {
           it to your requirements.
         </p>
       </div>
-
-      <PushNotificationPrompt />
     </div>
   );
 }

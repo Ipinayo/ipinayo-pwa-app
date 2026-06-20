@@ -1,13 +1,12 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
-
 import { Notification, NotificationStatus } from "@/types/models";
 import {
+    deleteAllNotificationsAction,
     getMyNotificationsFeed,
-    markAllNotificationsAsReadAction,
     markNotificationAsReadAction,
 } from "@/lib/actions/notification";
+import { useCallback, useRef, useState } from "react";
 
 interface UseNotificationsOptions {
     onUnreadUpdate?: (count: number) => void;
@@ -52,42 +51,39 @@ export function useNotifications({ onUnreadUpdate }: UseNotificationsOptions = {
         }
     }, [hasMore, nextCursor, load]);
 
+    // Viewing a notification marks it read. 
     const markAsRead = useCallback(async (id: string) => {
-        const prev = notifications;
-        const target = prev.find((n) => n.id === id);
-        if (!target || target.status !== NotificationStatus.UNREAD) return;
-
-        const updated = prev.map((n) =>
-            n.id === id ? { ...n, status: NotificationStatus.READ, readAt: new Date() } : n
-        );
-        setNotifications(updated);
-        onUnreadUpdate?.(countUnread(updated));
+        setNotifications((prev) => {
+            const updated = prev.map((n) =>
+                n.id === id && n.status === NotificationStatus.UNREAD
+                    ? { ...n, status: NotificationStatus.READ, readAt: new Date() }
+                    : n
+            );
+            onUnreadUpdate?.(countUnread(updated));
+            return updated;
+        });
 
         try {
             await markNotificationAsReadAction(id);
-        } catch {
-            setNotifications(prev);
-            onUnreadUpdate?.(countUnread(prev));
+        } catch (error) {
+            console.error("Failed to mark notification as read:", error);
+            // The update didn't persist — re-sync from the server rather than
+            // trusting a (possibly stale) local snapshot.
+            load();
         }
-    }, [notifications, onUnreadUpdate]);
+    }, [onUnreadUpdate, load]);
 
-    const markAllAsRead = useCallback(async () => {
-        const prev = notifications;
-        const updated = prev.map((n) => ({
-            ...n,
-            status: NotificationStatus.READ,
-            readAt: n.readAt ?? new Date(),
-        }));
-        setNotifications(updated);
+    const clearAll = useCallback(async () => {
+        setNotifications([]);
         onUnreadUpdate?.(0);
 
         try {
-            await markAllNotificationsAsReadAction();
-        } catch {
-            setNotifications(prev);
-            onUnreadUpdate?.(countUnread(prev));
+            await deleteAllNotificationsAction();
+        } catch (error) {
+            console.error("Failed to clear notifications:", error);
+            load();
         }
-    }, [notifications, onUnreadUpdate]);
+    }, [onUnreadUpdate, load]);
 
     return {
         notifications,
@@ -96,6 +92,6 @@ export function useNotifications({ onUnreadUpdate }: UseNotificationsOptions = {
         load,
         loadMore,
         markAsRead,
-        markAllAsRead,
+        clearAll,
     };
 }
