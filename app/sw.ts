@@ -27,7 +27,7 @@ const serwist = new Serwist({
   fallbacks: {
     entries: [
       {
-        url: "/~offline",
+        url: "/offline",
         matcher({ request }) {
           return request.destination === "document";
         },
@@ -36,7 +36,7 @@ const serwist = new Serwist({
   },
 });
 
-const urlsToCache = ["/", "/liturgical-selections", "/~offline"] as const
+const urlsToCache = ["/", "/liturgical-selections", "/offline"] as const
 
 // cache on install
 self.addEventListener("install", (event) => {

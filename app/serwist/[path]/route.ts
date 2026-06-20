@@ -12,10 +12,17 @@ import { spawnSync } from "node:child_process";
 // `git rev-parse HEAD` might not the most efficient way
 // of determining a revision, however. You may prefer to use
 // the hashes of every extra file you precache.
-const revision = spawnSync("git", ["rev-parse", "HEAD"], { encoding: "utf-8" }).stdout ?? crypto.randomUUID();
+// Trim the trailing newline from `git rev-parse` output, otherwise the
+// revision carries a "%0A" and corrupts the precache URL.
+const revision =
+    spawnSync("git", ["rev-parse", "HEAD"], { encoding: "utf-8" }).stdout?.trim() ||
+    crypto.randomUUID();
 
 export const { dynamic, dynamicParams, revalidate, generateStaticParams, GET } = createSerwistRoute({
-    additionalPrecacheEntries: [{ url: "/~offline", revision }, { url: "/images/logo.png", revision }],
+    // `/images/logo.png` is already in the build's __SW_MANIFEST, so don't add
+    // it again here — duplicate URLs with different revisions make Serwist throw
+    // `add-to-cache-list-conflicting-entries` and the SW fails to register.
+    additionalPrecacheEntries: [{ url: "/offline", revision }],
     swSrc: "app/sw.ts",
     // nextConfig,
     // If set to `false`, Serwist will attempt to use `esbuild-wasm`.
