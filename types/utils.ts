@@ -41,6 +41,7 @@ export interface MassSelectionFilter {
     sortBy?: SortBy,
     sortOrder?: SortOrder
     isPublic?: boolean
+    isFeatured?: boolean
 }
 
 export interface UpdateUserProfile {

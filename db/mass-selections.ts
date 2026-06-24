@@ -57,7 +57,8 @@ export async function findAllSelections({
     year,
     sortBy = SortBy.UPDATED_AT,
     sortOrder = SortOrder.DESC,
-    isPublic
+    isPublic,
+    isFeatured
 }: MassSelectionFilter) {
 
     const skip = (page - 1) * limit
@@ -66,6 +67,7 @@ export async function findAllSelections({
     const whereClause: Prisma.MassSelectionWhereInput = {}
 
     if (isPublic !== undefined) { whereClause.isPublic = isPublic }
+    if (isFeatured !== undefined) { whereClause.isFeatured = isFeatured }
 
     // Build AND conditions array
     const andConditions: Prisma.MassSelectionWhereInput[] = []
@@ -108,9 +110,8 @@ export async function findAllSelections({
     }
 
     // On search, featured selections surface above the rest (even when no
-    // longer the current week's feature); on plain browse, use the requested
-    // sort as-is.
-    const orderBy: Prisma.MassSelectionOrderByWithRelationInput[] = query
+    // longer the current week's feature); on plain browse, use the requested sort as-is.
+    const orderBy: Prisma.MassSelectionOrderByWithRelationInput[] = (query || season || year)
         ? [{ isFeatured: "desc" }, { [sortBy]: sortOrder }]
         : [{ [sortBy]: sortOrder }]
 

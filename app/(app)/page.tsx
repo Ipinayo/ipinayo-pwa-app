@@ -7,6 +7,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { SortBy, SortOrder } from "@/types/utils";
+import {
+  getFeaturedSelections,
+  getSelections,
+} from "@/lib/actions/mass-selections";
 
 import { Button } from "@/components/ui/button";
 import CreateSelectionTrigger from "@/components/common/create-selection-trigger";
@@ -14,7 +18,6 @@ import { Fragment } from "react";
 import Link from "next/link";
 import MassSelectionCard from "@/components/app/mass-selections/mass-selection-card";
 import SelectTemplateButton from "@/components/app/draft-selections/select-template-button";
-import { getSelections } from "@/lib/actions/mass-selections";
 import { getUser } from "@/lib/actions/user";
 import { liturgyTemplates } from "@/lib/constants";
 
@@ -42,18 +45,16 @@ const STEPS = [
 export default async function HomePage() {
   const user = await getUser().catch(() => null);
 
-  let featured: Awaited<ReturnType<typeof getSelections>>["selections"] = [];
-  try {
-    const community = await getSelections({
-      isPublic: true,
-      limit: 3,
-      sortBy: SortBy.UPDATED_AT,
-      sortOrder: SortOrder.DESC,
-    });
-    featured = community.selections;
-  } catch {
-    featured = [];
-  }
+  const featuredThisWeek = await getFeaturedSelections();
+  const selections = await getSelections({
+    isPublic: true,
+    isFeatured: false,
+    limit: 3,
+    sortBy: SortBy.UPDATED_AT,
+    sortOrder: SortOrder.DESC,
+  }).catch(() => null);
+
+  const communitySelections = selections?.selections || [];
 
   const firstName = user?.name?.split(" ")[0] || user?.email?.split("@")[0];
   const quickTemplates = liturgyTemplates.slice(0, 3);
@@ -118,8 +119,35 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* Featured this week */}
+      {featuredThisWeek.length > 0 && (
+        <section className="space-y-5">
+          <div className="flex items-end justify-between gap-4">
+            <div>
+              <h2 className="font-display text-2xl">Featured this week</h2>
+              <p className="text-muted-foreground mt-1 text-sm">
+                Curated selections from trusted contributors — clone one as a
+                starting point for your own.
+              </p>
+            </div>
+            <Button variant="ghost" size="sm" asChild className="shrink-0">
+              <Link href="/liturgical-selections">
+                See all
+                <ArrowRight className="size-4" />
+              </Link>
+            </Button>
+          </div>
+
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 assistant-open:lg:grid-cols-1 assistant-open:xl:grid-cols-2">
+            {featuredThisWeek.map((selection) => (
+              <MassSelectionCard key={selection.id} selection={selection} />
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* Recently shared by the community */}
-      {featured.length > 0 && (
+      {communitySelections.length > 0 && (
         <section className="space-y-5">
           <div className="flex items-end justify-between gap-4">
             <div>
@@ -140,7 +168,7 @@ export default async function HomePage() {
           </div>
 
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 assistant-open:lg:grid-cols-1 assistant-open:xl:grid-cols-2">
-            {featured.map((selection) => (
+            {communitySelections.map((selection) => (
               <MassSelectionCard key={selection.id} selection={selection} />
             ))}
           </div>

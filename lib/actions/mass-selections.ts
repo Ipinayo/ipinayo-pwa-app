@@ -37,7 +37,8 @@ export async function getSelections({
     year,
     sortBy = SortBy.DATE,
     sortOrder = SortOrder.DESC,
-    isPublic
+    isPublic,
+    isFeatured
 }: MassSelectionFilter) {
     try {
         const { selections, total } = await findAllSelections({
@@ -48,7 +49,8 @@ export async function getSelections({
             sortBy,
             sortOrder,
             year,
-            isPublic
+            isPublic,
+            isFeatured
         });
 
         return {
