@@ -543,7 +543,7 @@ export default function CreateForm(props: Readonly<CreateFormProps>) {
               Part" to remove them, but at least one part is required.
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-5">
             <DndContext
               sensors={sensors}
               collisionDetection={closestCenter}

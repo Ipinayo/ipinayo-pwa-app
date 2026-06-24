@@ -91,7 +91,7 @@ export default function EditForm(props: EditFormProps) {
     }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    })
+    }),
   );
 
   const form = useForm<NewMassSelection>({
@@ -127,7 +127,7 @@ export default function EditForm(props: EditFormProps) {
 
   const addPart = (afterIndex?: number) => {
     const insertIndex =
-      afterIndex !== undefined ? afterIndex + 1 : fields.length;
+      afterIndex === undefined ? fields.length : afterIndex + 1;
 
     const newPart = {
       id: `temp-${Date.now()}`,
@@ -139,10 +139,10 @@ export default function EditForm(props: EditFormProps) {
     };
 
     // Use insert if adding at a specific position, append if adding at the end
-    if (afterIndex !== undefined) {
-      insert(insertIndex, newPart);
-    } else {
+    if (afterIndex === undefined) {
       append(newPart);
+    } else {
+      insert(insertIndex, newPart);
     }
   };
 
@@ -302,7 +302,7 @@ export default function EditForm(props: EditFormProps) {
                         field.onChange(
                           value === "none"
                             ? null
-                            : getEnum(LiturgicalYear, value) ?? null
+                            : (getEnum(LiturgicalYear, value) ?? null),
                         )
                       }
                     >
@@ -339,7 +339,7 @@ export default function EditForm(props: EditFormProps) {
                         field.onChange(
                           value === "none"
                             ? null
-                            : getEnum(LiturgicalSeason, value) ?? null
+                            : (getEnum(LiturgicalSeason, value) ?? null),
                         )
                       }
                     >
@@ -440,11 +440,11 @@ export default function EditForm(props: EditFormProps) {
           <CardHeader>
             <CardTitle>Liturgy Parts</CardTitle>
             <CardDescription>
-              Drag to reorder parts. Click "Insert Part" to add parts at
-              specific positions.
+              Click "Insert Part" to add parts at specific positions and "Delete
+              Part" to remove them, but at least one part is required.
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent>
             <DndContext
               sensors={sensors}
               collisionDetection={closestCenter}

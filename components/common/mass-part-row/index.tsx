@@ -43,7 +43,7 @@ export default function MassPartRow({
   };
 
   return (
-    <div ref={setNodeRef} style={style} className="space-y-1">
+    <div ref={setNodeRef} style={style} className="space-y-0.5">
       <div className="flex gap-3 flex-col sm:flex-row">
         {/* Grip Handle */}
         <button
