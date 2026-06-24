@@ -220,6 +220,43 @@ export function isAdmin(userRole: UserRole | null | undefined): boolean {
   return userRole === UserRole.ADMIN || userRole === UserRole.SUPERADMIN;
 }
 
+export function isFeaturedAuthor(
+  userRole: UserRole | null | undefined,
+): boolean {
+  return userRole === UserRole.FEATURED_AUTHOR;
+}
+
+/**
+ * The current calendar week as a Monday→Sunday range, BOTH ends inclusive.
+ */
+export function getCurrentWeekRange(now: Date = new Date()): {
+  start: Date;
+  end: Date;
+} {
+  const daysSinceMonday = (now.getDay() + 6) % 7;
+
+  const monday = new Date(now);
+  monday.setDate(now.getDate() - daysSinceMonday);
+
+  const sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 6);
+
+  const start = new Date(
+    Date.UTC(monday.getFullYear(), monday.getMonth(), monday.getDate()),
+  );
+  const end = new Date(
+    Date.UTC(sunday.getFullYear(), sunday.getMonth(), sunday.getDate()),
+  );
+
+  return { start, end };
+}
+
+export function isDateInCurrentWeek(date: Date | string): boolean {
+  const { start, end } = getCurrentWeekRange();
+  const d = new Date(date);
+  return d >= start && d <= end;
+}
+
 export function stringToBoolean(str: string | undefined | null): boolean | undefined {
 
   const value = str?.toLowerCase();

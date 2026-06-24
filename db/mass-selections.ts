@@ -1,8 +1,8 @@
 import { MassSelectionFilter, SortBy, SortOrder } from "@/types/utils";
 import { MassSelectionStats, NewMassSelection, NewMassSelectionPart, SingleMassSelectionWithParts } from "@/types/models";
+import { Prisma, UserRole } from "@/lib/generated/prisma/client";
+import { capitalize, getCurrentWeekRange } from "@/lib/utils";
 
-import { Prisma } from "@/lib/generated/prisma/client";
-import { capitalize } from "@/lib/utils";
 import prisma from "@/lib/prisma";
 
 export async function findSelectionWithParts(id: string) {
@@ -13,7 +13,7 @@ export async function findSelectionWithParts(id: string) {
             parishLocation: true,
             parts: { orderBy: { order: "asc" } },
             createdBy: {
-                select: { name: true, email: true },
+                select: { name: true, email: true, userRole: true },
             },
         },
     })
@@ -27,7 +27,7 @@ export async function findUserSelectionWithParts(id: string, userId: string) {
             parishLocation: true,
             parts: { orderBy: { order: "asc" } },
             createdBy: {
-                select: { name: true, email: true },
+                select: { name: true, email: true, userRole: true },
             },
         },
     })
@@ -107,10 +107,12 @@ export async function findAllSelections({
         whereClause.AND = andConditions
     }
 
-    // Build order by clause
-    const orderBy = {
-        [sortBy]: sortOrder
-    }
+    // On search, featured selections surface above the rest (even when no
+    // longer the current week's feature); on plain browse, use the requested
+    // sort as-is.
+    const orderBy: Prisma.MassSelectionOrderByWithRelationInput[] = query
+        ? [{ isFeatured: "desc" }, { [sortBy]: sortOrder }]
+        : [{ [sortBy]: sortOrder }]
 
     // Get public selections with filters
     const selections = await prisma.massSelection.findMany({
@@ -119,7 +121,7 @@ export async function findAllSelections({
             themes: true,
             parishLocation: true,
             createdBy: {
-                select: { name: true, email: true },
+                select: { name: true, email: true, userRole: true },
             },
             _count: {
                 select: { parts: true },
@@ -135,6 +137,30 @@ export async function findAllSelections({
     })
 
     return { selections, total }
+}
+
+export async function findFeaturedSelections(limit?: number) {
+    const { start, end } = getCurrentWeekRange()
+
+    return await prisma.massSelection.findMany({
+        where: {
+            isFeatured: true,
+            isPublic: true,
+            date: { gte: start, lte: end },
+        },
+        include: {
+            themes: true,
+            parishLocation: true,
+            createdBy: {
+                select: { name: true, email: true, userRole: true },
+            },
+            _count: {
+                select: { parts: true },
+            },
+        },
+        orderBy: { date: "asc" },
+        ...(limit ? { take: limit } : {}),
+    })
 }
 
 export async function findAllUserSelections({
@@ -199,7 +225,7 @@ export async function findAllUserSelections({
             themes: true,
             parishLocation: true,
             createdBy: {
-                select: { name: true, email: true },
+                select: { name: true, email: true, userRole: true },
             },
             _count: {
                 select: { parts: true },
@@ -229,8 +255,17 @@ export async function saveSelection(selection: NewMassSelection, userId: string,
     })
     const ownerId = draft?.createdById ?? userId
 
+    // A public selection by a featured author is part of the featured bank.
+    const owner = await prisma.user.findUnique({
+        where: { id: ownerId },
+        select: { userRole: true },
+    })
+    const isFeatured =
+        rest.isPublic === true && owner?.userRole === UserRole.FEATURED_AUTHOR
+
     const data: Prisma.MassSelectionCreateInput = {
         ...rest,
+        isFeatured,
         date: date,
         themes: {
             connectOrCreate: themes.map(name => ({
@@ -316,6 +351,22 @@ export async function updateSelection(
 ) {
     const { parts, date, themes, parishLocation, ...rest } = selection
 
+    // Recompute featured status. It's sticky: once featured it stays featured
+    // (so role revocation never retroactively un-features valid past work), and
+    // a featured author publishing turns it on.
+    const current = await prisma.massSelection.findUnique({
+        where: { id },
+        select: {
+            isFeatured: true,
+            isPublic: true,
+            createdBy: { select: { userRole: true } },
+        },
+    })
+    const effectiveIsPublic = rest.isPublic ?? current?.isPublic ?? false
+    const isFeatured =
+        (current?.isFeatured ?? false) ||
+        (current?.createdBy.userRole === UserRole.FEATURED_AUTHOR &&
+            effectiveIsPublic)
 
     let partsToCreate: NewMassSelectionPart[] = [];
     let partsToUpdate: NewMassSelectionPart[] = [];
@@ -365,6 +416,7 @@ export async function updateSelection(
             where: { id },
             data: {
                 ...rest,
+                isFeatured,
                 ...(date && { date: new Date(date) }),
                 ...(themes && {
                     themes: {

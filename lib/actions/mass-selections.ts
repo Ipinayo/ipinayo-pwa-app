@@ -8,6 +8,7 @@ import {
     findAllSelections,
     findAllThemes,
     findAllUserSelections,
+    findFeaturedSelections,
     findMassSelectionStats,
     findSelection,
     findSelectionWithParts,
@@ -62,6 +63,15 @@ export async function getSelections({
     } catch (error: any) {
         console.error("Error fetching mass selections:", error);
         throw new Error("Error fetching mass selections: " + error?.message);
+    }
+}
+
+export async function getFeaturedSelections(limit?: number) {
+    try {
+        return await findFeaturedSelections(limit);
+    } catch (error: any) {
+        console.error("Error fetching featured selections:", error);
+        return [];
     }
 }
 
@@ -305,11 +315,11 @@ export async function cloneSelection(selectionId: string) {
         }
 
         const parishAndChoirInfo = await findUserParishAndChoirInfo(session.user.id);
-        const { parishLocationId, themes, choirName, parishName, title, id, createdAt, updatedAt, createdById, isPublic, ...selection } = originalSelection;
+
+        const { parishLocationId, themes, choirName, parishName, id, createdAt, updatedAt, createdById, isPublic, isFeatured, ...selection } = originalSelection;
 
         const result = await createDraft({
             ...selection,
-            title: `${title} (Copy)`,
             isPublic: true,
             themes: themes.map(theme => theme.name),
             parishLocation: parishAndChoirInfo?.parishLocation || null,
