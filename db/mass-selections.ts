@@ -109,25 +109,72 @@ export async function findAllSelections({
         whereClause.AND = andConditions
     }
 
-    // On search, featured selections surface above the rest (even when no
-    // longer the current week's feature); on plain browse, use the requested sort as-is.
-    const orderBy: Prisma.MassSelectionOrderByWithRelationInput[] = (query || season || year)
-        ? [{ isFeatured: "desc" }, { [sortBy]: sortOrder }]
+    const include = {
+        themes: true,
+        parishLocation: true,
+        createdBy: {
+            select: { name: true, email: true, userRole: true },
+        },
+        _count: {
+            select: { parts: true },
+        },
+    } as const
+
+    const featuredSort = sortBy === SortBy.FEATURED
+    const hasFilters = Boolean(query || season || year)
+
+    // "Featured first" sort, unfiltered: pin THIS WEEK's featured to the very top
+    if (featuredSort && !hasFilters) {
+        const { start, end } = getCurrentWeekRange()
+        const currentWeekFeatured: Prisma.MassSelectionWhereInput = {
+            isFeatured: true,
+            date: { gte: start, lte: end },
+        }
+        const pinnedWhere: Prisma.MassSelectionWhereInput = {
+            AND: [whereClause, currentWeekFeatured],
+        }
+        const mainWhere: Prisma.MassSelectionWhereInput = {
+            AND: [whereClause, { NOT: currentWeekFeatured }],
+        }
+
+        const [pinnedTotal, mainTotal] = await Promise.all([
+            prisma.massSelection.count({ where: pinnedWhere }),
+            prisma.massSelection.count({ where: mainWhere }),
+        ])
+
+        // Combined sequence is [current-week featured..., everything else...]; page over it
+        const pinned = skip < pinnedTotal
+            ? await prisma.massSelection.findMany({
+                where: pinnedWhere,
+                include,
+                orderBy: { date: "desc" },
+                skip,
+                take: limit,
+            })
+            : []
+
+        const remaining = limit - pinned.length
+        const main = remaining > 0
+            ? await prisma.massSelection.findMany({
+                where: mainWhere,
+                include,
+                orderBy: { date: "desc" },
+                skip: Math.max(0, skip - pinnedTotal),
+                take: remaining,
+            })
+            : []
+
+        return { selections: [...pinned, ...main], total: pinnedTotal + mainTotal }
+    }
+
+    // "Featured first" WITH a search/filter → all featured surface first 
+    const orderBy: Prisma.MassSelectionOrderByWithRelationInput[] = featuredSort
+        ? [{ [sortBy]: sortOrder }, { date: "desc" }]
         : [{ [sortBy]: sortOrder }]
 
-    // Get public selections with filters
     const selections = await prisma.massSelection.findMany({
         where: whereClause,
-        include: {
-            themes: true,
-            parishLocation: true,
-            createdBy: {
-                select: { name: true, email: true, userRole: true },
-            },
-            _count: {
-                select: { parts: true },
-            },
-        },
+        include,
         orderBy,
         skip,
         take: limit,

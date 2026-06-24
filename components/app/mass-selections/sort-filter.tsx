@@ -8,7 +8,7 @@ import { createQueryString } from "@/lib/utils";
 import { saveSortPreferences } from "@/lib/actions/filter";
 import { useCallback } from "react";
 
-const items = [
+const baseItems = [
   { label: "Date (Newest)", value: `${SortBy.DATE}-${SortOrder.DESC}` },
   { label: "Date (Oldest)", value: `${SortBy.DATE}-${SortOrder.ASC}` },
   { label: "Title A-Z", value: `${SortBy.TITLE}-${SortOrder.ASC}` },
@@ -16,6 +16,11 @@ const items = [
   { label: "Latest First", value: `${SortBy.UPDATED_AT}-${SortOrder.DESC}` },
   { label: "Oldest First", value: `${SortBy.UPDATED_AT}-${SortOrder.ASC}` },
 ];
+
+const featuredItem = {
+  label: "Featured first",
+  value: `${SortBy.FEATURED}-${SortOrder.DESC}`,
+};
 
 export default function SortFilter({
   filterType,
@@ -26,6 +31,8 @@ export default function SortFilter({
   sortBy?: SortBy;
   order?: SortOrder;
 }>) {
+  const items =
+    filterType === "selections" ? [featuredItem, ...baseItems] : baseItems;
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -40,11 +47,11 @@ export default function SortFilter({
       router.push(
         `${pathname}?${createQueryString(
           { sort_by, order, page: "1" },
-          searchParams
-        )}`
+          searchParams,
+        )}`,
       );
     },
-    [pathname, router, searchParams]
+    [pathname, router, searchParams],
   );
 
   return (
