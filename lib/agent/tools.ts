@@ -25,6 +25,7 @@ import {
 } from "@/lib/actions/mass-selections";
 
 import { DraftMassSelection } from "@/types/schemas/mass-selections";
+import { SortBy } from "@/types/utils";
 import { getLiturgicalDay } from "@/lib/liturgy/calendar";
 import { liturgyTemplates } from "@/lib/constants";
 import { normalizeDate } from "@/lib/utils";
@@ -181,19 +182,23 @@ export const selectionTools = {
 
   find_public_selections: tool({
     description:
-      "Search selections the community has shared publicly, to see what themes and songs others used for a similar time. Filter by liturgical season and/or Year cycle (from get_liturgical_day) and an optional keyword. Read a promising one with read_selection to see its actual songs and keys. Prefer this over guessing; only fall back to your own knowledge when the community has nothing suitable.",
+      "Search selections the community has shared publicly, to see what themes and songs others used for a similar time. Filter by liturgical season and/or Year cycle (from get_liturgical_day) and an optional keyword. FEATURED selections are curated, vetted references from trusted contributors — each result's `isFeatured` flag tells you which; prefer a featured match and you can tell the user it's a featured/recommended selection. Set featuredOnly to search the featured bank exclusively. Read a promising selection one with read_selection to see its actual songs and keys. Prefer this over guessing; only fall back to your own knowledge when the community has nothing suitable.",
     inputSchema: z.object({
       query: z.string().nullish(),
       season: z.enum(LiturgicalSeason).nullish(),
       year: z.enum(LiturgicalYear).nullish(),
+      featuredOnly: z.boolean().nullish(),
+      sortBy: z.enum(SortBy).nullish().describe("Sort by one of the fields; default is featured first, then newest. If you sort by featured, current-week featured selections are pinned to the very top."),
     }),
-    execute: async ({ query, season, year }) => {
+    execute: async ({ query, season, year, featuredOnly, sortBy }) => {
       try {
         const { selections } = await getSelections({
           isPublic: true,
           query: query ?? "",
           season: season ?? undefined,
           year: year ?? undefined,
+          isFeatured: featuredOnly ? true : undefined,
+          sortBy: sortBy ?? SortBy.FEATURED,
           limit: 8,
         });
         return {
@@ -204,6 +209,7 @@ export const selectionTools = {
             season: s.liturgicalSeason,
             year: s.liturgicalYear,
             themes: s.themes.map((t) => t.name),
+            isFeatured: s.isFeatured,
           })),
         };
       } catch (e) {
@@ -294,6 +300,7 @@ export const selectionTools = {
           liturgicalYear: s.liturgicalYear,
           liturgicalSeason: s.liturgicalSeason,
           themes: s.themes.map((t) => t.name),
+          isFeatured: s.isFeatured,
           parts: presentParts(s.parts as RawPart[]),
           entity: { type: "selection" as const, id: s.id, title: s.title },
         };

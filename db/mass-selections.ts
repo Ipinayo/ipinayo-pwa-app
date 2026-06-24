@@ -1,8 +1,8 @@
 import { MassSelectionFilter, SortBy, SortOrder } from "@/types/utils";
 import { MassSelectionStats, NewMassSelection, NewMassSelectionPart, SingleMassSelectionWithParts } from "@/types/models";
+import { Prisma, UserRole } from "@/lib/generated/prisma/client";
+import { capitalize, getCurrentWeekRange } from "@/lib/utils";
 
-import { Prisma } from "@/lib/generated/prisma/client";
-import { capitalize } from "@/lib/utils";
 import prisma from "@/lib/prisma";
 
 export async function findSelectionWithParts(id: string) {
@@ -13,7 +13,7 @@ export async function findSelectionWithParts(id: string) {
             parishLocation: true,
             parts: { orderBy: { order: "asc" } },
             createdBy: {
-                select: { name: true, email: true },
+                select: { name: true, email: true, userRole: true },
             },
         },
     })
@@ -27,7 +27,7 @@ export async function findUserSelectionWithParts(id: string, userId: string) {
             parishLocation: true,
             parts: { orderBy: { order: "asc" } },
             createdBy: {
-                select: { name: true, email: true },
+                select: { name: true, email: true, userRole: true },
             },
         },
     })
@@ -57,7 +57,8 @@ export async function findAllSelections({
     year,
     sortBy = SortBy.UPDATED_AT,
     sortOrder = SortOrder.DESC,
-    isPublic
+    isPublic,
+    isFeatured
 }: MassSelectionFilter) {
 
     const skip = (page - 1) * limit
@@ -66,6 +67,7 @@ export async function findAllSelections({
     const whereClause: Prisma.MassSelectionWhereInput = {}
 
     if (isPublic !== undefined) { whereClause.isPublic = isPublic }
+    if (isFeatured !== undefined) { whereClause.isFeatured = isFeatured }
 
     // Build AND conditions array
     const andConditions: Prisma.MassSelectionWhereInput[] = []
@@ -107,24 +109,72 @@ export async function findAllSelections({
         whereClause.AND = andConditions
     }
 
-    // Build order by clause
-    const orderBy = {
-        [sortBy]: sortOrder
+    const include = {
+        themes: true,
+        parishLocation: true,
+        createdBy: {
+            select: { name: true, email: true, userRole: true },
+        },
+        _count: {
+            select: { parts: true },
+        },
+    } as const
+
+    const featuredSort = sortBy === SortBy.FEATURED
+    const hasFilters = Boolean(query || season || year)
+
+    // "Featured first" sort, unfiltered: pin THIS WEEK's featured to the very top
+    if (featuredSort && !hasFilters) {
+        const { start, end } = getCurrentWeekRange()
+        const currentWeekFeatured: Prisma.MassSelectionWhereInput = {
+            isFeatured: true,
+            date: { gte: start, lte: end },
+        }
+        const pinnedWhere: Prisma.MassSelectionWhereInput = {
+            AND: [whereClause, currentWeekFeatured],
+        }
+        const mainWhere: Prisma.MassSelectionWhereInput = {
+            AND: [whereClause, { NOT: currentWeekFeatured }],
+        }
+
+        const [pinnedTotal, mainTotal] = await Promise.all([
+            prisma.massSelection.count({ where: pinnedWhere }),
+            prisma.massSelection.count({ where: mainWhere }),
+        ])
+
+        // Combined sequence is [current-week featured..., everything else...]; page over it
+        const pinned = skip < pinnedTotal
+            ? await prisma.massSelection.findMany({
+                where: pinnedWhere,
+                include,
+                orderBy: { date: "desc" },
+                skip,
+                take: limit,
+            })
+            : []
+
+        const remaining = limit - pinned.length
+        const main = remaining > 0
+            ? await prisma.massSelection.findMany({
+                where: mainWhere,
+                include,
+                orderBy: { date: "desc" },
+                skip: Math.max(0, skip - pinnedTotal),
+                take: remaining,
+            })
+            : []
+
+        return { selections: [...pinned, ...main], total: pinnedTotal + mainTotal }
     }
 
-    // Get public selections with filters
+    // "Featured first" WITH a search/filter → all featured surface first 
+    const orderBy: Prisma.MassSelectionOrderByWithRelationInput[] = featuredSort
+        ? [{ [sortBy]: sortOrder }, { date: "desc" }]
+        : [{ [sortBy]: sortOrder }]
+
     const selections = await prisma.massSelection.findMany({
         where: whereClause,
-        include: {
-            themes: true,
-            parishLocation: true,
-            createdBy: {
-                select: { name: true, email: true },
-            },
-            _count: {
-                select: { parts: true },
-            },
-        },
+        include,
         orderBy,
         skip,
         take: limit,
@@ -135,6 +185,30 @@ export async function findAllSelections({
     })
 
     return { selections, total }
+}
+
+export async function findFeaturedSelections(limit?: number) {
+    const { start, end } = getCurrentWeekRange()
+
+    return await prisma.massSelection.findMany({
+        where: {
+            isFeatured: true,
+            isPublic: true,
+            date: { gte: start, lte: end },
+        },
+        include: {
+            themes: true,
+            parishLocation: true,
+            createdBy: {
+                select: { name: true, email: true, userRole: true },
+            },
+            _count: {
+                select: { parts: true },
+            },
+        },
+        orderBy: { date: "asc" },
+        ...(limit ? { take: limit } : {}),
+    })
 }
 
 export async function findAllUserSelections({
@@ -199,7 +273,7 @@ export async function findAllUserSelections({
             themes: true,
             parishLocation: true,
             createdBy: {
-                select: { name: true, email: true },
+                select: { name: true, email: true, userRole: true },
             },
             _count: {
                 select: { parts: true },
@@ -229,8 +303,17 @@ export async function saveSelection(selection: NewMassSelection, userId: string,
     })
     const ownerId = draft?.createdById ?? userId
 
+    // A public selection by a featured author is part of the featured bank.
+    const owner = await prisma.user.findUnique({
+        where: { id: ownerId },
+        select: { userRole: true },
+    })
+    const isFeatured =
+        rest.isPublic === true && owner?.userRole === UserRole.FEATURED_AUTHOR
+
     const data: Prisma.MassSelectionCreateInput = {
         ...rest,
+        isFeatured,
         date: date,
         themes: {
             connectOrCreate: themes.map(name => ({
@@ -316,6 +399,22 @@ export async function updateSelection(
 ) {
     const { parts, date, themes, parishLocation, ...rest } = selection
 
+    // Recompute featured status. It's sticky: once featured it stays featured
+    // (so role revocation never retroactively un-features valid past work), and
+    // a featured author publishing turns it on.
+    const current = await prisma.massSelection.findUnique({
+        where: { id },
+        select: {
+            isFeatured: true,
+            isPublic: true,
+            createdBy: { select: { userRole: true } },
+        },
+    })
+    const effectiveIsPublic = rest.isPublic ?? current?.isPublic ?? false
+    const isFeatured =
+        (current?.isFeatured ?? false) ||
+        (current?.createdBy.userRole === UserRole.FEATURED_AUTHOR &&
+            effectiveIsPublic)
 
     let partsToCreate: NewMassSelectionPart[] = [];
     let partsToUpdate: NewMassSelectionPart[] = [];
@@ -365,6 +464,7 @@ export async function updateSelection(
             where: { id },
             data: {
                 ...rest,
+                isFeatured,
                 ...(date && { date: new Date(date) }),
                 ...(themes && {
                     themes: {

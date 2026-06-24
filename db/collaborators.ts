@@ -206,7 +206,7 @@ export async function findSelectionsSharedWith(
           include: {
             themes: true,
             parishLocation: true,
-            createdBy: { select: { name: true, email: true } },
+            createdBy: { select: { name: true, email: true, userRole: true } },
             _count: { select: { parts: true } },
           },
         },

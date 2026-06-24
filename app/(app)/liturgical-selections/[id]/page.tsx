@@ -24,6 +24,7 @@ import { keySignatureItems, liturgicalSeasonItems } from "@/lib/constants";
 import { AccessAvatarGroup } from "@/components/app/collaboration/access-avatar-group";
 import BackButton from "@/components/common/back-button";
 import { Badge } from "@/components/ui/badge";
+import FeaturedBadge from "@/components/app/mass-selections/featured-badge";
 import Options from "@/components/app/mass-selections/options";
 import { Params } from "@/types/utils";
 import { auth } from "@/auth";
@@ -66,14 +67,31 @@ export default async function LiturgicalSelectionPage(props: {
             <h2 className="text-3xl font-display text-foreground">
               {selection.title}
             </h2>
-            {selection.isPublic ? (
+            {hasAccess ? (
+              <div className="inline-flex items-center gap-2 sm:flex-row flex-col">
+                {selection.isFeatured && <FeaturedBadge />}
+                {selection.isPublic ? (
+                  <Badge variant="secondary">
+                    <Globe className="h-3 w-3" />
+                    Public
+                  </Badge>
+                ) : (
+                  <Badge variant="outline">
+                    <Lock className="h-3 w-3" />
+                    Private
+                  </Badge>
+                )}
+              </div>
+            ) : selection.isFeatured ? (
+              <FeaturedBadge />
+            ) : selection.isPublic ? (
               <Badge variant="secondary">
-                <Globe className="mr-1 h-3 w-3" />
+                <Globe className="h-3 w-3" />
                 Public
               </Badge>
             ) : (
               <Badge variant="outline">
-                <Lock className="mr-1 h-3 w-3" />
+                <Lock className="h-3 w-3" />
                 Private
               </Badge>
             )}
@@ -85,7 +103,7 @@ export default async function LiturgicalSelectionPage(props: {
               }}
             />
           </div>
-          
+
           <div className="flex flex-wrap w-full items-center gap-4 text-muted-foreground">
             <div className="flex items-center gap-1">
               <Calendar className="h-4 w-4" />

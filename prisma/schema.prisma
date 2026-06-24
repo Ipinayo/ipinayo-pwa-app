@@ -107,6 +107,7 @@ model MassSelection {
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @updatedAt
   isPublic         Boolean           @default(false)
+  isFeatured       Boolean           @default(false)
   parishName       String?
   choirName        String?
   parishLocationId String?
@@ -118,6 +119,7 @@ model MassSelection {
 
   @@index([createdById])
   @@index([isPublic])
+  @@index([isFeatured])
   @@index([date])
   @@index([parishLocationId])
 }
@@ -356,6 +358,7 @@ enum LiturgicalSeason {
 
 enum UserRole {
   USER
+  FEATURED_AUTHOR
   ADMIN
   SUPERADMIN
 }

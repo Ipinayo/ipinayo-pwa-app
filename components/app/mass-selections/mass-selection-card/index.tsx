@@ -16,16 +16,19 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
+  cn,
   formatCalendarDate,
   formatDate,
   formatParishInfo,
   getLabelForValue,
+  isDateInCurrentWeek,
 } from "@/lib/utils";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import CloneButton from "@/components/app/mass-selections/clone-button";
 import DownloadButton from "@/components/app/mass-selections/download-button";
+import FeaturedBadge from "@/components/app/mass-selections/featured-badge";
 import Link from "next/link";
 import { MassSelection } from "@/types/models";
 import Options from "../options";
@@ -38,9 +41,18 @@ export default function MassSelectionCard({
   selection: MassSelection;
   publicView?: boolean;
 }>) {
+  const isCurrentlyFeatured =
+    selection.isFeatured && isDateInCurrentWeek(selection.date);
+
   return (
-    <Card className="transition-shadow hover:shadow-lg">
+    <Card
+      className={cn(
+        "transition-shadow hover:shadow-lg",
+        isCurrentlyFeatured && "border-l-4 border-l-primary",
+      )}
+    >
       <CardHeader>
+        {selection.isFeatured && <FeaturedBadge className="mb-1 w-fit" />}
         <div className="flex items-center justify-between gap-2">
           <div className="flex-1">
             <CardTitle className="flex items-center justify-between">
@@ -83,10 +95,12 @@ export default function MassSelectionCard({
             </div>
           )}
 
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-muted-foreground">Parts:</span>
-            <span className="font-medium">{selection._count.parts}</span>
-          </div>
+          {!selection.isFeatured && (
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-muted-foreground">Parts:</span>
+              <span className="font-medium">{selection._count.parts}</span>
+            </div>
+          )}
 
           {selection.liturgicalSeason && (
             <div className="flex items-center justify-between text-sm">
@@ -94,7 +108,7 @@ export default function MassSelectionCard({
               <span className="font-medium">
                 {getLabelForValue(
                   liturgicalSeasonItems,
-                  selection.liturgicalSeason
+                  selection.liturgicalSeason,
                 )}
               </span>
             </div>
@@ -164,33 +178,35 @@ export default function MassSelectionCard({
           </div>
         )}
 
-        <div className="grid grid-cols-2 gap-4 text-xs w-full">
-          <div className="flex items-start gap-2 min-w-0">
-            <Users className="h-3.5 w-3.5 text-muted-foreground shrink-0 mt-0.5" />
-            <div className="min-w-0">
-              <p className="text-muted-foreground text-xs">For</p>
-              <p className="font-medium text-foreground truncate">
-                {selection.choirName || "Unnamed Choir"}
-              </p>
+        {!selection.isFeatured && (
+          <div className="grid grid-cols-2 gap-4 text-xs w-full">
+            <div className="flex items-start gap-2 min-w-0">
+              <Users className="h-3.5 w-3.5 text-muted-foreground shrink-0 mt-0.5" />
+              <div className="min-w-0">
+                <p className="text-muted-foreground text-xs">For</p>
+                <p className="font-medium text-foreground truncate">
+                  {selection.choirName || "Unnamed Choir"}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-start gap-2 min-w-0">
+              <MapPin className="h-3.5 w-3.5 text-muted-foreground shrink-0 mt-0.5" />
+              <div className="min-w-0">
+                <p className="text-muted-foreground text-xs">
+                  {selection.parishName && selection.parishLocation
+                    ? "Parish: "
+                    : "Parish In: "}
+                </p>
+                <p className="font-medium text-foreground truncate">
+                  {formatParishInfo(
+                    selection.parishLocation,
+                    selection.parishName,
+                  )}
+                </p>
+              </div>
             </div>
           </div>
-          <div className="flex items-start gap-2 min-w-0">
-            <MapPin className="h-3.5 w-3.5 text-muted-foreground shrink-0 mt-0.5" />
-            <div className="min-w-0">
-              <p className="text-muted-foreground text-xs">
-                {selection.parishName && selection.parishLocation
-                  ? "Parish: "
-                  : "Parish In: "}
-              </p>
-              <p className="font-medium text-foreground truncate">
-                {formatParishInfo(
-                  selection.parishLocation,
-                  selection.parishName
-                )}
-              </p>
-            </div>
-          </div>
-        </div>
+        )}
       </CardFooter>
     </Card>
   );

@@ -3,7 +3,7 @@
 import { AppUser, UserProfile, UserRole } from "@/types/models";
 import { DraftSelectionFilter, MassSelectionFilter, NotificationChannel, SortBy, SortOrder, SortUsersBy, UsersFilter } from "@/types/utils";
 import { countAnnouncementStats, createAnnouncement, findAllAnnouncements } from "@/db/announcement";
-import findAllDrafts, { deleteDraftById, findAdminDashboardStats, findAllActivities, findAllAdminUserIds, findAllUserIds, findAllUsersForSelect, findDraftsStats, findSelectionsStats, findUsersStats, updateUserAdminStatus } from "@/db/admin";
+import findAllDrafts, { deleteDraftById, findAdminDashboardStats, findAllActivities, findAllAdminUserIds, findAllUserIds, findAllUsersForSelect, findDraftsStats, findSelectionsStats, findUsersStats, setUserFeaturedAuthor, updateUserAdminStatus } from "@/db/admin";
 import { findAllUserSelections, findMassSelectionStats } from "@/db/mass-selections";
 import findAllUsers, { deleteUserById, findUser, findUserProfile } from "@/db/user";
 import { notifyExpiringDrafts, purgeOldDrafts } from "@/lib/jobs/draft-maintenance";
@@ -220,6 +220,25 @@ export async function updateUserAdminStatusAction(userId: string, makeAdmin: boo
     }
 
     const result = await updateUserAdminStatus(userId, makeAdmin);
+
+    revalidatePath('/admin/users');
+    revalidatePath(`/admin/users/${result.id}`);
+
+    return result;
+}
+
+export async function updateUserFeaturedAuthorStatusAction(userId: string, makeFeatured: boolean) {
+    const session = await auth();
+    if (!session?.user?.id) {
+        throw new Error("Unauthorized");
+    }
+
+    const user = await findUser(session.user.id);
+    if (!isAdmin(user?.userRole)) {
+        throw new Error("Forbidden");
+    }
+
+    const result = await setUserFeaturedAuthor(userId, makeFeatured);
 
     revalidatePath('/admin/users');
     revalidatePath(`/admin/users/${result.id}`);
