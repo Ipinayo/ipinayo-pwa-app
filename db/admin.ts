@@ -186,6 +186,17 @@ export async function updateUserAdminStatus(userId: string, isAdmin: boolean) {
     })
 }
 
+export async function setUserFeaturedAuthor(userId: string, makeFeatured: boolean) {
+    return await prisma.user.update({
+        where: {
+            id: userId,
+        },
+        data: {
+            userRole: makeFeatured ? UserRole.FEATURED_AUTHOR : UserRole.USER,
+        },
+    })
+}
+
 export default async function findAllDrafts({
     page = 1,
     limit = 12,

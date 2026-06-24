@@ -12,7 +12,8 @@ export enum SortOrder {
 export enum SortBy {
     UPDATED_AT = 'updatedAt',
     TITLE = 'title',
-    DATE = 'date'
+    DATE = 'date',
+    FEATURED = 'isFeatured'
 }
 
 export enum SortUsersBy {
@@ -41,6 +42,7 @@ export interface MassSelectionFilter {
     sortBy?: SortBy,
     sortOrder?: SortOrder
     isPublic?: boolean
+    isFeatured?: boolean
 }
 
 export interface UpdateUserProfile {

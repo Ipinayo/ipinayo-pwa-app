@@ -34,7 +34,7 @@ export default async function MassSelectionsPage(props: {
   const sort_by =
     getEnumByValue(SortBy, filters["sort_by"] || "") ||
     getEnumByValue(SortBy, savedPreferences.sortBy || "") ||
-    SortBy.DATE;
+    SortBy.FEATURED;
   const order =
     getEnumByValue(SortOrder, filters["order"] || "") ||
     getEnumByValue(SortOrder, savedPreferences.order || "") ||
