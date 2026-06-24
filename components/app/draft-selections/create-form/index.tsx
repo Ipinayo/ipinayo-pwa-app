@@ -44,8 +44,6 @@ import {
   useSensor,
   useSensors,
   type DragEndEvent,
-  MouseSensor,
-  TouchSensor,
 } from "@dnd-kit/core";
 import {
   SortableContext,
@@ -161,17 +159,6 @@ export default function CreateForm(props: Readonly<CreateFormProps>) {
     }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    }),
-    useSensor(MouseSensor, {
-      activationConstraint: {
-        distance: 8,
-      },
-    }),
-    useSensor(TouchSensor, {
-      activationConstraint: {
-        delay: 250,
-        tolerance: 8,
-      },
     }),
   );
 
@@ -552,8 +539,8 @@ export default function CreateForm(props: Readonly<CreateFormProps>) {
           <CardHeader>
             <CardTitle>Liturgy Parts</CardTitle>
             <CardDescription>
-              Drag to reorder parts. Click "Insert Part" to add parts at
-              specific positions.
+              Click "Insert Part" to add parts at specific positions and "Delete
+              Part" to remove them, but at least one part is required.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
