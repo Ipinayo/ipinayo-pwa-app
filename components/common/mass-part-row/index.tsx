@@ -46,14 +46,14 @@ export default function MassPartRow({
     <div ref={setNodeRef} style={style} className="space-y-1 touch-none">
       <div className="flex gap-3 flex-col sm:flex-row">
         {/* Grip Handle */}
-        <div
+        <button
           className="flex items-start pt-3 cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground transition-colors shrink-0"
           {...attributes}
           {...listeners}
           title="Drag to reorder"
         >
           <GripVertical className="h-4 w-4 sm:h-5 sm:w-5" />
-        </div>
+        </button>
 
         {/* Part Content */}
         <div className="flex-1 min-w-0">

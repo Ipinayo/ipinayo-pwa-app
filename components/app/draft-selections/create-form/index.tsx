@@ -170,7 +170,7 @@ export default function CreateForm(props: Readonly<CreateFormProps>) {
     useSensor(TouchSensor, {
       activationConstraint: {
         delay: 250,
-        tolerance: 5,
+        tolerance: 8,
       },
     }),
   );
