@@ -444,7 +444,7 @@ export default function EditForm(props: EditFormProps) {
               Part" to remove them, but at least one part is required.
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-5">
             <DndContext
               sensors={sensors}
               collisionDetection={closestCenter}
