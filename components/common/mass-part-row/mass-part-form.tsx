@@ -32,10 +32,9 @@ interface MassPartFormProps {
 }
 
 export function MassPartForm({ mode, index, partNames }: MassPartFormProps) {
-  const form =
-    mode === "edit"
-      ? useFormContext<NewMassSelection>()
-      : useFormContext<DraftMassSelection>();
+  const formEdit = useFormContext<NewMassSelection>();
+  const formDraft = useFormContext<DraftMassSelection>();
+  const form = mode === "edit" ? formEdit : formDraft;
 
   return (
     <div className="bg-card grid gap-4 rounded-lg border p-3 sm:p-4 transition-colors">
