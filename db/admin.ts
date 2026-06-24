@@ -190,7 +190,6 @@ export async function setUserFeaturedAuthor(userId: string, makeFeatured: boolea
     return await prisma.user.update({
         where: {
             id: userId,
-            userRole: makeFeatured ? UserRole.USER : UserRole.FEATURED_AUTHOR,
         },
         data: {
             userRole: makeFeatured ? UserRole.FEATURED_AUTHOR : UserRole.USER,
