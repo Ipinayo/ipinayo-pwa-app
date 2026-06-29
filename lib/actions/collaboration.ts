@@ -10,10 +10,19 @@ import {
   getAccessForRole,
 } from "@/lib/collaboration-utils";
 import {
+  ChangeRoleInput,
+  RemoveAccessInput,
+  ShareInput,
   changeRoleSchema,
   removeAccessSchema,
   shareSchema,
 } from "@/types/schemas/collaboration";
+import {
+  findAttachableGroups,
+  removeGroupMember,
+  updateGroupMemberRole,
+  upsertGroupMember,
+} from "@/db/collaborator-groups";
 import {
   findDraftAccessList,
   findDraftAccessRecord,
@@ -25,19 +34,19 @@ import {
   findSelectionsSharedWith,
   listDraftCollaborators,
   listSelectionCollaborators,
-  removeDraftCollaborator,
-  removeSelectionCollaborator,
   searchUsers as searchUsersDb,
-  updateDraftCollaboratorRole,
-  updateSelectionCollaboratorRole,
-  upsertDraftCollaborator,
-  upsertSelectionCollaborator,
-} from "@/db/collaborators";
+} from "@/db/collaboration";
 
 import { auth } from "@/auth";
 import { createActivity } from "@/lib/notifications/dispatch";
 import { getFieldError } from "@/lib/utils";
 import { revalidatePath } from "next/cache";
+
+type GroupContext = {
+  /** The entity's current group. `name === null` means ad-hoc (direct sharing). */
+  group: { id: string; name: string | null };
+  attachableGroups: { id: string; name: string; memberCount: number }[];
+};
 
 function actorName(
   user: { name?: string | null; email?: string | null } | undefined,
@@ -93,7 +102,7 @@ export async function getSelectionAccessPeople(
 
   return [
     { ...data.createdBy, role: "OWNER", isOwner: true },
-    ...data.collaborators.map((c) => ({ ...c.user, role: c.role, isOwner: false })),
+    ...data.group.members.map((m) => ({ ...m.user, role: m.role, isOwner: false })),
   ];
 }
 
@@ -109,11 +118,63 @@ export async function getDraftAccessPeople(id: string): Promise<AccessPerson[]> 
 
   return [
     { ...data.createdBy, role: "OWNER", isOwner: true },
-    ...data.collaborators.map((c) => ({ ...c.user, role: c.role, isOwner: false })),
+    ...data.group.members.map((m) => ({ ...m.user, role: m.role, isOwner: false })),
   ];
 }
 
-export async function shareSelection(input: unknown) {
+export async function getSelectionGroupContext(
+  id: string,
+): Promise<GroupContext | null> {
+  const session = await auth();
+  if (!session?.user?.id) return null;
+
+  const meta = await findSelectionMeta(id);
+  if (!meta) return null;
+
+  const access = await getSelectionAccess(id, session.user.id);
+  if (!can(access, Permission.View)) return null;
+
+  const attachable = can(access, Permission.Manage)
+    ? await findAttachableGroups(session.user.id, meta.createdById)
+    : [];
+
+  return {
+    group: { id: meta.groupId, name: meta.groupName },
+    attachableGroups: attachable.map((g) => ({
+      id: g.id,
+      name: g.name ?? "",
+      memberCount: g._count.members,
+    })),
+  };
+}
+
+export async function getDraftGroupContext(
+  id: string,
+): Promise<GroupContext | null> {
+  const session = await auth();
+  if (!session?.user?.id) return null;
+
+  const meta = await findDraftMeta(id);
+  if (!meta) return null;
+
+  const access = await getDraftAccess(id, session.user.id);
+  if (!can(access, Permission.View)) return null;
+
+  const attachable = can(access, Permission.Manage)
+    ? await findAttachableGroups(session.user.id, meta.createdById)
+    : [];
+
+  return {
+    group: { id: meta.groupId, name: meta.groupName },
+    attachableGroups: attachable.map((g) => ({
+      id: g.id,
+      name: g.name ?? "",
+      memberCount: g._count.members,
+    })),
+  };
+}
+
+export async function shareSelection(input: ShareInput) {
   try {
     const session = await auth();
     if (!session?.user?.id) throw new Error("You're not signed in.");
@@ -130,6 +191,11 @@ export async function shareSelection(input: unknown) {
 
     const selection = await findSelectionMeta(id);
     if (!selection) throw new Error("Selection not found.");
+    if (selection.groupName !== null) {
+      throw new Error(
+        "This selection uses a collaborator group. Manage its members in the group.",
+      );
+    }
 
     // Can't (re)add the owner or yourself.
     const targets = recipients.filter(
@@ -142,8 +208,8 @@ export async function shareSelection(input: unknown) {
 
     await Promise.all(
       targets.map((t) =>
-        upsertSelectionCollaborator({
-          selectionId: id,
+        upsertGroupMember({
+          groupId: selection.groupId,
           userId: t.userId,
           role: t.role,
           invitedById: session.user!.id,
@@ -199,7 +265,7 @@ export async function shareSelection(input: unknown) {
   }
 }
 
-export async function changeSelectionRole(input: unknown) {
+export async function changeSelectionRole(input: ChangeRoleInput) {
   try {
     const session = await auth();
     if (!session?.user?.id) throw new Error("You're not signed in.");
@@ -218,8 +284,13 @@ export async function changeSelectionRole(input: unknown) {
     if (userId === selection.createdById) {
       throw new Error("The owner's role can't be changed.");
     }
+    if (selection.groupName !== null) {
+      throw new Error(
+        "This selection uses a collaborator group. Change roles in the group.",
+      );
+    }
 
-    await updateSelectionCollaboratorRole(id, userId, role);
+    await updateGroupMemberRole(selection.groupId, userId, role);
 
     createActivity({
       targetUsers: [userId],
@@ -240,7 +311,7 @@ export async function changeSelectionRole(input: unknown) {
   }
 }
 
-export async function removeSelectionAccess(input: unknown) {
+export async function removeSelectionAccess(input: RemoveAccessInput) {
   try {
     const session = await auth();
     if (!session?.user?.id) throw new Error("You're not signed in.");
@@ -257,11 +328,17 @@ export async function removeSelectionAccess(input: unknown) {
     }
 
     const selection = await findSelectionMeta(id);
-    if (userId === selection?.createdById) {
+    if (!selection) throw new Error("Selection not found.");
+    if (userId === selection.createdById) {
       throw new Error("The owner's access can't be removed.");
     }
+    if (selection.groupName !== null) {
+      throw new Error(
+        "This selection uses a collaborator group. Remove members in the group.",
+      );
+    }
 
-    await removeSelectionCollaborator(id, userId);
+    await removeGroupMember(selection.groupId, userId);
 
     if (userId !== session.user.id) {
       createActivity({
@@ -294,7 +371,7 @@ export async function getSelectionCollaborators(id: string) {
   return listSelectionCollaborators(id);
 }
 
-export async function shareDraft(input: unknown) {
+export async function shareDraft(input: ShareInput) {
   try {
     const session = await auth();
     if (!session?.user?.id) throw new Error("You're not signed in.");
@@ -311,6 +388,11 @@ export async function shareDraft(input: unknown) {
 
     const draft = await findDraftMeta(id);
     if (!draft) throw new Error("Draft not found.");
+    if (draft.groupName !== null) {
+      throw new Error(
+        "This draft uses a collaborator group. Manage its members in the group.",
+      );
+    }
     const title = draft.title || "Untitled draft";
 
     const targets = recipients.filter(
@@ -322,8 +404,8 @@ export async function shareDraft(input: unknown) {
 
     await Promise.all(
       targets.map((t) =>
-        upsertDraftCollaborator({
-          draftId: id,
+        upsertGroupMember({
+          groupId: draft.groupId,
           userId: t.userId,
           role: t.role,
           invitedById: session.user!.id,
@@ -373,7 +455,7 @@ export async function shareDraft(input: unknown) {
   }
 }
 
-export async function changeDraftRole(input: unknown) {
+export async function changeDraftRole(input: ChangeRoleInput) {
   try {
     const session = await auth();
     if (!session?.user?.id) throw new Error("You're not signed in.");
@@ -393,8 +475,13 @@ export async function changeDraftRole(input: unknown) {
     if (userId === draft.createdById) {
       throw new Error("The owner's role can't be changed.");
     }
+    if (draft.groupName !== null) {
+      throw new Error(
+        "This draft uses a collaborator group. Change roles in the group.",
+      );
+    }
 
-    await updateDraftCollaboratorRole(id, userId, role);
+    await updateGroupMemberRole(draft.groupId, userId, role);
 
     createActivity({
       targetUsers: [userId],
@@ -415,7 +502,7 @@ export async function changeDraftRole(input: unknown) {
   }
 }
 
-export async function removeDraftAccess(input: unknown) {
+export async function removeDraftAccess(input: RemoveAccessInput) {
   try {
     const session = await auth();
     if (!session?.user?.id) throw new Error("You're not signed in.");
@@ -430,11 +517,17 @@ export async function removeDraftAccess(input: unknown) {
     }
 
     const draft = await findDraftMeta(id);
-    if (userId === draft?.createdById) {
+    if (!draft) throw new Error("Draft not found.");
+    if (userId === draft.createdById) {
       throw new Error("The owner's access can't be removed.");
     }
+    if (draft.groupName !== null) {
+      throw new Error(
+        "This draft uses a collaborator group. Remove members in the group.",
+      );
+    }
 
-    await removeDraftCollaborator(id, userId);
+    await removeGroupMember(draft.groupId, userId);
 
     if (userId !== session.user.id) {
       createActivity({

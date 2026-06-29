@@ -29,8 +29,57 @@ export const removeAccessSchema = z.object({
     userId: z.string().nonempty(),
 });
 
+export const groupNameSchema = z
+    .string()
+    .trim()
+    .min(1, "Give the group a name.")
+    .max(80, "Group name is too long.");
+
+export const createGroupSchema = z.object({
+    name: groupNameSchema,
+});
+
+export const renameGroupSchema = z.object({
+    groupId: z.string().nonempty(),
+    name: groupNameSchema,
+});
+
+export const deleteGroupSchema = z.object({
+    groupId: z.string().nonempty(),
+    confirmName: z.string(),
+});
+
+export const addGroupMembersSchema = z.object({
+    groupId: z.string().nonempty(),
+    recipients: z.array(recipientSchema).min(1, "Add at least one person."),
+});
+
+export const changeGroupMemberRoleSchema = z.object({
+    groupId: z.string().nonempty(),
+    userId: z.string().nonempty(),
+    role: collaboratorRoleSchema,
+});
+
+export const removeGroupMemberSchema = z.object({
+    groupId: z.string().nonempty(),
+    userId: z.string().nonempty(),
+});
+
+export const attachGroupSchema = z.object({
+    id: z.string().nonempty(),
+    groupId: z.string().nonempty(),
+});
+
+export type CreateGroupInput = z.input<typeof createGroupSchema>;
+export type RenameGroupInput = z.input<typeof renameGroupSchema>;
+export type DeleteGroupInput = z.input<typeof deleteGroupSchema>;
+export type AddGroupMembersInput = z.input<typeof addGroupMembersSchema>;
+export type ChangeGroupMemberRoleInput = z.input<typeof changeGroupMemberRoleSchema>;
+export type RemoveGroupMemberInput = z.input<typeof removeGroupMemberSchema>;
+export type AttachGroupInput = z.input<typeof attachGroupSchema>;
+
 export type ShareableRole = z.infer<typeof collaboratorRoleSchema>;
-export type Recipient = z.infer<typeof recipientSchema>;
-export type ShareInput = z.infer<typeof shareSchema>;
-export type ChangeRoleInput = z.infer<typeof changeRoleSchema>;
-export type RemoveAccessInput = z.infer<typeof removeAccessSchema>;
+export type Recipient = z.input<typeof recipientSchema>;
+export type ShareInput = z.input<typeof shareSchema>;
+export type ChangeRoleInput = z.input<typeof changeRoleSchema>;
+export type RemoveAccessInput = z.input<typeof removeAccessSchema>;
