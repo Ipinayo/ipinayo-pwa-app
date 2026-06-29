@@ -172,6 +172,13 @@ export default function NavLinks({
               active: pathname.startsWith("/settings/notifications"),
               activeClassName: "font-semibold",
             },
+            {
+              href: "/settings/groups",
+              label: "Collaborator Groups",
+              icon: Users,
+              active: pathname.startsWith("/settings/groups"),
+              activeClassName: "font-semibold",
+            },
           ],
         },
       ];

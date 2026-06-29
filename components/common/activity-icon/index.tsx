@@ -1,4 +1,13 @@
-import { Activity, BookOpen, Megaphone, User, Wrench } from "lucide-react";
+import {
+  Activity,
+  BookOpen,
+  LogOut,
+  Megaphone,
+  User,
+  UserMinus2,
+  UserPlus2,
+  Wrench,
+} from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
@@ -6,37 +15,35 @@ export default function ActivityIcon({
   event,
   className,
 }: Readonly<{ event: string; className?: string }>) {
+  if (event.startsWith("selection.")) {
+    return <BookOpen className={className} />;
+  }
+
+  if (event.startsWith("draft.")) {
+    return <BookOpen className={cn("text-amber-500", className)} />;
+  }
+
+  if (event.startsWith("user.")) {
+    return <User className={className} />;
+  }
+
   switch (event) {
-    case "selection.created_by_self":
-      return <BookOpen className={className} />;
-    case "selection.cloned_by_self":
-      return <BookOpen className={className} />;
-    case "selection.cloned_by_other":
-      return <BookOpen className={className} />;
-    case "selection.updated_by_self":
-      return <BookOpen className={className} />;
-    case "selection.deleted_by_self":
-      return <BookOpen className={className} />;
-    case "user.registered":
-      return <User className={className} />;
-    case "user.updated":
-      return <User className={className} />;
-    case "draft.created_by_self":
-      return <BookOpen className={cn("text-amber-500", className)} />;
-    case "draft.updated_by_self":
-      return <BookOpen className={cn("text-amber-500", className)} />;
-    case "draft.deleted_by_other":
-      return <BookOpen className={cn("text-amber-500", className)} />;
-    case "draft.deleted_by_self":
-      return <BookOpen className={cn("text-amber-500", className)} />;
-    case "draft.expired":
-      return <BookOpen className={cn("text-amber-500", className)} />;
-    case "draft.expiring":
-      return <BookOpen className={cn("text-amber-500", className)} />;
+    case "collaboration.added_to_group":
+      return <UserPlus2 className={className} />;
+
+    case "collaboration.removed_from_group":
+      return <UserMinus2 className={className} />;
+
+    case "collaboration.left_group":
+    case "collaboration.left_group_by_self":
+      return <LogOut className={className} />;
+
     case "system.announcement":
       return <Megaphone className={className} />;
+
     case "system.maintenance":
       return <Wrench className={className} />;
+
     default:
       return <Activity className={className} />;
   }
