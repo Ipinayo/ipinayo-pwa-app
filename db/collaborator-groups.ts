@@ -138,15 +138,11 @@ export async function findGroupWithMembers(groupId: string) {
   });
 }
 
-/** Named groups the user owns or co-manages, with members + attachment counts. */
 export async function findGroupsForUser(userId: string) {
   return prisma.collaboratorGroup.findMany({
     where: {
       name: { not: null },
-      OR: [
-        { ownerId: userId },
-        { members: { some: { userId, role: CollaboratorRole.MANAGER } } },
-      ],
+      OR: [{ ownerId: userId }, { members: { some: { userId } } }],
     },
     select: {
       id: true,
