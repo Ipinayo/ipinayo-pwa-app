@@ -220,6 +220,10 @@ function getTitle<K extends keyof ActivityEventMap>(
             return `Your access changed`;
         case "draft.updated_by_other":
             return `A shared draft was updated`;
+        case "collaboration.added_to_group":
+            return `You were added to a group`;
+        case "collaboration.removed_from_group":
+            return `You were removed from a group`;
         case "user.registered":
             return `Welcome to Ìpínayò`;
         case "draft.created_by_self":
@@ -342,6 +346,16 @@ function getMessage<K extends keyof ActivityEventMap>(
                 const data = metadata as ActivityEventMap["draft.updated_by_other"]["metadata"];
                 return `${data.actorName} updated the draft "${data.title}".`;
             }
+        case "collaboration.added_to_group":
+            {
+                const data = metadata as ActivityEventMap["collaboration.added_to_group"]["metadata"];
+                return `${data.actorName} added you to the group "${data.groupName}" as ${roleArticle(data.role)}, giving you access to its selections and drafts.`;
+            }
+        case "collaboration.removed_from_group":
+            {
+                const data = metadata as ActivityEventMap["collaboration.removed_from_group"]["metadata"];
+                return `${data.actorName} removed you from the group "${data.groupName}".`;
+            }
         case "user.registered":
             {
                 const data = metadata as ActivityEventMap["user.registered"]["metadata"];
@@ -415,6 +429,10 @@ function getActionURL<K extends keyof ActivityEventMap>(
         case "draft.updated_by_other":
             return `/liturgical-selections/new/${entityId}`;
 
+        case "collaboration.added_to_group":
+        case "collaboration.removed_from_group":
+            return '/settings/collaboration';
+
         default:
             return undefined;
     }
@@ -474,6 +492,10 @@ function getPath<K extends keyof ActivityEventMap>(
 
         case "system.announcement":
             return `/`;
+
+        case "collaboration.added_to_group":
+        case "collaboration.removed_from_group":
+            return `/settings/collaboration`;
 
         default:
             return undefined;

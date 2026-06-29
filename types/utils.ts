@@ -171,6 +171,23 @@ export type ActivityEventMap = {
         };
     };
 
+    "collaboration.added_to_group": {
+        entityType: "collaboration";
+        metadata: {
+            groupName: string;
+            role: string;
+            actorName: string;
+        };
+    };
+
+    "collaboration.removed_from_group": {
+        entityType: "collaboration";
+        metadata: {
+            groupName: string;
+            actorName: string;
+        };
+    };
+
     "user.registered": {
         entityType: "user";
         metadata: {

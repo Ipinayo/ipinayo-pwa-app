@@ -536,6 +536,16 @@ export const userNotificationEvents: Partial<Record<keyof ActivityEventMap, { la
         description: "These are notifications for when someone else deletes your draft",
         default: { inApp: true, email: true, push: true },
     },
+    "collaboration.added_to_group": {
+        label: "Added to a Group",
+        description: "These are notifications for when someone adds you to a collaborator group",
+        default: { inApp: true, email: false, push: true },
+    },
+    "collaboration.removed_from_group": {
+        label: "Removed from a Group",
+        description: "These are notifications for when someone removes you from a collaborator group",
+        default: { inApp: true, email: false, push: true },
+    },
     "system.announcement": {
         label: "System Announcements",
         description: "Important updates from Ìpínayò.",
