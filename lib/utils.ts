@@ -410,6 +410,26 @@ export function getActivityEntity(
         const data = metadata as ActivityEventMap["draft.expiring"]["metadata"];
         return `${data.title}`;
       }
+    case "collaboration.added_to_group":
+      {
+        const data = metadata as ActivityEventMap["collaboration.added_to_group"]["metadata"];
+        return `${data.groupName}`;
+      }
+    case "collaboration.removed_from_group":
+      {
+        const data = metadata as ActivityEventMap["collaboration.removed_from_group"]["metadata"];
+        return `${data.groupName}`;
+      }
+    case "collaboration.left_group":
+      {
+        const data = metadata as ActivityEventMap["collaboration.left_group"]["metadata"];
+        return `${data.groupName}`;
+      }
+    case "collaboration.left_group_by_self":
+      {
+        const data = metadata as ActivityEventMap["collaboration.left_group_by_self"]["metadata"];
+        return `${data.groupName}`;
+      }
     case "system.announcement":
       {
         const data = metadata as ActivityEventMap["system.announcement"]["metadata"];
@@ -479,6 +499,14 @@ export function getActivityEvent(event: string, admin?: boolean): string {
       return `Draft expired`;
     case "draft.expiring":
       return `Draft expiring soon`;
+    case "collaboration.added_to_group":
+      return admin ? `User added to a group` : `You were added to a group`;
+    case "collaboration.removed_from_group":
+      return admin ? `User removed from a group` : `You were removed from a group`;
+    case "collaboration.left_group":
+      return admin ? `Member left a group` : `A member left your group`;
+    case "collaboration.left_group_by_self":
+      return admin ? `Member left a group` : `You left a group`;
     case "system.announcement":
       return `Announcement`;
     case "system.maintenance":

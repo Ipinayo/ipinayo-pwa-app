@@ -297,6 +297,14 @@ export async function removeGroupMember(input: RemoveGroupMemberInput) {
 
     const groupName = group.name ?? "a group";
     if (isSelf) {
+      // Record a self-activity for the person who left ("You left …").
+      createActivity({
+        targetUsers: [session.user.id],
+        event: "collaboration.left_group_by_self",
+        entityId: group.id,
+        metadata: { groupName },
+        actorId: session.user.id,
+      });
       // Tell the owner that a member left (skip if the owner left their own group).
       if (group.ownerId !== session.user.id) {
         createActivity({

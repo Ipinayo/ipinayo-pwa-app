@@ -188,6 +188,21 @@ export type ActivityEventMap = {
         };
     };
 
+    "collaboration.left_group": {
+        entityType: "collaboration";
+        metadata: {
+            groupName: string;
+            actorName: string;
+        };
+    };
+
+    "collaboration.left_group_by_self": {
+        entityType: "collaboration";
+        metadata: {
+            groupName: string;
+        };
+    };
+
     "user.registered": {
         entityType: "user";
         metadata: {

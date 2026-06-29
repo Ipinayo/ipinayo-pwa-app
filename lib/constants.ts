@@ -539,12 +539,22 @@ export const userNotificationEvents: Partial<Record<keyof ActivityEventMap, { la
     "collaboration.added_to_group": {
         label: "Added to a Group",
         description: "These are notifications for when someone adds you to a collaborator group",
-        default: { inApp: true, email: false, push: true },
+        default: { inApp: true, email: true, push: true },
     },
     "collaboration.removed_from_group": {
         label: "Removed from a Group",
         description: "These are notifications for when someone removes you from a collaborator group",
+        default: { inApp: true, email: true, push: true },
+    },
+    "collaboration.left_group": {
+        label: "Member Left a Group",
+        description: "These are notifications for when a member leaves a group you own",
         default: { inApp: true, email: false, push: true },
+    },
+    "collaboration.left_group_by_self": {
+        label: "You Left a Group",
+        description: "These are notifications for when you leave a group",
+        default: { inApp: false, email: false, push: false },
     },
     "system.announcement": {
         label: "System Announcements",

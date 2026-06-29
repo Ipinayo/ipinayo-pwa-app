@@ -224,6 +224,12 @@ function getTitle<K extends keyof ActivityEventMap>(
             return `You were added to a group`;
         case "collaboration.removed_from_group":
             return `You were removed from a group`;
+        case "collaboration.left_group":
+            return `A member left your group`;
+        case "collaboration.left_group_by_self": {
+            const data = metadata as ActivityEventMap["collaboration.left_group_by_self"]["metadata"];
+            return `You left ${data.groupName}`;
+        }
         case "user.registered":
             return `Welcome to Ìpínayò`;
         case "draft.created_by_self":
@@ -356,6 +362,16 @@ function getMessage<K extends keyof ActivityEventMap>(
                 const data = metadata as ActivityEventMap["collaboration.removed_from_group"]["metadata"];
                 return `${data.actorName} removed you from the group "${data.groupName}".`;
             }
+        case "collaboration.left_group":
+            {
+                const data = metadata as ActivityEventMap["collaboration.left_group"]["metadata"];
+                return `${data.actorName} left the group "${data.groupName}".`;
+            }
+        case "collaboration.left_group_by_self":
+            {
+                const data = metadata as ActivityEventMap["collaboration.left_group_by_self"]["metadata"];
+                return `You left the group "${data.groupName}".`;
+            }
         case "user.registered":
             {
                 const data = metadata as ActivityEventMap["user.registered"]["metadata"];
@@ -431,7 +447,9 @@ function getActionURL<K extends keyof ActivityEventMap>(
 
         case "collaboration.added_to_group":
         case "collaboration.removed_from_group":
-            return '/settings/collaboration';
+        case "collaboration.left_group":
+        case "collaboration.left_group_by_self":
+            return '/settings/groups';
 
         default:
             return undefined;
@@ -495,7 +513,9 @@ function getPath<K extends keyof ActivityEventMap>(
 
         case "collaboration.added_to_group":
         case "collaboration.removed_from_group":
-            return `/settings/collaboration`;
+        case "collaboration.left_group":
+        case "collaboration.left_group_by_self":
+            return `/settings/groups`;
 
         default:
             return undefined;
