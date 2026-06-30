@@ -425,6 +425,21 @@ export function getActivityEntity(
         const data = metadata as ActivityEventMap["collaboration.left_group"]["metadata"];
         return `${data.groupName}`;
       }
+    case "collaboration.group_created_by_self":
+      {
+        const data = metadata as ActivityEventMap["collaboration.group_created_by_self"]["metadata"];
+        return `${data.groupName}`;
+      }
+    case "collaboration.group_deleted_by_self":
+      {
+        const data = metadata as ActivityEventMap["collaboration.group_deleted_by_self"]["metadata"];
+        return `${data.groupName}`;
+      }
+    case "collaboration.group_role_updated":
+      {
+        const data = metadata as ActivityEventMap["collaboration.group_role_updated"]["metadata"];
+        return `${data.groupName}`;
+      }
     case "collaboration.left_group_by_self":
       {
         const data = metadata as ActivityEventMap["collaboration.left_group_by_self"]["metadata"];
@@ -507,6 +522,12 @@ export function getActivityEvent(event: string, admin?: boolean): string {
       return admin ? `Member left a group` : `A member left your group`;
     case "collaboration.left_group_by_self":
       return admin ? `Member left a group` : `You left a group`;
+    case "collaboration.group_created_by_self":
+      return `Group created`;
+    case "collaboration.group_deleted_by_self":
+      return `Group deleted`;
+    case "collaboration.group_role_updated":
+      return admin ? `Group role changed` : `Your group role changed`;
     case "system.announcement":
       return `Announcement`;
     case "system.maintenance":

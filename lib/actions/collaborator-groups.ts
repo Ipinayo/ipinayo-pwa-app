@@ -1,10 +1,6 @@
 "use server";
 
 import {
-  Permission,
-  can,
-} from "@/lib/collaboration-utils";
-import {
   AddGroupMembersInput,
   AttachGroupInput,
   ChangeGroupMemberRoleInput,
@@ -20,6 +16,10 @@ import {
   removeGroupMemberSchema,
   renameGroupSchema,
 } from "@/types/schemas/collaboration";
+import {
+  Permission,
+  can,
+} from "@/lib/collaboration-utils";
 import {
   attachGroupToDraft,
   attachGroupToSelection,
@@ -117,6 +117,14 @@ export async function createGroup(input: CreateGroupInput) {
 
     const group = await createNamedGroup(session.user.id, parsed.data.name);
 
+    createActivity({
+      targetUsers: [session.user.id],
+      event: "collaboration.group_created_by_self",
+      entityId: group.id,
+      metadata: { groupName: parsed.data.name },
+      actorId: session.user.id,
+    });
+
     revalidatePath("/settings/groups");
     return { id: group.id };
   } catch (error: any) {
@@ -169,6 +177,15 @@ export async function deleteGroup(input: DeleteGroupInput) {
 
     const actor = actorName(session.user);
     const groupName = group.name ?? "a group";
+
+    createActivity({
+      targetUsers: [session.user.id],
+      event: "collaboration.group_deleted_by_self",
+      entityId: group.id,
+      metadata: { groupName },
+      actorId: session.user.id,
+    });
+
     group.members
       .filter((m) => m.userId !== session.user!.id)
       .forEach((m) =>
@@ -265,6 +282,20 @@ export async function changeGroupMemberRole(input: ChangeGroupMemberRoleInput) {
 
     await updateGroupMemberRole(group.id, parsed.data.userId, parsed.data.role);
 
+    if (parsed.data.userId !== session.user.id) {
+      createActivity({
+        targetUsers: [parsed.data.userId],
+        event: "collaboration.group_role_updated",
+        entityId: group.id,
+        metadata: {
+          groupName: group.name ?? "a group",
+          role: parsed.data.role,
+          actorName: actorName(session.user),
+        },
+        actorId: session.user.id,
+      });
+    }
+
     revalidatePath("/settings/groups");
     revalidatePath(`/settings/groups/${group.id}`);
   } catch (error: any) {
@@ -339,7 +370,7 @@ async function assertAttachable(
   entityOwnerId: string,
 ) {
   const group = await findGroupOwnerAndRole(groupId, actorId);
-  if (!group || group.name === null) throw new Error("Group not found.");
+  if (!group?.name) throw new Error("Group not found.");
   if (group.ownerId !== entityOwnerId) {
     throw new Error("That group belongs to a different owner.");
   }
@@ -415,7 +446,27 @@ export async function detachSelectionGroup(input: Pick<AttachGroupInput, "id">) 
       throw new Error("You don't have permission to manage this selection.");
     }
 
+    // Capture the group's members BEFORE detaching.
+    const meta = await findSelectionMeta(parsed.data.id);
+    const losing =
+      meta && meta.groupName !== null
+        ? (await findGroupWithMembers(meta.groupId))?.members ?? []
+        : [];
+
     await detachGroupFromSelection(parsed.data.id);
+
+    const actor = actorName(session.user);
+    losing
+      .filter((m) => m.userId !== session.user!.id)
+      .forEach((m) =>
+        createActivity({
+          targetUsers: [m.userId],
+          event: "selection.access_revoked",
+          entityId: parsed.data.id,
+          metadata: { title: meta?.title ?? "a selection", actorName: actor },
+          actorId: session.user!.id,
+        }),
+      );
 
     revalidatePath(`/liturgical-selections/${parsed.data.id}`);
     revalidatePath(`/liturgical-selections/${parsed.data.id}/collaborators`);
@@ -492,7 +543,27 @@ export async function detachDraftGroup(input: Pick<AttachGroupInput, "id">) {
       throw new Error("You don't have permission to manage this draft.");
     }
 
+    const meta = await findDraftMeta(parsed.data.id);
+    const losing =
+      meta && meta.groupName !== null
+        ? (await findGroupWithMembers(meta.groupId))?.members ?? []
+        : [];
+
     await detachGroupFromDraft(parsed.data.id);
+
+    const actor = actorName(session.user);
+    const title = meta?.title || "Untitled draft";
+    losing
+      .filter((m) => m.userId !== session.user!.id)
+      .forEach((m) =>
+        createActivity({
+          targetUsers: [m.userId],
+          event: "draft.access_revoked",
+          entityId: parsed.data.id,
+          metadata: { title, actorName: actor },
+          actorId: session.user!.id,
+        }),
+      );
 
     revalidatePath(`/liturgical-selections/new/${parsed.data.id}`);
     revalidatePath(`/liturgical-selections/new/${parsed.data.id}/collaborators`);

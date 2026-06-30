@@ -4,8 +4,10 @@ import {
   LogOut,
   Megaphone,
   User,
+  UserCog2,
   UserMinus2,
   UserPlus2,
+  Users2,
   Wrench,
 } from "lucide-react";
 
@@ -37,6 +39,13 @@ export default function ActivityIcon({
     case "collaboration.left_group":
     case "collaboration.left_group_by_self":
       return <LogOut className={className} />;
+
+    case "collaboration.group_created_by_self":
+    case "collaboration.group_deleted_by_self":
+      return <Users2 className={className} />;
+
+    case "collaboration.group_role_updated":
+      return <UserCog2 className={className} />;
 
     case "system.announcement":
       return <Megaphone className={className} />;

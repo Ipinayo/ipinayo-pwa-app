@@ -230,6 +230,16 @@ function getTitle<K extends keyof ActivityEventMap>(
             const data = metadata as ActivityEventMap["collaboration.left_group_by_self"]["metadata"];
             return `You left ${data.groupName}`;
         }
+        case "collaboration.group_created_by_self": {
+            const data = metadata as ActivityEventMap["collaboration.group_created_by_self"]["metadata"];
+            return `You created ${data.groupName}`;
+        }
+        case "collaboration.group_deleted_by_self": {
+            const data = metadata as ActivityEventMap["collaboration.group_deleted_by_self"]["metadata"];
+            return `You deleted ${data.groupName}`;
+        }
+        case "collaboration.group_role_updated":
+            return `Your group role changed`;
         case "user.registered":
             return `Welcome to Ìpínayò`;
         case "draft.created_by_self":
@@ -372,6 +382,21 @@ function getMessage<K extends keyof ActivityEventMap>(
                 const data = metadata as ActivityEventMap["collaboration.left_group_by_self"]["metadata"];
                 return `You left the group "${data.groupName}".`;
             }
+        case "collaboration.group_created_by_self":
+            {
+                const data = metadata as ActivityEventMap["collaboration.group_created_by_self"]["metadata"];
+                return `You created the group "${data.groupName}".`;
+            }
+        case "collaboration.group_deleted_by_self":
+            {
+                const data = metadata as ActivityEventMap["collaboration.group_deleted_by_self"]["metadata"];
+                return `You deleted the group "${data.groupName}".`;
+            }
+        case "collaboration.group_role_updated":
+            {
+                const data = metadata as ActivityEventMap["collaboration.group_role_updated"]["metadata"];
+                return `${data.actorName} changed your role in "${data.groupName}" to ${roleArticle(data.role)}.`;
+            }
         case "user.registered":
             {
                 const data = metadata as ActivityEventMap["user.registered"]["metadata"];
@@ -449,6 +474,9 @@ function getActionURL<K extends keyof ActivityEventMap>(
         case "collaboration.removed_from_group":
         case "collaboration.left_group":
         case "collaboration.left_group_by_self":
+        case "collaboration.group_created_by_self":
+        case "collaboration.group_deleted_by_self":
+        case "collaboration.group_role_updated":
             return '/settings/groups';
 
         default:
@@ -515,6 +543,9 @@ function getPath<K extends keyof ActivityEventMap>(
         case "collaboration.removed_from_group":
         case "collaboration.left_group":
         case "collaboration.left_group_by_self":
+        case "collaboration.group_created_by_self":
+        case "collaboration.group_deleted_by_self":
+        case "collaboration.group_role_updated":
             return `/settings/groups`;
 
         default:
