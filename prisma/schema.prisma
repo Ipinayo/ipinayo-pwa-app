@@ -239,7 +239,6 @@ model CollaboratorGroupInvitation {
   role        CollaboratorRole  @default(VIEWER)
   invitedById String?
   invitedBy   User?             @relation("SentGroupInvitations", fields: [invitedById], references: [id], onDelete: SetNull)
-  acceptedAt  DateTime?
   createdAt   DateTime          @default(now())
   updatedAt   DateTime          @updatedAt
 
