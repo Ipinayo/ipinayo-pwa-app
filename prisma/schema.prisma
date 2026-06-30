@@ -10,32 +10,33 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
+  provider = "postgresql"
 }
 
 model User {
-  id                      String                   @id @default(cuid())
-  name                    String?
-  email                   String                   @unique
-  emailVerified           DateTime?
-  image                   String?
-  userRole                UserRole                 @default(USER)
-  accounts                Account[]
-  sessions                Session[]
-  createdAt               DateTime                 @default(now())
-  updatedAt               DateTime                 @updatedAt
-  profile                 UserProfile?
-  selections              MassSelection[]
-  massSelectionDrafts     MassSelectionDraft[]
-  notifications           Notification[]
-  activities              Activity[]               @relation("ActivityActor")
-  activityRecipients      ActivityRecipient[]
-  notificationPreferences NotificationPreference[]
-  announcements           Announcement[]           @relation("AnnouncementCreator")
-  pushSubscriptions       PushSubscription[]
-  chatSessions            ChatSession[]
-  ownedCollaboratorGroups      CollaboratorGroup[]       @relation("OwnedCollaboratorGroups")
+  id                           String                        @id @default(cuid())
+  name                         String?
+  email                        String                        @unique
+  emailVerified                DateTime?
+  image                        String?
+  userRole                     UserRole                      @default(USER)
+  accounts                     Account[]
+  sessions                     Session[]
+  createdAt                    DateTime                      @default(now())
+  updatedAt                    DateTime                      @updatedAt
+  profile                      UserProfile?
+  selections                   MassSelection[]
+  massSelectionDrafts          MassSelectionDraft[]
+  notifications                Notification[]
+  activities                   Activity[]                    @relation("ActivityActor")
+  activityRecipients           ActivityRecipient[]
+  notificationPreferences      NotificationPreference[]
+  announcements                Announcement[]                @relation("AnnouncementCreator")
+  pushSubscriptions            PushSubscription[]
+  chatSessions                 ChatSession[]
+  ownedCollaboratorGroups      CollaboratorGroup[]           @relation("OwnedCollaboratorGroups")
   collaboratorGroupMemberships CollaboratorGroupMember[]
+  sentGroupInvitations         CollaboratorGroupInvitation[] @relation("SentGroupInvitations")
 }
 
 model Account {
@@ -197,15 +198,16 @@ model MassSelectionDraft {
 /// The owner is implicit (`ownerId`, never a member row), so each user has at
 /// most one role source for an entity — no role union is ever needed.
 model CollaboratorGroup {
-  id         String                    @id @default(cuid())
-  name       String?
-  ownerId    String
-  owner      User                      @relation("OwnedCollaboratorGroups", fields: [ownerId], references: [id], onDelete: Cascade)
-  members    CollaboratorGroupMember[]
-  selections MassSelection[]
-  drafts     MassSelectionDraft[]
-  createdAt  DateTime                  @default(now())
-  updatedAt  DateTime                  @updatedAt
+  id          String                        @id @default(cuid())
+  name        String?
+  ownerId     String
+  owner       User                          @relation("OwnedCollaboratorGroups", fields: [ownerId], references: [id], onDelete: Cascade)
+  members     CollaboratorGroupMember[]
+  invitations CollaboratorGroupInvitation[]
+  selections  MassSelection[]
+  drafts      MassSelectionDraft[]
+  createdAt   DateTime                      @default(now())
+  updatedAt   DateTime                      @updatedAt
 
   @@index([ownerId])
 }
@@ -227,6 +229,23 @@ model CollaboratorGroupMember {
   @@unique([groupId, userId])
   @@index([groupId])
   @@index([userId])
+}
+
+model CollaboratorGroupInvitation {
+  id          String            @id @default(cuid())
+  groupId     String
+  group       CollaboratorGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  email       String
+  role        CollaboratorRole  @default(VIEWER)
+  invitedById String?
+  invitedBy   User?             @relation("SentGroupInvitations", fields: [invitedById], references: [id], onDelete: SetNull)
+  acceptedAt  DateTime?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  @@unique([groupId, email])
+  @@index([email])
+  @@index([groupId])
 }
 
 model Activity {
