@@ -11,7 +11,14 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { BookOpen, FileClock, Megaphone, RotateCcw, Save } from "lucide-react";
+import {
+  BookOpen,
+  FileClock,
+  Megaphone,
+  RotateCcw,
+  Save,
+  Users2,
+} from "lucide-react";
 import {
   Card,
   CardContent,
@@ -62,6 +69,12 @@ const GROUPS: {
     label: "Drafts",
     description: "Notifications about your drafts",
     icon: FileClock,
+  },
+  {
+    key: "collaboration",
+    label: "Collaboration",
+    description: "Notifications about your groups and collaborators",
+    icon: Users2,
   },
   {
     key: "system",
@@ -194,7 +207,11 @@ export function NotificationPreferencesForm({
       <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
         <AlertDialog>
           <AlertDialogTrigger asChild>
-            <Button type="button" variant="outline" disabled={restoring || saving}>
+            <Button
+              type="button"
+              variant="outline"
+              disabled={restoring || saving}
+            >
               <RotateCcw className="mr-2 h-4 w-4" />
               {restoring ? "Restoring..." : "Restore defaults"}
             </Button>

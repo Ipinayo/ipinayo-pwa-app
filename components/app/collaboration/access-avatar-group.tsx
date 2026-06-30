@@ -1,6 +1,6 @@
 "use client";
 
-import type { AccessPersonView } from "./shared";
+import type { AccessPerson } from "@/lib/collaboration-utils";
 import { CollaboratorAvatar } from "./collaborator-avatar";
 import Link from "next/link";
 import { UserPlus2 } from "lucide-react";
@@ -12,7 +12,7 @@ export function AccessAvatarGroup({
   hasAccess,
   manageHref,
 }: Readonly<{
-  people: AccessPersonView[];
+  people: AccessPerson[];
   hasAccess: boolean;
   manageHref: string;
 }>) {

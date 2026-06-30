@@ -2,6 +2,7 @@ import { Permission, can } from "@/lib/collaboration-utils";
 import {
   getDraftAccess,
   getDraftAccessPeople,
+  getDraftGroupContext,
 } from "@/lib/actions/collaboration";
 
 import BackButton from "@/components/common/back-button";
@@ -26,7 +27,10 @@ export default async function DraftCollaboratorsPage(props: {
   }
 
   const canManage = can(access, Permission.Manage);
-  const people = await getDraftAccessPeople(params.id);
+  const [people, groupContext] = await Promise.all([
+    getDraftAccessPeople(params.id),
+    getDraftGroupContext(params.id),
+  ]);
 
   return (
     <div className="mx-auto w-full max-w-2xl">
@@ -50,6 +54,8 @@ export default async function DraftCollaboratorsPage(props: {
         id={params.id}
         canManage={canManage}
         initialPeople={people}
+        group={groupContext?.group ?? { id: "", name: null }}
+        attachableGroups={groupContext?.attachableGroups ?? []}
       />
     </div>
   );

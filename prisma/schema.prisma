@@ -34,8 +34,8 @@ model User {
   announcements           Announcement[]           @relation("AnnouncementCreator")
   pushSubscriptions       PushSubscription[]
   chatSessions            ChatSession[]
-  selectionCollaborations SelectionCollaborator[]
-  draftCollaborations     DraftCollaborator[]
+  ownedCollaboratorGroups      CollaboratorGroup[]       @relation("OwnedCollaboratorGroups")
+  collaboratorGroupMemberships CollaboratorGroupMember[]
 }
 
 model Account {
@@ -115,13 +115,15 @@ model MassSelection {
   createdBy        User              @relation(fields: [createdById], references: [id], onDelete: Cascade)
   parts            MassPart[]
   parishLocation   Location?         @relation(fields: [parishLocationId], references: [id], onDelete: SetNull)
-  collaborators    SelectionCollaborator[]
+  groupId          String
+  group            CollaboratorGroup @relation(fields: [groupId], references: [id], onDelete: NoAction)
 
   @@index([createdById])
   @@index([isPublic])
   @@index([isFeatured])
   @@index([date])
   @@index([parishLocationId])
+  @@index([groupId])
 }
 
 model MassPart {
@@ -181,44 +183,49 @@ model MassSelectionDraft {
   createdBy        User              @relation(fields: [createdById], references: [id], onDelete: Cascade)
   parts            Json              @default("[]")
   parishLocation   Json?
-  collaborators    DraftCollaborator[]
+  groupId          String
+  group            CollaboratorGroup @relation(fields: [groupId], references: [id], onDelete: NoAction)
 
   @@index([createdById])
+  @@index([groupId])
 }
 
-/// A user granted access to someone else's selection (the creator is the
-/// implicit OWNER and has no row here). Role governs view/comment/edit/manage.
-model SelectionCollaborator {
-  id          String           @id @default(cuid())
-  selectionId String
-  selection   MassSelection    @relation(fields: [selectionId], references: [id], onDelete: Cascade)
-  userId      String
-  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  role        CollaboratorRole @default(VIEWER)
-  invitedById String?
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
+/// A reusable set of collaborators owned by one user. Every selection and draft
+/// points to exactly one group. An UNNAMED group (`name` is null) is "ad-hoc" —
+/// the per-entity direct-access list, belonging to a single selection/draft. A
+/// NAMED group is reusable and can be attached to many of the owner's entities.
+/// The owner is implicit (`ownerId`, never a member row), so each user has at
+/// most one role source for an entity — no role union is ever needed.
+model CollaboratorGroup {
+  id         String                    @id @default(cuid())
+  name       String?
+  ownerId    String
+  owner      User                      @relation("OwnedCollaboratorGroups", fields: [ownerId], references: [id], onDelete: Cascade)
+  members    CollaboratorGroupMember[]
+  selections MassSelection[]
+  drafts     MassSelectionDraft[]
+  createdAt  DateTime                  @default(now())
+  updatedAt  DateTime                  @updatedAt
 
-  @@unique([selectionId, userId])
-  @@index([selectionId])
-  @@index([userId])
+  @@index([ownerId])
 }
 
-/// A user granted access to someone else's draft (the creator is the implicit
-/// OWNER and has no row here).
-model DraftCollaborator {
-  id          String             @id @default(cuid())
-  draftId     String
-  draft       MassSelectionDraft @relation(fields: [draftId], references: [id], onDelete: Cascade)
+/// A member of a CollaboratorGroup. The role governs view/comment/edit/manage on
+/// every selection/draft the group is attached to, and (for MANAGER) the ability
+/// to add/remove members. The group owner is never represented here.
+model CollaboratorGroupMember {
+  id          String            @id @default(cuid())
+  groupId     String
+  group       CollaboratorGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
   userId      String
-  user        User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  role        CollaboratorRole   @default(VIEWER)
+  user        User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role        CollaboratorRole  @default(VIEWER)
   invitedById String?
-  createdAt   DateTime           @default(now())
-  updatedAt   DateTime           @updatedAt
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
 
-  @@unique([draftId, userId])
-  @@index([draftId])
+  @@unique([groupId, userId])
+  @@index([groupId])
   @@index([userId])
 }
 

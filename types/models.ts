@@ -37,7 +37,7 @@ export type NewLocation = Omit<Prisma.LocationCreateInput, 'id' | 'massSelection
     country?: string
 };
 
-export type NewMassSelection = Omit<Prisma.MassSelectionCreateInput, 'id' | 'createdAt' | 'updatedAt' | 'createdBy' | 'collaborators' | 'isFeatured' | 'themes' | 'parishLocation' | 'date'> & {
+export type NewMassSelection = Omit<Prisma.MassSelectionCreateInput, 'id' | 'createdAt' | 'updatedAt' | 'createdBy' | 'group' | 'groupId' | 'isFeatured' | 'themes' | 'parishLocation' | 'date'> & {
     date: Date
     themes: string[]
     parts: NewMassSelectionPart[]
@@ -107,6 +107,15 @@ export type User = Prisma.UserGetPayload<{
             },
         },
     },
+}>;
+
+export type UserLite = Prisma.UserGetPayload<{
+    select: {
+        id: true,
+        name: true,
+        email: true,
+        image: true
+    }
 }>;
 
 export type MassSelectionDraft = Prisma.MassSelectionDraftGetPayload<{}>;
@@ -226,6 +235,14 @@ export type Announcement = Prisma.AnnouncementGetPayload<{
         }
     }
 }>;
+
+export type AttachableGroup = { id: string; name: string; memberCount: number };
+
+export type GroupContext = {
+    /** The entity's current group. `name === null` means ad-hoc (direct sharing). */
+    group: { id: string; name: string | null };
+    attachableGroups: AttachableGroup[];
+};
 
 export type Json = Prisma.JsonValue;
 
