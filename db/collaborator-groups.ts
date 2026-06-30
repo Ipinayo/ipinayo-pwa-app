@@ -2,6 +2,17 @@ import { CollaboratorRole, Prisma } from "@/lib/generated/prisma/client";
 
 import prisma from "@/lib/prisma";
 
+type ClaimedInvitation = {
+  groupId: string;
+  role: CollaboratorRole;
+  invitedById: string | null;
+  inviterName: string;
+  groupName: string | null;
+  entity:
+  | { type: "selection" | "draft"; id: string; title: string }
+  | null;
+};
+
 const collaboratorUser = {
   select: { id: true, name: true, email: true, image: true },
 } satisfies Prisma.UserDefaultArgs;
@@ -133,6 +144,10 @@ export async function findGroupWithMembers(groupId: string) {
         include: { user: collaboratorUser },
         orderBy: { createdAt: "asc" },
       },
+      invitations: {
+        select: { id: true, email: true, role: true, createdAt: true },
+        orderBy: { createdAt: "asc" },
+      },
       _count: { select: { selections: true, drafts: true } },
     },
   });
@@ -151,6 +166,10 @@ export async function findGroupsForUser(userId: string) {
       owner: collaboratorUser,
       members: {
         include: { user: collaboratorUser },
+        orderBy: { createdAt: "asc" },
+      },
+      invitations: {
+        select: { id: true, email: true, role: true, createdAt: true },
         orderBy: { createdAt: "asc" },
       },
       _count: { select: { selections: true, drafts: true } },
@@ -271,6 +290,149 @@ export async function detachGroupFromDraft(draftId: string) {
     await tx.massSelectionDraft.update({
       where: { id: draftId },
       data: { groupId: adhoc.id },
+    });
+  });
+}
+
+export async function upsertInvitation(params: {
+  groupId: string;
+  email: string;
+  role: CollaboratorRole;
+  invitedById: string;
+}) {
+  const email = params.email.trim().toLowerCase();
+  return prisma.collaboratorGroupInvitation.upsert({
+    where: { groupId_email: { groupId: params.groupId, email } },
+    create: {
+      groupId: params.groupId,
+      email,
+      role: params.role,
+      invitedById: params.invitedById,
+    },
+    update: { role: params.role },
+  });
+}
+
+export async function listInvitations(groupId: string) {
+  return prisma.collaboratorGroupInvitation.findMany({
+    where: { groupId },
+    select: { id: true, email: true, role: true, createdAt: true },
+    orderBy: { createdAt: "asc" },
+  });
+}
+
+export async function findInvitation(groupId: string, invitationId: string) {
+  return prisma.collaboratorGroupInvitation.findFirst({
+    where: { id: invitationId, groupId },
+    select: { id: true, email: true, role: true },
+  });
+}
+
+export async function deleteInvitation(groupId: string, invitationId: string) {
+  return prisma.collaboratorGroupInvitation.deleteMany({
+    where: { id: invitationId, groupId },
+  });
+}
+
+/**
+ * The pending invites waiting for an email, with a human label and inviter name.
+ * Read while composing the magic-link email so its wording can name what's
+ * waiting. A named group shows its name; an ad-hoc group shows its sole entity.
+ */
+export async function findPendingInvitationsForEmail(rawEmail: string) {
+  const email = rawEmail.trim().toLowerCase();
+  const invites = await prisma.collaboratorGroupInvitation.findMany({
+    where: { email },
+    select: {
+      group: {
+        select: {
+          name: true,
+          selections: { select: { title: true }, take: 1 },
+          drafts: { select: { title: true }, take: 1 },
+        },
+      },
+      invitedBy: { select: { name: true, email: true } },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+
+  return invites.map((inv) => ({
+    label:
+      inv.group.name ||
+      inv.group.selections[0]?.title ||
+      inv.group.drafts[0]?.title ||
+      "a collaboration",
+    inviterName: inv.invitedBy?.name || inv.invitedBy?.email || "Someone",
+  }));
+}
+
+/**
+ * Convert every pending invite for `email` into a group membership for `userId`
+ * and delete the invites, in one transaction. Email-scoped (not per-invite) so a
+ * single sign-in claims invites across all groups at once.
+ * Returns context for firing the access notifications.
+ */
+export async function claimInvitationsForUser(
+  userId: string,
+  rawEmail: string,
+): Promise<ClaimedInvitation[]> {
+  const email = rawEmail.trim().toLowerCase();
+  return prisma.$transaction(async (tx) => {
+    const invites = await tx.collaboratorGroupInvitation.findMany({
+      where: { email },
+      select: {
+        groupId: true,
+        role: true,
+        invitedById: true,
+        invitedBy: { select: { name: true, email: true } },
+        group: {
+          select: {
+            name: true,
+            selections: { select: { id: true, title: true }, take: 1 },
+            drafts: { select: { id: true, title: true }, take: 1 },
+          },
+        },
+      },
+    });
+    if (invites.length === 0) return [];
+
+    for (const inv of invites) {
+      await tx.collaboratorGroupMember.upsert({
+        where: { groupId_userId: { groupId: inv.groupId, userId } },
+        create: {
+          groupId: inv.groupId,
+          userId,
+          role: inv.role,
+          invitedById: inv.invitedById,
+        },
+        update: { role: inv.role },
+      });
+    }
+
+    await tx.collaboratorGroupInvitation.deleteMany({ where: { email } });
+
+    return invites.map((inv) => {
+      const sel = inv.group.selections[0];
+      const draft = inv.group.drafts[0];
+      const entity = inv.group.name
+        ? null
+        : sel
+          ? { type: "selection" as const, id: sel.id, title: sel.title }
+          : draft
+            ? {
+              type: "draft" as const,
+              id: draft.id,
+              title: draft.title || "Untitled draft",
+            }
+            : null;
+      return {
+        groupId: inv.groupId,
+        role: inv.role,
+        invitedById: inv.invitedById,
+        inviterName: inv.invitedBy?.name || inv.invitedBy?.email || "Someone",
+        groupName: inv.group.name,
+        entity,
+      };
     });
   });
 }

@@ -236,6 +236,10 @@ export type Announcement = Prisma.AnnouncementGetPayload<{
     }
 }>;
 
+export type PendingInvite = Prisma.CollaboratorGroupInvitationGetPayload<{
+    select: { id: true, email: true, role: true, createdAt: true }
+}>;
+
 export type AttachableGroup = { id: string; name: string; memberCount: number };
 
 export type GroupContext = {
