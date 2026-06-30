@@ -2,6 +2,7 @@ import { Church, FileText, Flower, Heart, Music2, Users } from "lucide-react";
 import { KeySignature, LiturgicalSeason, LiturgicalYear } from "@/types/models";
 
 import { ActivityEventMap } from '../types/utils';
+import { ShareableRole } from "@/types/schemas/collaboration";
 
 export const liturgicalSeasonItems = [
     { label: "Advent", value: LiturgicalSeason.ADVENT },
@@ -568,3 +569,23 @@ export const MAX_CHAT_MESSAGES = 25;
 
 /** Start nudging the user to begin a new conversation at this many messages. */
 export const CHAT_WARN_THRESHOLD = 20;
+
+/** Assignable roles, with the descriptions shown in the role picker. */
+export const ROLE_OPTIONS: {
+    value: ShareableRole;
+    label: string;
+    description: string;
+}[] = [
+        { value: "MANAGER", label: "Manager", description: "Can edit and manage sharing" },
+        { value: "EDITOR", label: "Editor", description: "Can view and make changes" },
+        // { value: "COMMENTER", label: "Commenter", description: "Can view and comment" },
+        { value: "VIEWER", label: "Viewer", description: "Can view only" },
+    ];
+
+export const ROLE_LABEL: Record<string, string> = {
+    OWNER: "Owner",
+    MANAGER: "Manager",
+    EDITOR: "Editor",
+    // COMMENTER: "Commenter",
+    VIEWER: "Viewer",
+};

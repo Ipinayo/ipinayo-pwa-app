@@ -6,7 +6,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
-import { ROLE_LABEL } from "./shared";
+import { ROLE_LABEL } from "@/lib/constants";
 import type { ShareableRole } from "@/types/schemas/collaboration";
 import UserAvatar from "@/components/common/user-avatar";
 import { cn } from "@/lib/utils";

@@ -32,7 +32,8 @@ export const removeAccessSchema = z.object({
 export const groupNameSchema = z
     .string()
     .trim()
-    .min(1, "Give the group a name.")
+    .nonempty("Give the group a name.")
+    .min(3, "Group name is too short.")
     .max(80, "Group name is too long.");
 
 export const createGroupSchema = z.object({
@@ -46,7 +47,7 @@ export const renameGroupSchema = z.object({
 
 export const deleteGroupSchema = z.object({
     groupId: z.string().nonempty(),
-    confirmName: z.string(),
+    confirmName: z.string().nonempty("Please confirm the group name."),
 });
 
 export const addGroupMembersSchema = z.object({

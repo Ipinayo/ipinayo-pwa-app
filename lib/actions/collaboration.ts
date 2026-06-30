@@ -37,16 +37,11 @@ import {
   searchUsers as searchUsersDb,
 } from "@/db/collaboration";
 
+import { GroupContext } from "@/types/models";
 import { auth } from "@/auth";
 import { createActivity } from "@/lib/notifications/dispatch";
 import { getFieldError } from "@/lib/utils";
 import { revalidatePath } from "next/cache";
-
-type GroupContext = {
-  /** The entity's current group. `name === null` means ad-hoc (direct sharing). */
-  group: { id: string; name: string | null };
-  attachableGroups: { id: string; name: string; memberCount: number }[];
-};
 
 function actorName(
   user: { name?: string | null; email?: string | null } | undefined,
