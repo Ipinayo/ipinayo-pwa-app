@@ -8,6 +8,15 @@ import { SelectOption } from "@/types/components/select";
 import { formatDistanceToNow } from "date-fns";
 import { ActivityEventMap } from "@/types/utils";
 
+
+type EventMeta<K extends keyof ActivityEventMap> = ActivityEventMap[K]["metadata"];
+
+/** Per-event value: a static string or a builder from the metadata. Typed as a
+ *  full mapped type so adding an event forces an entry in each map below. */
+type EventText = {
+  [K in keyof ActivityEventMap]: string | ((m: EventMeta<K>) => string);
+};
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
@@ -281,258 +290,93 @@ export function getCallbackUrl(path: string, filters: {
   return path + (searchParams.toString() ? `?${searchParams.toString()}` : "");
 }
 
-export function getActivityEntity(
-  event: string,
-  metadata: Json
-) {
-  switch (event) {
-    case "selection.created_by_self":
-      {
-        const data = metadata as ActivityEventMap["selection.created_by_self"]["metadata"];
-        return `${data.title}`;
-      }
-    case "selection.cloned_by_self":
-      {
-        const data = metadata as ActivityEventMap["selection.cloned_by_self"]["metadata"];
-        return `${data.title}`;
-      }
-    case "selection.cloned_by_other":
-      {
-        const data = metadata as ActivityEventMap["selection.cloned_by_other"]["metadata"];
-        return `${data.title}`;
-      }
-    case "selection.updated_by_self":
-      {
-        const data = metadata as ActivityEventMap["selection.updated_by_self"]["metadata"];
-        return `${data.title}`;
-      }
-    case "selection.deleted_by_self":
-      {
-        const data = metadata as ActivityEventMap["selection.deleted_by_self"]["metadata"];
-        return `${data.title}`;
-      }
-    case "selection.shared_with_other":
-      {
-        const data = metadata as ActivityEventMap["selection.shared_with_other"]["metadata"];
-        return `${data.title}`;
-      }
-    case "selection.shared_by_other":
-      {
-        const data = metadata as ActivityEventMap["selection.shared_by_other"]["metadata"];
-        return `${data.title}`;
-      }
-    case "selection.shared_by_self":
-      {
-        const data = metadata as ActivityEventMap["selection.shared_by_self"]["metadata"];
-        return `${data.title}`;
-      }
-    case "selection.role_updated":
-      {
-        const data = metadata as ActivityEventMap["selection.role_updated"]["metadata"];
-        return `${data.title}`;
-      }
-    case "selection.updated_by_other":
-      {
-        const data = metadata as ActivityEventMap["selection.updated_by_other"]["metadata"];
-        return `${data.title}`;
-      }
-    case "selection.deleted_by_other":
-      {
-        const data = metadata as ActivityEventMap["selection.deleted_by_other"]["metadata"];
-        return `${data.title}`;
-      }
-    case "selection.access_revoked":
-      {
-        const data = metadata as ActivityEventMap["selection.access_revoked"]["metadata"];
-        return `${data.title}`;
-      }
-    case "draft.access_revoked":
-      {
-        const data = metadata as ActivityEventMap["draft.access_revoked"]["metadata"];
-        return `${data.title}`;
-      }
-    case "draft.shared_with_other":
-      {
-        const data = metadata as ActivityEventMap["draft.shared_with_other"]["metadata"];
-        return `${data.title}`;
-      }
-    case "draft.shared_by_other":
-      {
-        const data = metadata as ActivityEventMap["draft.shared_by_other"]["metadata"];
-        return `${data.title}`;
-      }
-    case "draft.shared_by_self":
-      {
-        const data = metadata as ActivityEventMap["draft.shared_by_self"]["metadata"];
-        return `${data.title}`;
-      }
-    case "draft.role_updated":
-      {
-        const data = metadata as ActivityEventMap["draft.role_updated"]["metadata"];
-        return `${data.title}`;
-      }
-    case "draft.updated_by_other":
-      {
-        const data = metadata as ActivityEventMap["draft.updated_by_other"]["metadata"];
-        return `${data.title}`;
-      }
-    case "user.registered":
-      {
-        const data = metadata as ActivityEventMap["user.registered"]["metadata"];
-        return `${data.name}`;
-      }
-    case "user.updated":
-      return `Your profile`;
-    case "draft.created_by_self":
-      return `New Draft`;
-    case "draft.updated_by_self":
-      {
-        const data = metadata as ActivityEventMap["draft.updated_by_self"]["metadata"];
-        return `${data.title}`;
-      }
-    case "draft.deleted_by_self":
-      {
-        const data = metadata as ActivityEventMap["draft.deleted_by_self"]["metadata"];
-        return `${data.title}`;
-      }
-    case "draft.deleted_by_other":
-      {
-        const data = metadata as ActivityEventMap["draft.deleted_by_other"]["metadata"];
-        return `${data.title}`;
-      }
-    case "draft.expired":
-      {
-        const data = metadata as ActivityEventMap["draft.expired"]["metadata"];
-        return `${data.title}`;
-      }
-    case "draft.expiring":
-      {
-        const data = metadata as ActivityEventMap["draft.expiring"]["metadata"];
-        return `${data.title}`;
-      }
-    case "collaboration.added_to_group":
-      {
-        const data = metadata as ActivityEventMap["collaboration.added_to_group"]["metadata"];
-        return `${data.groupName}`;
-      }
-    case "collaboration.removed_from_group":
-      {
-        const data = metadata as ActivityEventMap["collaboration.removed_from_group"]["metadata"];
-        return `${data.groupName}`;
-      }
-    case "collaboration.left_group":
-      {
-        const data = metadata as ActivityEventMap["collaboration.left_group"]["metadata"];
-        return `${data.groupName}`;
-      }
-    case "collaboration.group_created_by_self":
-      {
-        const data = metadata as ActivityEventMap["collaboration.group_created_by_self"]["metadata"];
-        return `${data.groupName}`;
-      }
-    case "collaboration.group_deleted_by_self":
-      {
-        const data = metadata as ActivityEventMap["collaboration.group_deleted_by_self"]["metadata"];
-        return `${data.groupName}`;
-      }
-    case "collaboration.group_role_updated":
-      {
-        const data = metadata as ActivityEventMap["collaboration.group_role_updated"]["metadata"];
-        return `${data.groupName}`;
-      }
-    case "collaboration.left_group_by_self":
-      {
-        const data = metadata as ActivityEventMap["collaboration.left_group_by_self"]["metadata"];
-        return `${data.groupName}`;
-      }
-    case "system.announcement":
-      {
-        const data = metadata as ActivityEventMap["system.announcement"]["metadata"];
-        return `${data.title}`;
-      }
-    case "system.maintenance":
-      {
-        const data = metadata as ActivityEventMap["system.maintenance"]["metadata"];
-        return `${data.title}`;
-      }
+const ACTIVITY_ENTITY: EventText = {
+  "selection.created_by_self": (m) => m.title,
+  "selection.cloned_by_self": (m) => m.title,
+  "selection.cloned_by_other": (m) => m.title,
+  "selection.updated_by_self": (m) => m.title,
+  "selection.deleted_by_self": (m) => m.title,
+  "selection.deleted_by_other": (m) => m.title,
+  "selection.shared_with_other": (m) => m.title,
+  "selection.shared_by_other": (m) => m.title,
+  "selection.shared_by_self": (m) => m.title,
+  "selection.role_updated": (m) => m.title,
+  "selection.updated_by_other": (m) => m.title,
+  "selection.access_revoked": (m) => m.title,
+  "draft.access_revoked": (m) => m.title,
+  "draft.shared_with_other": (m) => m.title,
+  "draft.shared_by_other": (m) => m.title,
+  "draft.shared_by_self": (m) => m.title,
+  "draft.role_updated": (m) => m.title,
+  "draft.updated_by_other": (m) => m.title,
+  "draft.updated_by_self": (m) => m.title,
+  "draft.deleted_by_self": (m) => m.title,
+  "draft.deleted_by_other": (m) => m.title,
+  "draft.expired": (m) => m.title,
+  "draft.expiring": (m) => m.title,
+  "draft.created_by_self": "New Draft",
+  "collaboration.added_to_group": (m) => m.groupName,
+  "collaboration.removed_from_group": (m) => m.groupName,
+  "collaboration.left_group": (m) => m.groupName,
+  "collaboration.left_group_by_self": (m) => m.groupName,
+  "collaboration.group_created_by_self": (m) => m.groupName,
+  "collaboration.group_deleted_by_self": (m) => m.groupName,
+  "collaboration.group_role_updated": (m) => m.groupName,
+  "user.registered": (m) => m.name,
+  "user.updated": "Your profile",
+  "system.announcement": (m) => m.title,
+  "system.maintenance": (m) => m.title,
+};
 
-    default:
-      return "";
-  }
+export function getActivityEntity(event: string, metadata: Json) {
+  const entry = (ACTIVITY_ENTITY as Record<string, string | ((m: any) => string)>)[event];
+  if (entry === undefined) return "";
+  return typeof entry === "function" ? entry(metadata) : entry;
 }
 
-export function getActivityEvent(event: string, admin?: boolean): string {
-  switch (event) {
-    case "selection.created_by_self":
-      return `New selection`;
-    case "selection.cloned_by_self":
-      return `Selection cloned`;
-    case "selection.cloned_by_other":
-      return admin ? `Selection cloned by another user` : `Your selection was cloned`;
-    case "selection.updated_by_self":
-      return `Selection updated`;
-    case "selection.deleted_by_self":
-      return `Selection deleted`;
-    case "selection.shared_with_other":
-      return admin ? `Selection shared with a user` : `A selection was shared with you`;
-    case "selection.shared_by_other":
-      return admin ? `Selection was shared by another user` : `Your selection was shared`;
-    case "selection.shared_by_self":
-      return admin ? `Selection shared` : `You shared a selection`;
-    case "selection.role_updated":
-      return admin ? `Selection access changed` : `Your access changed`;
-    case "selection.updated_by_other":
-      return admin ? `Shared selection updated` : `A shared selection was updated`;
-    case "selection.deleted_by_other":
-      return admin ? `Shared selection deleted` : `A shared selection was deleted`;
-    case "selection.access_revoked":
-    case "draft.access_revoked":
-      return `Your access was removed`;
-    case "draft.shared_with_other":
-      return admin ? `Draft shared with a user` : `A draft was shared with you`;
-    case "draft.shared_by_other":
-      return admin ? `Draft was shared by another user` : `Your draft was shared`;
-    case "draft.shared_by_self":
-      return admin ? `Draft shared` : `You shared a draft`;
-    case "draft.role_updated":
-      return admin ? `Draft access changed` : `Your access changed`;
-    case "draft.updated_by_other":
-      return admin ? `Shared draft updated` : `A shared draft was updated`;
-    case "user.registered":
-      return `Profile created`;
-    case "user.updated":
-      return `Profile updated`;
-    case "draft.created_by_self":
-      return `New draft created`;
-    case "draft.updated_by_self":
-      return `Draft updated`;
-    case "draft.deleted_by_other":
-      return admin ? `Draft deleted by another user` : `Your draft was deleted`;
-    case "draft.deleted_by_self":
-      return `Draft deleted`;
-    case "draft.expired":
-      return `Draft expired`;
-    case "draft.expiring":
-      return `Draft expiring soon`;
-    case "collaboration.added_to_group":
-      return admin ? `User added to a group` : `You were added to a group`;
-    case "collaboration.removed_from_group":
-      return admin ? `User removed from a group` : `You were removed from a group`;
-    case "collaboration.left_group":
-      return admin ? `Member left a group` : `A member left your group`;
-    case "collaboration.left_group_by_self":
-      return admin ? `Member left a group` : `You left a group`;
-    case "collaboration.group_created_by_self":
-      return `Group created`;
-    case "collaboration.group_deleted_by_self":
-      return `Group deleted`;
-    case "collaboration.group_role_updated":
-      return admin ? `Group role changed` : `Your group role changed`;
-    case "system.announcement":
-      return `Announcement`;
-    case "system.maintenance":
-      return `System maintenance`;
-    default:
-      return "New activity";
-  }
+/** The activity-feed heading. Admins see a third-person variant of some events. */
+const ACTIVITY_EVENT: {
+  [K in keyof ActivityEventMap]: string | ((admin: boolean) => string);
+} = {
+  "selection.created_by_self": "New selection",
+  "selection.cloned_by_self": "Selection cloned",
+  "selection.cloned_by_other": (admin) => admin ? "Selection cloned by another user" : "Your selection was cloned",
+  "selection.updated_by_self": "Selection updated",
+  "selection.deleted_by_self": "Selection deleted",
+  "selection.shared_with_other": (admin) => admin ? "Selection shared with a user" : "A selection was shared with you",
+  "selection.shared_by_other": (admin) => admin ? "Selection was shared by another user" : "Your selection was shared",
+  "selection.shared_by_self": (admin) => admin ? "Selection shared" : "You shared a selection",
+  "selection.role_updated": (admin) => admin ? "Selection access changed" : "Your access changed",
+  "selection.updated_by_other": (admin) => admin ? "Shared selection updated" : "A shared selection was updated",
+  "selection.deleted_by_other": (admin) => admin ? "Shared selection deleted" : "A shared selection was deleted",
+  "selection.access_revoked": "Your access was removed",
+  "draft.access_revoked": "Your access was removed",
+  "draft.shared_with_other": (admin) => admin ? "Draft shared with a user" : "A draft was shared with you",
+  "draft.shared_by_other": (admin) => admin ? "Draft was shared by another user" : "Your draft was shared",
+  "draft.shared_by_self": (admin) => admin ? "Draft shared" : "You shared a draft",
+  "draft.role_updated": (admin) => admin ? "Draft access changed" : "Your access changed",
+  "draft.updated_by_other": (admin) => admin ? "Shared draft updated" : "A shared draft was updated",
+  "user.registered": "Profile created",
+  "user.updated": "Profile updated",
+  "draft.created_by_self": "New draft created",
+  "draft.updated_by_self": "Draft updated",
+  "draft.deleted_by_other": (admin) => admin ? "Draft deleted by another user" : "Your draft was deleted",
+  "draft.deleted_by_self": "Draft deleted",
+  "draft.expired": "Draft expired",
+  "draft.expiring": "Draft expiring soon",
+  "collaboration.added_to_group": (admin) => admin ? "User added to a group" : "You were added to a group",
+  "collaboration.removed_from_group": (admin) => admin ? "User removed from a group" : "You were removed from a group",
+  "collaboration.left_group": (admin) => admin ? "Member left a group" : "A member left your group",
+  "collaboration.left_group_by_self": (admin) => admin ? "Member left a group" : "You left a group",
+  "collaboration.group_created_by_self": "Group created",
+  "collaboration.group_deleted_by_self": "Group deleted",
+  "collaboration.group_role_updated": (admin) => admin ? "Group role changed" : "Your group role changed",
+  "system.announcement": "Announcement",
+  "system.maintenance": "System maintenance",
+};
+
+export function getActivityEvent(event: string, admin = false): string {
+  const entry = (ACTIVITY_EVENT as Record<string, string | ((admin: boolean) => string)>)[event];
+  if (entry === undefined) return "New activity";
+  return typeof entry === "function" ? entry(admin) : entry;
 }
