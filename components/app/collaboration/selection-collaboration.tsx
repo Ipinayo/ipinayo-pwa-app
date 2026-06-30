@@ -1,32 +1,45 @@
 "use client";
 
 import {
+  attachSelectionGroup,
+  detachSelectionGroup,
+} from "@/lib/actions/collaborator-groups";
+import {
   changeSelectionRole,
   getSelectionAccessPeople,
   removeSelectionAccess,
-  searchUsers,
   shareSelection,
 } from "@/lib/actions/collaboration";
 
-import type { AccessPersonView } from "./shared";
-import { CollaboratorsManager } from "./collaborators-manager";
+import { AccessPerson } from "@/lib/collaboration-utils";
+import { AttachableGroup } from "@/types/models";
+import {
+  CollaboratorsManager,
+} from "./collaborators-manager";
 
 const actions = {
-  search: searchUsers,
   share: shareSelection,
   changeRole: changeSelectionRole,
   remove: removeSelectionAccess,
   list: getSelectionAccessPeople,
+  attachGroup: attachSelectionGroup,
+  detachGroup: detachSelectionGroup,
 };
 
 export function SelectionCollaboratorsManager(
   props: Readonly<{
     id: string;
     canManage: boolean;
-    initialPeople: AccessPersonView[];
+    initialPeople: AccessPerson[];
+    group: { id: string; name: string | null };
+    attachableGroups?: AttachableGroup[];
   }>,
 ) {
   return (
-    <CollaboratorsManager entityLabel="selection" actions={actions} {...props} />
+    <CollaboratorsManager
+      entityLabel="selection"
+      actions={actions}
+      {...props}
+    />
   );
 }

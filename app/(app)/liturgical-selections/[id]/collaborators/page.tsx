@@ -2,6 +2,7 @@ import { Permission, can } from "@/lib/collaboration-utils";
 import {
   getSelectionAccess,
   getSelectionAccessPeople,
+  getSelectionGroupContext,
 } from "@/lib/actions/collaboration";
 
 import BackButton from "@/components/common/back-button";
@@ -27,7 +28,10 @@ export default async function SelectionCollaboratorsPage(props: {
   }
 
   const canManage = can(access, Permission.Manage);
-  const people = await getSelectionAccessPeople(params.id);
+  const [people, groupContext] = await Promise.all([
+    getSelectionAccessPeople(params.id),
+    getSelectionGroupContext(params.id),
+  ]);
 
   return (
     <div className="mx-auto w-full max-w-2xl">
@@ -49,6 +53,8 @@ export default async function SelectionCollaboratorsPage(props: {
         id={params.id}
         canManage={canManage}
         initialPeople={people}
+        group={groupContext?.group ?? { id: "", name: null }}
+        attachableGroups={groupContext?.attachableGroups ?? []}
       />
     </div>
   );

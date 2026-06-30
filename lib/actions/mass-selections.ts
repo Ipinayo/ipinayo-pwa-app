@@ -22,7 +22,7 @@ import { NewMassSelection } from "@/types/models";
 import { auth } from "@/auth";
 import { createActivity } from "@/lib/notifications/dispatch";
 import { createDraft } from "@/db/draft";
-import { findSelectionStakeholderIds } from "@/db/collaborators";
+import { findSelectionStakeholderIds } from "@/db/collaboration";
 import { findUserParishAndChoirInfo } from "@/db/user";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { redirect } from "next/navigation";

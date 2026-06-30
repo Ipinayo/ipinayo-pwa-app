@@ -1,5 +1,5 @@
 import { MassSelectionFilter, SortBy, SortOrder } from "@/types/utils";
-import { MassSelectionStats, NewMassSelection, NewMassSelectionPart, SingleMassSelectionWithParts } from "@/types/models";
+import { MassSelectionStats, NewMassSelection, NewMassSelectionPart } from "@/types/models";
 import { Prisma, UserRole } from "@/lib/generated/prisma/client";
 import { capitalize, getCurrentWeekRange } from "@/lib/utils";
 
@@ -299,7 +299,7 @@ export async function saveSelection(selection: NewMassSelection, userId: string,
     // collaborator is the one promoting it.
     const draft = await prisma.massSelectionDraft.findUnique({
         where: { id: draftId },
-        select: { createdById: true },
+        select: { createdById: true, groupId: true },
     })
     const ownerId = draft?.createdById ?? userId
 
@@ -334,6 +334,10 @@ export async function saveSelection(selection: NewMassSelection, userId: string,
         createdBy: {
             connect: { id: ownerId }
         },
+
+        group: draft?.groupId
+            ? { connect: { id: draft.groupId } }
+            : { create: { ownerId } },
     }
 
     if (parishLocation?.country) {
@@ -364,23 +368,6 @@ export async function saveSelection(selection: NewMassSelection, userId: string,
         const selection = await tx.massSelection.create({
             data
         })
-
-
-        const draftCollaborators = await tx.draftCollaborator.findMany({
-            where: { draftId },
-            select: { userId: true, role: true, invitedById: true },
-        })
-        if (draftCollaborators.length > 0) {
-            await tx.selectionCollaborator.createMany({
-                data: draftCollaborators.map((collaborator) => ({
-                    selectionId: selection.id,
-                    userId: collaborator.userId,
-                    role: collaborator.role,
-                    invitedById: collaborator.invitedById,
-                })),
-                skipDuplicates: true,
-            })
-        }
 
         await tx.massSelectionDraft.delete({
             where: { id: draftId }
@@ -514,8 +501,33 @@ export async function updateSelection(
 }
 
 export async function removeSelection(id: string) {
-    return await prisma.massSelection.delete({
-        where: { id },
+    return await prisma.$transaction(async (tx) => {
+        const selection = await tx.massSelection.findUnique({
+            where: { id },
+            select: {
+                groupId: true,
+                group: {
+                    select: {
+                        name: true,
+                        _count: { select: { selections: true, drafts: true } },
+                    },
+                },
+            },
+        })
+
+        const deleted = await tx.massSelection.delete({ where: { id } })
+
+        // Drop the ad-hoc group once it no longer backs any entity. Named groups
+        // are reusable and left intact.
+        if (
+            selection?.group.name === null &&
+            selection.group._count.drafts === 0 &&
+            selection.group._count.selections === 1
+        ) {
+            await tx.collaboratorGroup.delete({ where: { id: selection.groupId } })
+        }
+
+        return deleted
     })
 }
 
@@ -577,30 +589,6 @@ export async function findMassSelectionStats(
         thisWeek,
         totalDrafts
     };
-}
-
-export async function saveSelectionBySelection(selection: SingleMassSelectionWithParts, userId: string) {
-    const { themes, parts, createdById, id, createdAt, updatedAt, ...rest } = selection;
-
-
-    return await prisma.massSelection.create({
-        data: {
-            ...rest,
-            themes: themes.length > 0
-                ? { connect: themes.map((t) => ({ id: t.id })) }
-                : undefined,
-            parts: {
-                create: parts.map((part) => ({
-                    partName: part.partName,
-                    order: part.order,
-                    keySignature: part.keySignature,
-                    notes: part.notes,
-                    songTitle: part.songTitle,
-                })),
-            },
-            createdById: userId,
-        },
-    })
 }
 
 export async function findAllPartNames() {

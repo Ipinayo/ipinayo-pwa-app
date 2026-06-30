@@ -57,12 +57,18 @@ export async function findDraftById(draftId: string) {
 
 export async function createDraft(selection: DraftMassSelection, userId: string) {
 
-    return await prisma.massSelectionDraft.create({
-        data: {
-            ...selection,
-            parishLocation: selection.parishLocation || undefined,
-            createdById: userId,
-        }
+    return await prisma.$transaction(async (tx) => {
+
+        const group = await tx.collaboratorGroup.create({ data: { ownerId: userId } })
+
+        return tx.massSelectionDraft.create({
+            data: {
+                ...selection,
+                parishLocation: selection.parishLocation || undefined,
+                createdById: userId,
+                groupId: group.id,
+            }
+        });
     });
 }
 
@@ -77,7 +83,30 @@ export async function updateDraftById(draftId: string, selection: DraftMassSelec
 }
 
 export async function deleteDraftById(draftId: string) {
-    return await prisma.massSelectionDraft.delete({
-        where: { id: draftId },
+    return await prisma.$transaction(async (tx) => {
+        const draft = await tx.massSelectionDraft.findUnique({
+            where: { id: draftId },
+            select: {
+                groupId: true,
+                group: {
+                    select: {
+                        name: true,
+                        _count: { select: { selections: true, drafts: true } },
+                    },
+                },
+            },
+        })
+
+        const deleted = await tx.massSelectionDraft.delete({ where: { id: draftId } })
+
+        if (
+            draft?.group.name === null &&
+            draft.group._count.selections === 0 &&
+            draft.group._count.drafts === 1
+        ) {
+            await tx.collaboratorGroup.delete({ where: { id: draft.groupId } })
+        }
+
+        return deleted
     })
 }

@@ -1,7 +1,7 @@
 'use server';
 
 import { Permission, can } from "@/lib/collaboration-utils";
-import { findDraftMeta, findDraftStakeholderIds } from "@/db/collaborators";
+import { findDraftMeta, findDraftStakeholderIds } from "@/db/collaboration";
 import findDraftsByUserId, { createDraft, deleteDraftById, findDraftById, updateDraftById } from "@/db/draft";
 
 import { DraftMassSelection } from "@/types/schemas/mass-selections";

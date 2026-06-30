@@ -171,6 +171,61 @@ export type ActivityEventMap = {
         };
     };
 
+    "collaboration.added_to_group": {
+        entityType: "collaboration";
+        metadata: {
+            groupName: string;
+            role: string;
+            actorName: string;
+        };
+    };
+
+    "collaboration.removed_from_group": {
+        entityType: "collaboration";
+        metadata: {
+            groupName: string;
+            actorName: string;
+        };
+    };
+
+    "collaboration.left_group": {
+        entityType: "collaboration";
+        metadata: {
+            groupName: string;
+            actorName: string;
+        };
+    };
+
+    "collaboration.left_group_by_self": {
+        entityType: "collaboration";
+        metadata: {
+            groupName: string;
+        };
+    };
+
+    "collaboration.group_created_by_self": {
+        entityType: "collaboration";
+        metadata: {
+            groupName: string;
+        };
+    };
+
+    "collaboration.group_deleted_by_self": {
+        entityType: "collaboration";
+        metadata: {
+            groupName: string;
+        };
+    };
+
+    "collaboration.group_role_updated": {
+        entityType: "collaboration";
+        metadata: {
+            groupName: string;
+            role: string;
+            actorName: string;
+        };
+    };
+
     "user.registered": {
         entityType: "user";
         metadata: {

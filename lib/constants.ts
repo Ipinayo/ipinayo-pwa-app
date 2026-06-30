@@ -2,6 +2,7 @@ import { Church, FileText, Flower, Heart, Music2, Users } from "lucide-react";
 import { KeySignature, LiturgicalSeason, LiturgicalYear } from "@/types/models";
 
 import { ActivityEventMap } from '../types/utils';
+import { ShareableRole } from "@/types/schemas/collaboration";
 
 export const liturgicalSeasonItems = [
     { label: "Advent", value: LiturgicalSeason.ADVENT },
@@ -536,6 +537,41 @@ export const userNotificationEvents: Partial<Record<keyof ActivityEventMap, { la
         description: "These are notifications for when someone else deletes your draft",
         default: { inApp: true, email: true, push: true },
     },
+    "collaboration.added_to_group": {
+        label: "Added to a Group",
+        description: "These are notifications for when someone adds you to a collaborator group",
+        default: { inApp: true, email: true, push: true },
+    },
+    "collaboration.removed_from_group": {
+        label: "Removed from a Group",
+        description: "These are notifications for when someone removes you from a collaborator group",
+        default: { inApp: true, email: true, push: true },
+    },
+    "collaboration.left_group": {
+        label: "Member Left a Group",
+        description: "These are notifications for when a member leaves a group you own",
+        default: { inApp: true, email: false, push: true },
+    },
+    "collaboration.group_created_by_self": {
+        label: "Group You Created",
+        description: "These are notifications for when you create a collaborator group",
+        default: { inApp: false, email: false, push: false },
+    },
+    "collaboration.group_deleted_by_self": {
+        label: "Group You Deleted",
+        description: "These are notifications for when you delete a collaborator group",
+        default: { inApp: false, email: false, push: false },
+    },
+    "collaboration.group_role_updated": {
+        label: "Your Group Role Changed",
+        description: "These are notifications for when your role in a group is changed",
+        default: { inApp: true, email: false, push: true },
+    },
+    "collaboration.left_group_by_self": {
+        label: "You Left a Group",
+        description: "These are notifications for when you leave a group",
+        default: { inApp: false, email: false, push: false },
+    },
     "system.announcement": {
         label: "System Announcements",
         description: "Important updates from Ìpínayò.",
@@ -548,3 +584,23 @@ export const MAX_CHAT_MESSAGES = 25;
 
 /** Start nudging the user to begin a new conversation at this many messages. */
 export const CHAT_WARN_THRESHOLD = 20;
+
+/** Assignable roles, with the descriptions shown in the role picker. */
+export const ROLE_OPTIONS: {
+    value: ShareableRole;
+    label: string;
+    description: string;
+}[] = [
+        { value: "MANAGER", label: "Manager", description: "Can edit and manage sharing" },
+        { value: "EDITOR", label: "Editor", description: "Can view and make changes" },
+        // { value: "COMMENTER", label: "Commenter", description: "Can view and comment" },
+        { value: "VIEWER", label: "Viewer", description: "Can view only" },
+    ];
+
+export const ROLE_LABEL: Record<string, string> = {
+    OWNER: "Owner",
+    MANAGER: "Manager",
+    EDITOR: "Editor",
+    // COMMENTER: "Commenter",
+    VIEWER: "Viewer",
+};
