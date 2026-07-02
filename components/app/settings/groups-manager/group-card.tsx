@@ -10,9 +10,16 @@ import { DeleteGroupDialog } from "./delete-group-dialog";
 import { GroupMemberRow } from "./group-member-row";
 import { GroupRenameForm } from "./group-rename-form";
 import { GroupView } from ".";
+import { PendingInvitesList } from "@/components/app/collaboration/pending-invites-list";
+import {
+  resendInvitation,
+  revokeInvitation,
+} from "@/lib/actions/collaborator-groups";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function GroupCard({ group }: Readonly<{ group: GroupView }>) {
+  const router = useRouter();
   const [editing, setEditing] = useState(false);
 
   const canEdit = group.isOwner; // rename / delete the group
@@ -95,6 +102,18 @@ export default function GroupCard({ group }: Readonly<{ group: GroupView }>) {
             canManageMembers={canManageMembers}
           />
         ))}
+
+        <PendingInvitesList
+          invites={group.invitations}
+          canManage={canManageMembers}
+          revoke={(invitationId) =>
+            revokeInvitation({ groupId: group.id, invitationId })
+          }
+          resend={(invitationId) =>
+            resendInvitation({ groupId: group.id, invitationId })
+          }
+          onRevoked={() => router.refresh()}
+        />
       </CardContent>
     </Card>
   );

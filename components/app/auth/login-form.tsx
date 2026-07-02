@@ -11,11 +11,11 @@ import { useActionState } from "react";
 export default function LoginForm({ callbackUrl }: { callbackUrl?: string }) {
   const [_, googleAction, googleAuthIsPending] = useActionState(
     googleAuthenticate,
-    undefined
+    undefined,
   );
   const [res, emailAction, emailAuthIsPending] = useActionState(
     emailAuthenticate,
-    undefined
+    undefined,
   );
 
   return (
@@ -29,7 +29,7 @@ export default function LoginForm({ callbackUrl }: { callbackUrl?: string }) {
             name="email"
             placeholder="Enter your email"
             error={res?.success === false ? res.message : undefined}
-            aria-invalid={res?.success === false ? true : false}
+            aria-invalid={res?.success === false}
           />
         </div>
         <input type="hidden" name="callbackUrl" value={callbackUrl} />

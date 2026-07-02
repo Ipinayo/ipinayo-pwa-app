@@ -7,19 +7,26 @@ import {
 import {
   changeDraftRole,
   getDraftAccessPeople,
+  getDraftInvitations,
   removeDraftAccess,
+  resendDraftInvitation,
+  revokeDraftInvitation,
   shareDraft,
 } from "@/lib/actions/collaboration";
 
 import { AccessPerson } from "@/lib/collaboration-utils";
 import { AttachableGroup } from "@/types/models";
+import type { CollaboratorsActions } from "./types";
 import { CollaboratorsManager } from "./collaborators-manager";
 
-const actions = {
+const actions: CollaboratorsActions = {
   share: shareDraft,
   changeRole: changeDraftRole,
   remove: removeDraftAccess,
   list: getDraftAccessPeople,
+  listInvites: getDraftInvitations,
+  revokeInvite: revokeDraftInvitation,
+  resendInvite: resendDraftInvitation,
   attachGroup: attachDraftGroup,
   detachGroup: detachDraftGroup,
 };
