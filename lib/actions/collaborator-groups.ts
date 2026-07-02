@@ -8,6 +8,8 @@ import {
   DeleteGroupInput,
   RemoveGroupMemberInput,
   RenameGroupInput,
+  RevokeInvitationInput,
+  ShareableRole,
   addGroupMembersSchema,
   attachGroupSchema,
   changeGroupMemberRoleSchema,
@@ -15,6 +17,7 @@ import {
   deleteGroupSchema,
   removeGroupMemberSchema,
   renameGroupSchema,
+  revokeInvitationSchema,
 } from "@/types/schemas/collaboration";
 import {
   Permission,
@@ -23,13 +26,17 @@ import {
 import {
   attachGroupToDraft,
   attachGroupToSelection,
+  claimInvitationsForUser,
+  createInvitations,
   createNamedGroup,
   deleteGroupAndReassign,
+  deleteInvitation,
   detachGroupFromDraft,
   detachGroupFromSelection,
   findGroupOwnerAndRole,
   findGroupWithMembers,
   findGroupsForUser,
+  findInvitation,
   removeGroupMember as removeGroupMemberDb,
   renameGroup as renameGroupDb,
   updateGroupMemberRole,
@@ -39,10 +46,13 @@ import { findDraftMeta, findSelectionMeta } from "@/db/collaboration";
 import { getDraftAccess, getSelectionAccess } from "@/lib/actions/collaboration";
 
 import { CollaboratorRole } from "@/lib/generated/prisma/client";
+import { after } from "next/server";
 import { auth } from "@/auth";
 import { createActivity } from "@/lib/notifications/dispatch";
+import { findUsers } from "@/db/user";
 import { getFieldError } from "@/lib/utils";
 import { revalidatePath } from "next/cache";
+import { sendInviteMagicLinks } from "@/lib/notifications/invite-magic-link";
 
 function actorName(
   user: { name?: string | null; email?: string | null } | undefined,
@@ -59,6 +69,29 @@ async function resolveGroupRole(groupId: string, userId: string) {
   return { group, canManageMembers };
 }
 
+/**
+ * An invited email that already belongs to an account joins directly (keeping
+ * the role it was invited with) instead of being emailed a redundant magic link;
+ * the rest stay as invites. Emails are lowercased to match stored addresses.
+ */
+async function splitInvites(
+  inviteRecipients: { email: string; role: ShareableRole }[],
+) {
+  const invited = inviteRecipients.map((r) => ({
+    email: r.email.trim().toLowerCase(),
+    role: r.role,
+  }));
+  const existing = await findUsers(invited.map((i) => i.email));
+  const idByEmail = new Map(existing.map((u) => [u.email, u.id]));
+
+  const promoted = invited.flatMap((i) => {
+    const userId = idByEmail.get(i.email);
+    return userId ? [{ userId, role: i.role }] : [];
+  });
+  const invites = invited.filter((i) => !idByEmail.has(i.email));
+  return { promoted, invites };
+}
+
 export async function getMyGroups() {
   const session = await auth();
   if (!session?.user?.id) return [];
@@ -68,15 +101,18 @@ export async function getMyGroups() {
     const isOwner = g.ownerId === session.user!.id;
     const myRole =
       g.members.find((m) => m.user.id === session.user!.id)?.role ?? null;
+    const canManageMembers = isOwner || myRole === CollaboratorRole.MANAGER;
     return {
       id: g.id,
       name: g.name ?? "",
       ownerId: g.ownerId,
       owner: g.owner,
       isOwner,
-      canManageMembers: isOwner || myRole === CollaboratorRole.MANAGER,
+      canManageMembers,
       viewerId: session.user!.id,
       members: g.members.map((m) => ({ ...m.user, role: m.role })),
+      // Pending invites expose email addresses — only managers see them.
+      invitations: canManageMembers ? g.invitations : [],
       attachedCount: g._count.selections + g._count.drafts,
     };
   });
@@ -95,14 +131,16 @@ export async function getGroup(groupId: string) {
   // Only the owner or a member may view the group.
   if (!isOwner && !memberRole) return null;
 
+  const canManage = isOwner || memberRole === CollaboratorRole.MANAGER;
   return {
     id: group.id,
     name: group.name ?? "",
     ownerId: group.ownerId,
     owner: group.owner,
     isOwner,
-    canManage: isOwner || memberRole === CollaboratorRole.MANAGER,
+    canManage,
     members: group.members.map((m) => ({ ...m.user, role: m.role })),
+    invitations: canManage ? group.invitations : [],
     attachedCount: group._count.selections + group._count.drafts,
   };
 }
@@ -221,16 +259,23 @@ export async function addGroupMembers(input: AddGroupMembersInput) {
       throw new Error("You don't have permission to add members to this group.");
     }
 
-    // The owner is the implicit principal and never a member row.
-    const targets = parsed.data.recipients.filter(
-      (r) => r.userId !== group.ownerId,
+    // Invited emails that already have an account become direct members. The
+    // owner is the implicit principal, never a member row; dedupe by user
+    // (explicit picks win on role).
+    const { promoted, invites: inviteTargets } = await splitInvites(
+      parsed.data.inviteRecipients,
     );
-    if (targets.length === 0) {
+    const byUser = new Map<string, ShareableRole>();
+    for (const r of [...promoted, ...parsed.data.userRecipients]) {
+      if (r.userId !== group.ownerId) byUser.set(r.userId, r.role);
+    }
+    const memberTargets = [...byUser].map(([userId, role]) => ({ userId, role }));
+    if (memberTargets.length === 0 && inviteTargets.length === 0) {
       throw new Error("Add at least one person.");
     }
 
     await Promise.all(
-      targets.map((t) =>
+      memberTargets.map((t) =>
         upsertGroupMember({
           groupId: group.id,
           userId: t.userId,
@@ -242,7 +287,7 @@ export async function addGroupMembers(input: AddGroupMembersInput) {
 
     const actor = actorName(session.user);
     const groupName = group.name ?? "a group";
-    targets.forEach((t) =>
+    memberTargets.forEach((t) =>
       createActivity({
         targetUsers: [t.userId],
         event: "collaboration.added_to_group",
@@ -252,9 +297,25 @@ export async function addGroupMembers(input: AddGroupMembersInput) {
       }),
     );
 
+    if (inviteTargets.length > 0) {
+      await createInvitations({
+        groupId: group.id,
+        invitedById: session.user.id,
+        recipients: inviteTargets,
+      });
+
+      // The invite IS the magic-link sign-in; claimed on first authentication.
+      after(() =>
+        sendInviteMagicLinks(
+          inviteTargets.map((t) => t.email),
+          "/settings/groups",
+        ),
+      );
+    }
+
     revalidatePath("/settings/groups");
     revalidatePath(`/settings/groups/${group.id}`);
-    return { added: targets.length };
+    return { added: memberTargets.length, invited: inviteTargets.length };
   } catch (error: any) {
     console.error("Error adding group members:", error);
     throw new Error(error?.message || "Error adding members");
@@ -361,6 +422,59 @@ export async function removeGroupMember(input: RemoveGroupMemberInput) {
   } catch (error: any) {
     console.error("Error removing group member:", error);
     throw new Error(error?.message || "Error removing member");
+  }
+}
+
+export async function revokeInvitation(input: RevokeInvitationInput) {
+  try {
+    const session = await auth();
+    if (!session?.user?.id) throw new Error("You're not signed in.");
+
+    const parsed = revokeInvitationSchema.safeParse(input);
+    if (!parsed.success) throw new Error(getFieldError(parsed.error.issues));
+
+    const { canManageMembers } = await resolveGroupRole(
+      parsed.data.groupId,
+      session.user.id,
+    );
+    if (!canManageMembers) {
+      throw new Error("You don't have permission to manage invitations for this group.");
+    }
+
+    await deleteInvitation(parsed.data.groupId, parsed.data.invitationId);
+
+    revalidatePath("/settings/groups");
+    revalidatePath(`/settings/groups/${parsed.data.groupId}`);
+  } catch (error: any) {
+    console.error("Error revoking invitation:", error);
+    throw new Error(error?.message || "Error revoking invitation");
+  }
+}
+
+export async function resendInvitation(input: RevokeInvitationInput) {
+  try {
+    const session = await auth();
+    if (!session?.user?.id) throw new Error("You're not signed in.");
+
+    const parsed = revokeInvitationSchema.safeParse(input);
+    if (!parsed.success) throw new Error(getFieldError(parsed.error.issues));
+
+    const { canManageMembers } = await resolveGroupRole(
+      parsed.data.groupId,
+      session.user.id,
+    );
+    if (!canManageMembers) {
+      throw new Error("You don't have permission to manage invitations for this group.");
+    }
+
+    const invite = await findInvitation(parsed.data.groupId, parsed.data.invitationId);
+    if (!invite) throw new Error("Invitation not found.");
+
+    // Re-send the same magic link — the invite row is unchanged.
+    await sendInviteMagicLinks([invite.email], "/settings/groups");
+  } catch (error: any) {
+    console.error("Error resending invitation:", error);
+    throw new Error(error?.message || "Error resending invitation");
   }
 }
 
@@ -571,5 +685,44 @@ export async function detachDraftGroup(input: Pick<AttachGroupInput, "id">) {
   } catch (error: any) {
     console.error("Error detaching group from draft:", error);
     throw new Error(error?.message || "Error detaching group");
+  }
+}
+
+export async function claimPendingInvitationsAction(
+  userId: string,
+  email: string | null | undefined,
+) {
+  if (!email) return;
+
+  const claimed = await claimInvitationsForUser(userId, email);
+
+  for (const c of claimed) {
+    const actorId = c.invitedById ?? userId;
+
+    if (c.groupName) {
+      createActivity({
+        targetUsers: [userId],
+        event: "collaboration.added_to_group",
+        entityId: c.groupId,
+        metadata: { groupName: c.groupName, role: c.role, actorName: c.inviterName },
+        actorId,
+      });
+    } else if (c.entity?.type === "selection") {
+      createActivity({
+        targetUsers: [userId],
+        event: "selection.shared_with_other",
+        entityId: c.entity.id,
+        metadata: { title: c.entity.title, role: c.role, actorName: c.inviterName },
+        actorId,
+      });
+    } else if (c.entity?.type === "draft") {
+      createActivity({
+        targetUsers: [userId],
+        event: "draft.shared_with_other",
+        entityId: c.entity.id,
+        metadata: { title: c.entity.title, role: c.role, actorName: c.inviterName },
+        actorId,
+      });
+    }
   }
 }

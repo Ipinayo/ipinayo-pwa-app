@@ -294,22 +294,25 @@ export async function detachGroupFromDraft(draftId: string) {
   });
 }
 
-export async function upsertInvitation(params: {
+/**
+ * Batch-create pending invites for a group in one query. `skipDuplicates` makes
+ * it idempotent against the `(groupId, email)` unique — an email already invited
+ * is left as-is (its magic link is re-sent separately).
+ */
+export async function createInvitations(params: {
   groupId: string;
-  email: string;
-  role: CollaboratorRole;
   invitedById: string;
+  recipients: { email: string; role: CollaboratorRole }[];
 }) {
-  const email = params.email.trim().toLowerCase();
-  return prisma.collaboratorGroupInvitation.upsert({
-    where: { groupId_email: { groupId: params.groupId, email } },
-    create: {
+  if (params.recipients.length === 0) return;
+  return prisma.collaboratorGroupInvitation.createMany({
+    data: params.recipients.map((r) => ({
       groupId: params.groupId,
-      email,
-      role: params.role,
+      email: r.email.trim().toLowerCase(),
+      role: r.role,
       invitedById: params.invitedById,
-    },
-    update: { role: params.role },
+    })),
+    skipDuplicates: true,
   });
 }
 
