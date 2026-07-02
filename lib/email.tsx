@@ -23,7 +23,25 @@ export async function sendVerificationRequest({
   const { server, from } = provider;
   const transporter = createTransport(server);
 
-  const invites = await findPendingInvitationsForEmail(email);
+  let invites: Awaited<
+    Promise<
+      {
+        label: string;
+        inviterName: string;
+      }[]
+    >
+  > = [];
+
+  try {
+    invites = await findPendingInvitationsForEmail(email);
+  } catch (error) {
+    console.error(
+      "Failed to load pending invitations for email:",
+      email,
+      error,
+    );
+  }
+
   const inviter = invites[0]?.inviterName ?? "Someone";
 
   const subject = invites.length
