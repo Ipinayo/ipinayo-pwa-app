@@ -1,6 +1,7 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { RecipientList, type RecipientDraft } from "./recipient-list";
 import {
   Select,
   SelectContent,
@@ -8,19 +9,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { StagedList, type StagedRecipient } from "./staged-list";
 import { useState, useTransition } from "react";
 
-import type { CollaboratorsActions } from "./types";
-
+import { AttachableGroup } from "@/types/models";
 import { Button } from "@/components/ui/button";
+import type { CollaboratorsActions } from "./types";
 import { Loader2 } from "lucide-react";
 import { PersonSearch } from "../../common/person-search";
 import { Textarea } from "@/components/ui/textarea";
 import { withToast } from "@/lib/with-toast";
-import { AttachableGroup } from "@/types/models";
 
-/** Direct (ad-hoc) sharing: stage people with roles + an optional message, or
+/** Direct (ad-hoc) sharing: queue people with roles + an optional message, or
  *  switch to a saved group. Owns the share + attach actions. */
 export function AddCollaborators({
   id,
@@ -37,25 +36,34 @@ export function AddCollaborators({
   attachGroup: CollaboratorsActions["attachGroup"];
   onChanged: () => void;
 }>) {
-  const [staged, setStaged] = useState<StagedRecipient[]>([]);
+  const [recipients, setRecipients] = useState<RecipientDraft[]>([]);
   const [message, setMessage] = useState("");
   const [groupToAttach, setGroupToAttach] = useState("");
   const [pending, startTransition] = useTransition();
 
-  const stagedIds = new Set(staged.map((s) => s.user.id));
-  const exclude = new Set([...existingIds, ...stagedIds]);
+  const excludeIds = new Set([
+    ...existingIds,
+    ...recipients.flatMap((r) => (r.userId ? [r.userId] : [])),
+  ]);
+  const excludeEmails = new Set(
+    recipients.flatMap((r) => (r.userId ? [] : [r.email.toLowerCase()])),
+  );
 
   const share = () => {
-    if (staged.length === 0) return;
+    if (recipients.length === 0) return;
     startTransition(async () => {
+      const userRecipients = recipients.flatMap((r) =>
+        r.userId ? [{ userId: r.userId, role: r.role }] : [],
+      );
+      const inviteRecipients = recipients.flatMap((r) =>
+        r.userId ? [] : [{ email: r.email, role: r.role }],
+      );
       const { data } = await withToast(
         () =>
           shareAction({
             id,
-            recipients: staged.map((s) => ({
-              userId: s.user.id,
-              role: s.role,
-            })),
+            userRecipients,
+            inviteRecipients,
             message: message.trim() || undefined,
           }),
         {
@@ -65,7 +73,7 @@ export function AddCollaborators({
         },
       );
       if (data) {
-        setStaged([]);
+        setRecipients([]);
         setMessage("");
         onChanged();
       }
@@ -93,24 +101,31 @@ export function AddCollaborators({
       </CardHeader>
       <CardContent className="space-y-3">
         <PersonSearch
-          excludeIds={exclude}
+          excludeIds={excludeIds}
+          excludeEmails={excludeEmails}
           onPick={(u) =>
-            setStaged((prev) => [...prev, { user: u, role: "VIEWER" }])
+            setRecipients((prev) => [
+              ...prev,
+              { userId: u.id, email: u.email, name: u.name, image: u.image, role: "VIEWER" },
+            ])
           }
-          emptyText="No matching users. Email invites are coming soon."
+          onInvite={(email) =>
+            setRecipients((prev) => [...prev, { email, role: "VIEWER" }])
+          }
+          emptyText="No matching users. Type a full email to invite someone new."
         />
 
-        {staged.length > 0 && (
+        {recipients.length > 0 && (
           <div className="flex flex-col gap-1">
-            <StagedList
-              staged={staged}
-              onRole={(userId, role) =>
-                setStaged((prev) =>
-                  prev.map((p) => (p.user.id === userId ? { ...p, role } : p)),
+            <RecipientList
+              recipients={recipients}
+              onRole={(index, role) =>
+                setRecipients((prev) =>
+                  prev.map((r, i) => (i === index ? { ...r, role } : r)),
                 )
               }
-              onRemove={(userId) =>
-                setStaged((prev) => prev.filter((p) => p.user.id !== userId))
+              onRemove={(index) =>
+                setRecipients((prev) => prev.filter((_, i) => i !== index))
               }
             />
 
@@ -127,7 +142,7 @@ export function AddCollaborators({
                 {pending ? (
                   <Loader2 className="size-4 animate-spin" />
                 ) : (
-                  `Share with ${staged.length}`
+                  `Share with ${recipients.length}`
                 )}
               </Button>
             </div>
