@@ -50,7 +50,7 @@ export default async function HomePage() {
     isPublic: true,
     isFeatured: false,
     limit: 3,
-    sortBy: SortBy.UPDATED_AT,
+    sortBy: SortBy.DATE,
     sortOrder: SortOrder.DESC,
   }).catch(() => null);
 
