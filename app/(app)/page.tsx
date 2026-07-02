@@ -1,4 +1,11 @@
-import { ArrowRight, BookOpen, ListMusic, Share2 } from "lucide-react";
+import {
+  ArrowRight,
+  BookOpen,
+  ChevronDown,
+  ListMusic,
+  PlayCircle,
+  Share2,
+} from "lucide-react";
 import {
   Card,
   CardContent,
@@ -39,6 +46,49 @@ const STEPS = [
     title: "Share & export",
     description:
       "Publish for your community to view and clone, or export a clean PDF for your choir.",
+  },
+];
+
+const FAQS = [
+  {
+    question: "What is Ìpínayò?",
+    answer:
+      "Ìpínayò helps you plan and share the music for Catholic Liturgies — Sunday Mass, weddings, funerals and more. Draft a selection with AI, start from a template, or build one from scratch, then share it with your choir and the wider community.",
+  },
+  {
+    question: "How do I create a selection?",
+    answer:
+      "There are multiple ways to create a selection.  To manually add the song for each part, click “Create Manually” to begin, pick a template for a common liturgy or start from a blank template.  You can also clone an existing public selection and adjust it. Finally, you can click 'Create with Ìpínayò AI', describe the celebration and Ìpínayò AI will draft a full selection for you to refine.",
+  },
+  {
+    question: "Can Ìpínayò suggest the music for me?",
+    answer:
+      "Yes, using Ìpínayò AI at the top of the page. Describe the celebration — its season, feast, or theme — and Ìpínayò AI drafts a full selection with parts you can refine.",
+  },
+  {
+    question: "What are collaborator groups?",
+    answer:
+      "A collaborator group (found in the settings) is a reusable set of people, like your choir selections team. Attach it to any selection or draft, and updating the group updates access everywhere it’s used.",
+  },
+  {
+    question: "Can I invite someone who doesn’t have an account yet?",
+    answer:
+      "Yes. Enter their email when adding them to a collaborator group or as a collaborator in a selection and they’ll receive an invitation link. Signing in creates their account and grants the access you gave them automatically.",
+  },
+  {
+    question: "What’s the difference between public and private selections?",
+    answer:
+      "Public selections can be viewed, downloaded, and cloned by the whole community. Private selections stay visible only to you and the people you share them with. The visibility setting can be changed at any time, and collaborators can always view and clone a selection regardless of its visibility.",
+  },
+  {
+    question: "Can I export a selection for my choir?",
+    answer:
+      "Yes — export a clean PDF of any selection to print or hand out at rehearsal.",
+  },
+  {
+    question: "Do drafts stay forever?",
+    answer:
+      "Drafts save your work in progress but expire after a period of inactivity. You’ll get a reminder before one is removed, so you can finish or publish it in time.",
   },
 ];
 
@@ -214,6 +264,47 @@ export default async function HomePage() {
               </Card>
             );
           })}
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="space-y-5 w-full">
+        <div className="flex flex-wrap items-end gap-4">
+          <div>
+            <h2 className="font-display text-2xl">
+              Frequently asked questions
+            </h2>
+            <p className="text-muted-foreground mt-1 text-sm">
+              New to Ìpínayò? Here’s how it works.
+            </p>
+          </div>
+          <Button variant="link" className="font-bold text-foreground" asChild>
+            <Link
+              href={process.env.NEXT_PUBLIC_WALKTHROUGH_VIDEO_URL || ""}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <PlayCircle className="size-4" />
+              Watch the walkthrough
+            </Link>
+          </Button>
+        </div>
+
+        <div className="w-full">
+          {FAQS.map((faq) => (
+            <details
+              key={faq.question}
+              className="group border-border border-b"
+            >
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-4 font-medium [&::-webkit-details-marker]:hidden">
+                {faq.question}
+                <ChevronDown className="text-muted-foreground size-4 transition-transform group-open:rotate-180" />
+              </summary>
+              <p className="text-muted-foreground font-medium pb-4 text-sm leading-relaxed">
+                {faq.answer}
+              </p>
+            </details>
+          ))}
         </div>
       </section>
     </div>
