@@ -23,7 +23,7 @@ import { useRouter } from "next/navigation";
 import { withToast } from "@/lib/with-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import GroupCard from "./group-card";
-import { UserLite } from "@/types/models";
+import { PendingInvite, UserLite } from "@/types/models";
 
 type Member = UserLite & { role: ShareableRole };
 export type GroupView = {
@@ -35,6 +35,7 @@ export type GroupView = {
   canManageMembers: boolean;
   viewerId: string;
   members: Member[];
+  invitations: PendingInvite[];
   attachedCount: number;
 };
 

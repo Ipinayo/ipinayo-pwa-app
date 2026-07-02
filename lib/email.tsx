@@ -1,6 +1,8 @@
-import { SignInEmail } from "@/emails/auth/sign-in";
+import { GroupInvitationEmail } from "@/emails/notifications/group-invitation";
 import type { NodemailerConfig } from "next-auth/providers/nodemailer";
+import { SignInEmail } from "@/emails/auth/sign-in";
 import { createTransport } from "nodemailer";
+import { findPendingInvitationsForEmail } from "@/db/collaborator-groups";
 import { render } from "@react-email/render";
 
 export async function sendVerificationRequest({
@@ -17,11 +19,43 @@ export async function sendVerificationRequest({
   request: Request;
 }) {
   // Uses NextAuth's own provider transport (not the notification transporter),
-  // but shares the Ìpínayò EmailLayout via the SignInEmail react-email template.
+  // but shares the Ìpínayò EmailLayout via the react-email templates.
   const { server, from } = provider;
   const transporter = createTransport(server);
 
-  const element = <SignInEmail url={url} email={email} />;
+  let invites: Awaited<
+    Promise<
+      {
+        label: string;
+        inviterName: string;
+      }[]
+    >
+  > = [];
+
+  try {
+    invites = await findPendingInvitationsForEmail(email);
+  } catch (error) {
+    console.error(
+      "Failed to load pending invitations for email:",
+      email,
+      error,
+    );
+  }
+
+  const inviter = invites[0]?.inviterName ?? "Someone";
+
+  const subject = invites.length
+    ? invites.length === 1
+      ? `${inviter} invited you to collaborate on Ìpínayò`
+      : "You've been invited to collaborate on Ìpínayò"
+    : "Sign in to Ìpínayò";
+
+  const element = invites.length ? (
+    <GroupInvitationEmail url={url} email={email} invites={invites} />
+  ) : (
+    <SignInEmail url={url} email={email} />
+  );
+
   const [html, text] = await Promise.all([
     render(element),
     render(element, { plainText: true }),
@@ -30,13 +64,15 @@ export async function sendVerificationRequest({
   const result = await transporter.sendMail({
     to: email,
     from,
-    subject: "Sign in to Ìpínayò",
+    subject,
     html,
     text,
   });
 
   const failed = result.rejected;
   if (failed.length) {
-    throw new Error(`Email(s) (${failed.map(String).join(", ")}) could not be sent`);
+    throw new Error(
+      `Email(s) (${failed.map(String).join(", ")}) could not be sent`,
+    );
   }
 }

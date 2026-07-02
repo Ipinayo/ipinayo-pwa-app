@@ -6,7 +6,7 @@ import {
 } from "@/lib/actions/collaboration";
 
 import BackButton from "@/components/common/back-button";
-import { DraftCollaboratorsManager } from "@/components/app/collaboration/draft-collaboration";
+import { DraftCollaboratorsManager } from "@/components/app/collaboration/draft-collaborators-manager";
 import { Params } from "@/types/utils";
 import { getDraftById } from "@/lib/actions/draft";
 import { requireAuth } from "@/lib/auth";

@@ -1,13 +1,16 @@
 "use client";
 
-import { AccessPeopleList } from "./access-people-list";
+import { AttachableGroup, PendingInvite } from "@/types/models";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useEffect, useState } from "react";
+
 import { AccessPerson } from "@/lib/collaboration-utils";
 import { AddCollaborators } from "./add-collaborators";
-import { AttachableGroup } from "@/types/models";
 import type { CollaboratorsActions } from "./types";
 import { CollaboratorsGroupBanner } from "./collaborators-group-banner";
+import { PendingInvitesList } from "./pending-invites-list";
+import PersonRow from "./person-row";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 
 export function CollaboratorsManager({
   entityLabel,
@@ -29,16 +32,35 @@ export function CollaboratorsManager({
 }>) {
   const router = useRouter();
   const [people, setPeople] = useState<AccessPerson[]>(initialPeople);
+  const [invites, setInvites] = useState<PendingInvite[]>([]);
 
   const usingGroup = group.name !== null;
 
-  // The one piece the children share: re-fetch the access list (and re-render
-  // the server tree) after any of them mutate access.
-  const refresh = async () => {
-    await actions
-      .list(id)
-      .then(setPeople)
+  // Pending invites only exist on the ad-hoc (direct-sharing) path; when a named
+  // group is attached, its invites are managed in the group's settings instead.
+  useEffect(() => {
+    if (usingGroup || !canManage) return;
+    actions
+      .listInvites(id)
+      .then(setInvites)
       .catch(() => {});
+  }, [id, usingGroup, canManage, actions]);
+
+  // The one piece the children share: re-fetch the access list + pending invites
+  // (and re-render the server tree) after any of them mutate access.
+  const refresh = async () => {
+    await Promise.all([
+      actions
+        .list(id)
+        .then(setPeople)
+        .catch(() => {}),
+      usingGroup || !canManage
+        ? Promise.resolve()
+        : actions
+            .listInvites(id)
+            .then(setInvites)
+            .catch(() => {}),
+    ]);
     router.refresh();
   };
 
@@ -66,17 +88,40 @@ export function CollaboratorsManager({
         />
       )}
 
-      <AccessPeopleList
-        people={people}
-        id={id}
-        entityLabel={entityLabel}
-        canManage={canManage}
-        usingGroup={usingGroup}
-        groupName={group.name}
-        changeRole={actions.changeRole}
-        remove={actions.remove}
-        onChanged={refresh}
-      />
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">People with access</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-1">
+          {people.map((person) => (
+            <PersonRow
+              key={person.id}
+              person={person}
+              id={id}
+              entityLabel={entityLabel}
+              editable={canManage && !person.isOwner && !usingGroup}
+              usingGroup={usingGroup}
+              groupName={group.name}
+              changeRole={actions.changeRole}
+              remove={actions.remove}
+              onChanged={refresh}
+            />
+          ))}
+          {!usingGroup && (
+            <PendingInvitesList
+              invites={invites}
+              canManage={canManage}
+              revoke={(invitationId) =>
+                actions.revokeInvite({ id, invitationId })
+              }
+              resend={(invitationId) =>
+                actions.resendInvite({ id, invitationId })
+              }
+              onRevoked={refresh}
+            />
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

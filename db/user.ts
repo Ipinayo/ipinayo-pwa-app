@@ -214,3 +214,14 @@ export default async function findAllUsers({
 
     return { users, total }
 }
+
+export async function findUsers(
+    emails: string[] = [],
+) {
+    return prisma.user.findMany({
+        where: {
+            email: { in: emails },
+        },
+        select: { id: true, email: true },
+    });
+}

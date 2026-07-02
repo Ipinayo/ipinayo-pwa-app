@@ -13,12 +13,18 @@ import {
   ChangeRoleInput,
   RemoveAccessInput,
   ShareInput,
+  ShareableRole,
   changeRoleSchema,
   removeAccessSchema,
   shareSchema,
 } from "@/types/schemas/collaboration";
+import { GroupContext, PendingInvite } from "@/types/models";
 import {
+  createInvitations,
+  deleteInvitation,
   findAttachableGroups,
+  findInvitation,
+  listInvitations,
   removeGroupMember,
   updateGroupMemberRole,
   upsertGroupMember,
@@ -37,16 +43,36 @@ import {
   searchUsers as searchUsersDb,
 } from "@/db/collaboration";
 
-import { GroupContext } from "@/types/models";
+import { after } from "next/server";
 import { auth } from "@/auth";
 import { createActivity } from "@/lib/notifications/dispatch";
+import { findUsers } from "@/db/user";
 import { getFieldError } from "@/lib/utils";
 import { revalidatePath } from "next/cache";
+import { sendInviteMagicLinks } from "@/lib/notifications/invite-magic-link";
 
 function actorName(
   user: { name?: string | null; email?: string | null } | undefined,
 ) {
   return user?.name || user?.email || "Someone";
+}
+
+async function splitInvites(
+  inviteRecipients: { email: string; role: ShareableRole }[],
+) {
+  const invited = inviteRecipients.map((r) => ({
+    email: r.email.trim().toLowerCase(),
+    role: r.role,
+  }));
+  const existing = await findUsers(invited.map((i) => i.email));
+  const idByEmail = new Map(existing.map((u) => [u.email, u.id]));
+
+  const promoted = invited.flatMap((i) => {
+    const userId = idByEmail.get(i.email);
+    return userId ? [{ userId, role: i.role }] : [];
+  });
+  const invites = invited.filter((i) => !idByEmail.has(i.email));
+  return { promoted, invites };
 }
 
 export async function getSelectionAccess(
@@ -75,12 +101,13 @@ export async function getDraftAccess(draftId: string, userId?: string | null) {
   return NO_ACCESS;
 }
 
-export async function searchUsers(query: string) {
+export async function searchUsers(query: string, excludeIds: string[] = []) {
   const session = await auth();
   if (!session?.user?.id) return [];
   const q = query.trim();
   if (q.length < 2) return [];
-  return searchUsersDb(q, [session.user.id], 8);
+
+  return searchUsersDb(q, [session.user.id, ...excludeIds], 8);
 }
 
 export async function getSelectionAccessPeople(
@@ -177,7 +204,7 @@ export async function shareSelection(input: ShareInput) {
     const parsed = shareSchema.safeParse(input);
     if (!parsed.success) throw new Error(getFieldError(parsed.error.issues));
 
-    const { id, recipients, message } = parsed.data;
+    const { id, userRecipients, inviteRecipients, message } = parsed.data;
 
     const access = await getSelectionAccess(id, session.user.id);
     if (!can(access, Permission.Manage)) {
@@ -192,17 +219,22 @@ export async function shareSelection(input: ShareInput) {
       );
     }
 
-    // Can't (re)add the owner or yourself.
-    const targets = recipients.filter(
-      (r) => r.userId !== selection.createdById && r.userId !== session.user!.id,
-    );
+    // Invited emails that already have an account become direct members. Owner
+    // and self are never (re)added; dedupe by user (explicit picks win on role).
+    const { promoted, invites: inviteTargets } = await splitInvites(inviteRecipients);
+    const exclude = new Set([selection.createdById, session.user.id]);
+    const byUser = new Map<string, ShareableRole>();
+    for (const r of [...promoted, ...userRecipients]) {
+      if (!exclude.has(r.userId)) byUser.set(r.userId, r.role);
+    }
+    const memberTargets = [...byUser].map(([userId, role]) => ({ userId, role }));
 
-    if (targets.length === 0) {
+    if (memberTargets.length === 0 && inviteTargets.length === 0) {
       throw new Error("Add at least one person to share with.");
     }
 
     await Promise.all(
-      targets.map((t) =>
+      memberTargets.map((t) =>
         upsertGroupMember({
           groupId: selection.groupId,
           userId: t.userId,
@@ -214,8 +246,10 @@ export async function shareSelection(input: ShareInput) {
 
     const actor = actorName(session.user);
 
-    // Record an activity for each recipient. 
-    targets.forEach((t) =>
+    // Record an activity for each existing-user recipient. Invited emails have
+    // no account yet — their notification is the magic-link email, and they get
+    // the standard "shared with you" activity when they sign in and it's claimed.
+    memberTargets.forEach((t) =>
       createActivity({
         targetUsers: [t.userId],
         event: "selection.shared_with_other",
@@ -230,12 +264,29 @@ export async function shareSelection(input: ShareInput) {
       }),
     );
 
+    if (inviteTargets.length > 0) {
+      await createInvitations({
+        groupId: selection.groupId,
+        invitedById: session.user.id,
+        recipients: inviteTargets,
+      });
+
+      after(() =>
+        sendInviteMagicLinks(
+          inviteTargets.map((t) => t.email),
+          `/liturgical-selections/${id}`,
+        ),
+      );
+    }
+
+    const shared = memberTargets.length + inviteTargets.length;
+
     // Record an activity for the sharer.
     createActivity({
       targetUsers: [session.user.id],
       event: "selection.shared_by_self",
       entityId: id,
-      metadata: { title: selection.title, count: targets.length },
+      metadata: { title: selection.title, count: shared },
       actorId: session.user.id,
     });
 
@@ -245,7 +296,7 @@ export async function shareSelection(input: ShareInput) {
         targetUsers: [selection.createdById],
         event: "selection.shared_by_other",
         entityId: id,
-        metadata: { title: selection.title, actorName: actor, count: targets.length },
+        metadata: { title: selection.title, actorName: actor, count: shared },
         actorId: session.user.id,
       });
     }
@@ -253,7 +304,7 @@ export async function shareSelection(input: ShareInput) {
     revalidatePath(`/liturgical-selections/${id}`);
     revalidatePath("/dashboard");
 
-    return { shared: targets.length };
+    return { shared };
   } catch (error: any) {
     console.error("Error sharing selection:", error);
     throw new Error(error?.message || "Error sharing selection");
@@ -356,6 +407,73 @@ export async function removeSelectionAccess(input: RemoveAccessInput) {
   }
 }
 
+export async function getSelectionInvitations(
+  id: string,
+): Promise<PendingInvite[]> {
+  const session = await auth();
+  if (!session?.user?.id) return [];
+
+  // Pending invites expose email addresses — only managers may read them.
+  const access = await getSelectionAccess(id, session.user.id);
+  if (!can(access, Permission.Manage)) return [];
+
+  const meta = await findSelectionMeta(id);
+  if (!meta) return [];
+
+  return await listInvitations(meta.groupId);
+}
+
+export async function revokeSelectionInvitation(input: {
+  id: string;
+  invitationId: string;
+}) {
+  try {
+    const session = await auth();
+    if (!session?.user?.id) throw new Error("You're not signed in.");
+
+    const access = await getSelectionAccess(input.id, session.user.id);
+    if (!can(access, Permission.Manage)) {
+      throw new Error("You don't have permission to manage this selection.");
+    }
+
+    const meta = await findSelectionMeta(input.id);
+    if (!meta) throw new Error("Selection not found.");
+
+    await deleteInvitation(meta.groupId, input.invitationId);
+
+    revalidatePath(`/liturgical-selections/${input.id}`);
+  } catch (error: any) {
+    console.error("Error revoking selection invitation:", error);
+    throw new Error(error?.message || "Error revoking invitation");
+  }
+}
+
+export async function resendSelectionInvitation(input: {
+  id: string;
+  invitationId: string;
+}) {
+  try {
+    const session = await auth();
+    if (!session?.user?.id) throw new Error("You're not signed in.");
+
+    const access = await getSelectionAccess(input.id, session.user.id);
+    if (!can(access, Permission.Manage)) {
+      throw new Error("You don't have permission to manage this selection.");
+    }
+
+    const meta = await findSelectionMeta(input.id);
+    if (!meta) throw new Error("Selection not found.");
+
+    const invite = await findInvitation(meta.groupId, input.invitationId);
+    if (!invite) throw new Error("Invitation not found.");
+
+    await sendInviteMagicLinks([invite.email], `/liturgical-selections/${input.id}`);
+  } catch (error: any) {
+    console.error("Error resending selection invitation:", error);
+    throw new Error(error?.message || "Error resending invitation");
+  }
+}
+
 export async function getSelectionCollaborators(id: string) {
   const session = await auth();
   if (!session?.user?.id) return [];
@@ -374,7 +492,7 @@ export async function shareDraft(input: ShareInput) {
     const parsed = shareSchema.safeParse(input);
     if (!parsed.success) throw new Error(getFieldError(parsed.error.issues));
 
-    const { id, recipients, message } = parsed.data;
+    const { id, userRecipients, inviteRecipients, message } = parsed.data;
 
     const access = await getDraftAccess(id, session.user.id);
     if (!can(access, Permission.Manage)) {
@@ -390,15 +508,21 @@ export async function shareDraft(input: ShareInput) {
     }
     const title = draft.title || "Untitled draft";
 
-    const targets = recipients.filter(
-      (r) => r.userId !== draft.createdById && r.userId !== session.user!.id,
-    );
-    if (targets.length === 0) {
+    // Invited emails that already have an account become direct members. Owner
+    // and self are never (re)added; dedupe by user (explicit picks win on role).
+    const { promoted, invites: inviteTargets } = await splitInvites(inviteRecipients);
+    const exclude = new Set([draft.createdById, session.user.id]);
+    const byUser = new Map<string, ShareableRole>();
+    for (const r of [...promoted, ...userRecipients]) {
+      if (!exclude.has(r.userId)) byUser.set(r.userId, r.role);
+    }
+    const memberTargets = [...byUser].map(([userId, role]) => ({ userId, role }));
+    if (memberTargets.length === 0 && inviteTargets.length === 0) {
       throw new Error("Add at least one person to share with.");
     }
 
     await Promise.all(
-      targets.map((t) =>
+      memberTargets.map((t) =>
         upsertGroupMember({
           groupId: draft.groupId,
           userId: t.userId,
@@ -409,7 +533,7 @@ export async function shareDraft(input: ShareInput) {
     );
 
     const actor = actorName(session.user);
-    targets.forEach((t) =>
+    memberTargets.forEach((t) =>
       createActivity({
         targetUsers: [t.userId],
         event: "draft.shared_with_other",
@@ -423,11 +547,28 @@ export async function shareDraft(input: ShareInput) {
         actorId: session.user!.id,
       }),
     );
+
+    if (inviteTargets.length > 0) {
+      await createInvitations({
+        groupId: draft.groupId,
+        invitedById: session.user.id,
+        recipients: inviteTargets,
+      });
+      after(() =>
+        sendInviteMagicLinks(
+          inviteTargets.map((t) => t.email),
+          `/liturgical-selections/new/${id}`,
+        ),
+      );
+    }
+
+    const shared = memberTargets.length + inviteTargets.length;
+
     createActivity({
       targetUsers: [session.user.id],
       event: "draft.shared_by_self",
       entityId: id,
-      metadata: { title, count: targets.length },
+      metadata: { title, count: shared },
       actorId: session.user.id,
     });
     if (session.user.id !== draft.createdById) {
@@ -435,7 +576,7 @@ export async function shareDraft(input: ShareInput) {
         targetUsers: [draft.createdById],
         event: "draft.shared_by_other",
         entityId: id,
-        metadata: { title, actorName: actor, count: targets.length },
+        metadata: { title, actorName: actor, count: shared },
         actorId: session.user.id,
       });
     }
@@ -443,7 +584,7 @@ export async function shareDraft(input: ShareInput) {
     revalidatePath(`/liturgical-selections/new/${id}`);
     revalidatePath("/dashboard");
 
-    return { shared: targets.length };
+    return { shared };
   } catch (error: any) {
     console.error("Error sharing draft:", error);
     throw new Error(error?.message || "Error sharing draft");
@@ -542,6 +683,70 @@ export async function removeDraftAccess(input: RemoveAccessInput) {
   } catch (error: any) {
     console.error("Error removing draft access:", error);
     throw new Error(error?.message || "Error removing collaborator");
+  }
+}
+
+export async function getDraftInvitations(id: string): Promise<PendingInvite[]> {
+  const session = await auth();
+  if (!session?.user?.id) return [];
+
+  const access = await getDraftAccess(id, session.user.id);
+  if (!can(access, Permission.Manage)) return [];
+
+  const meta = await findDraftMeta(id);
+  if (!meta) return [];
+
+  return await listInvitations(meta.groupId);
+}
+
+export async function revokeDraftInvitation(input: {
+  id: string;
+  invitationId: string;
+}) {
+  try {
+    const session = await auth();
+    if (!session?.user?.id) throw new Error("You're not signed in.");
+
+    const access = await getDraftAccess(input.id, session.user.id);
+    if (!can(access, Permission.Manage)) {
+      throw new Error("You don't have permission to manage this draft.");
+    }
+
+    const meta = await findDraftMeta(input.id);
+    if (!meta) throw new Error("Draft not found.");
+
+    await deleteInvitation(meta.groupId, input.invitationId);
+
+    revalidatePath(`/liturgical-selections/new/${input.id}`);
+  } catch (error: any) {
+    console.error("Error revoking draft invitation:", error);
+    throw new Error(error?.message || "Error revoking invitation");
+  }
+}
+
+export async function resendDraftInvitation(input: {
+  id: string;
+  invitationId: string;
+}) {
+  try {
+    const session = await auth();
+    if (!session?.user?.id) throw new Error("You're not signed in.");
+
+    const access = await getDraftAccess(input.id, session.user.id);
+    if (!can(access, Permission.Manage)) {
+      throw new Error("You don't have permission to manage this draft.");
+    }
+
+    const meta = await findDraftMeta(input.id);
+    if (!meta) throw new Error("Draft not found.");
+
+    const invite = await findInvitation(meta.groupId, input.invitationId);
+    if (!invite) throw new Error("Invitation not found.");
+
+    await sendInviteMagicLinks([invite.email], `/liturgical-selections/new/${input.id}`);
+  } catch (error: any) {
+    console.error("Error resending draft invitation:", error);
+    throw new Error(error?.message || "Error resending invitation");
   }
 }
 

@@ -7,7 +7,7 @@ import {
 
 import BackButton from "@/components/common/back-button";
 import { Params } from "@/types/utils";
-import { SelectionCollaboratorsManager } from "@/components/app/collaboration/selection-collaboration";
+import { SelectionCollaboratorsManager } from "@/components/app/collaboration/selection-collaborators-manager";
 import { getSelectionById } from "@/lib/actions/mass-selections";
 import { requireAuth } from "@/lib/auth";
 

@@ -1,6 +1,5 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useState, useTransition } from "react";
 
 import type { AccessPerson } from "@/lib/collaboration-utils";
@@ -13,7 +12,7 @@ import { RoleSelect } from "./role-select";
 import type { ShareableRole } from "@/types/schemas/collaboration";
 import { withToast } from "@/lib/with-toast";
 
-function PersonRow({
+export default function PersonRow({
   person,
   id,
   entityLabel,
@@ -105,52 +104,5 @@ function PersonRow({
         </span>
       )}
     </div>
-  );
-}
-
-/** The "People with access" card: owner + collaborators (or group members). */
-export function AccessPeopleList({
-  people,
-  id,
-  entityLabel,
-  canManage,
-  usingGroup,
-  groupName,
-  changeRole,
-  remove,
-  onChanged,
-}: Readonly<{
-  people: AccessPerson[];
-  id: string;
-  entityLabel: "selection" | "draft";
-  canManage: boolean;
-  usingGroup: boolean;
-  groupName: string | null;
-  changeRole: CollaboratorsActions["changeRole"];
-  remove: CollaboratorsActions["remove"];
-  onChanged: () => void;
-}>) {
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-lg">People with access</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-1">
-        {people.map((person) => (
-          <PersonRow
-            key={person.id}
-            person={person}
-            id={id}
-            entityLabel={entityLabel}
-            editable={canManage && !person.isOwner && !usingGroup}
-            usingGroup={usingGroup}
-            groupName={groupName}
-            changeRole={changeRole}
-            remove={remove}
-            onChanged={onChanged}
-          />
-        ))}
-      </CardContent>
-    </Card>
   );
 }
