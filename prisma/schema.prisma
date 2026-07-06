@@ -37,6 +37,7 @@ model User {
   ownedCollaboratorGroups      CollaboratorGroup[]           @relation("OwnedCollaboratorGroups")
   collaboratorGroupMemberships CollaboratorGroupMember[]
   sentGroupInvitations         CollaboratorGroupInvitation[] @relation("SentGroupInvitations")
+  comments                     Comment[]
 }
 
 model Account {
@@ -118,6 +119,7 @@ model MassSelection {
   parishLocation   Location?         @relation(fields: [parishLocationId], references: [id], onDelete: SetNull)
   groupId          String
   group            CollaboratorGroup @relation(fields: [groupId], references: [id], onDelete: NoAction)
+  comments         Comment[]
 
   @@index([createdById])
   @@index([isPublic])
@@ -186,6 +188,7 @@ model MassSelectionDraft {
   parishLocation   Json?
   groupId          String
   group            CollaboratorGroup @relation(fields: [groupId], references: [id], onDelete: NoAction)
+  comments         Comment[]
 
   @@index([createdById])
   @@index([groupId])
@@ -245,6 +248,37 @@ model CollaboratorGroupInvitation {
   @@unique([groupId, email])
   @@index([email])
   @@index([groupId])
+}
+
+/// An INTERNAL collaborator comment on a selection or draft (exactly one of the
+/// two). One level of threading: a reply sets `parentId`; replies to replies
+/// re-parent to the top comment in the action. Soft-deleted (`deletedAt`) so a
+/// removed parent keeps its thread shape. `resolvedAt` marks a thread done.
+model Comment {
+  id               String              @id @default(cuid())
+  selectionId      String?
+  selection        MassSelection?      @relation(fields: [selectionId], references: [id], onDelete: Cascade)
+  draftId          String?
+  draft            MassSelectionDraft? @relation(fields: [draftId], references: [id], onDelete: Cascade)
+  authorId         String
+  author           User                @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  body             String
+  mentionedUserIds String[]
+  parentId         String?
+  parent           Comment?            @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies          Comment[]           @relation("CommentReplies")
+  editedAt         DateTime?
+  deletedAt        DateTime?
+  deletedById      String?
+  resolvedAt       DateTime?
+  resolvedById     String?
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+
+  @@index([selectionId, createdAt])
+  @@index([draftId, createdAt])
+  @@index([parentId])
+  @@index([authorId])
 }
 
 model Activity {
