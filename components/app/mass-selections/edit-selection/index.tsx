@@ -18,7 +18,6 @@ import {
   LiturgicalSeason,
   LiturgicalYear,
   MassSelectionWithParts,
-  NewMassSelection,
 } from "@/types/models";
 import { Save } from "lucide-react";
 import {
@@ -58,7 +57,7 @@ import { Input } from "@/components/ui/input";
 import LocationSelector from "@/components/common/location-selector";
 import MultipleSelector from "@/components/common/multiple-selector";
 import { Switch } from "@/components/ui/switch";
-import { createMassSelectionSchema } from "@/types/schemas/mass-selections";
+import { createMassSelectionSchema, NewMassSelection } from "@/types/schemas/mass-selections";
 import { useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { withToast } from "@/lib/with-toast";

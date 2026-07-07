@@ -1,13 +1,16 @@
 "use client";
 
 import {
+  DraftMassSelection,
+  NewMassSelection,
+} from "@/types/schemas/mass-selections";
+import {
   FormControl,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { KeySignature, NewMassSelection } from "@/types/models";
 import {
   Select,
   SelectContent,
@@ -17,8 +20,8 @@ import {
 } from "@/components/ui/select";
 
 import AppSelect from "@/components/common/app-select";
-import { DraftMassSelection } from "@/types/schemas/mass-selections";
 import { Input } from "@/components/ui/input";
+import { KeySignature } from "@/types/models";
 import { SelectOption } from "@/types/components/select";
 import { Textarea } from "@/components/ui/textarea";
 import { getEnumByKey } from "@/lib/utils";

@@ -1,10 +1,10 @@
 import "server-only";
 
+import { DraftMassSelection, NewMassSelection } from "@/types/schemas/mass-selections";
 import {
   KeySignature,
   LiturgicalSeason,
   LiturgicalYear,
-  NewMassSelection,
 } from "@/types/models";
 import {
   createNewDraft,
@@ -24,7 +24,6 @@ import {
   updateSelection,
 } from "@/lib/actions/mass-selections";
 
-import { DraftMassSelection } from "@/types/schemas/mass-selections";
 import { SortBy } from "@/types/utils";
 import { getLiturgicalDay } from "@/lib/liturgy/calendar";
 import { liturgyTemplates } from "@/lib/constants";
