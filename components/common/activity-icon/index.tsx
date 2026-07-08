@@ -1,8 +1,10 @@
 import {
   Activity,
+  AtSign,
   BookOpen,
   LogOut,
   Megaphone,
+  MessageSquare,
   User,
   UserCog2,
   UserMinus2,
@@ -17,6 +19,14 @@ export default function ActivityIcon({
   event,
   className,
 }: Readonly<{ event: string; className?: string }>) {
+  if (event.endsWith(".comment_mention")) {
+    return <AtSign className={className} />;
+  }
+
+  if (event.endsWith(".commented")) {
+    return <MessageSquare className={className} />;
+  }
+
   if (event.startsWith("selection.")) {
     return <BookOpen className={className} />;
   }

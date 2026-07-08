@@ -236,6 +236,43 @@ export type GroupContext = {
     attachableGroups: AttachableGroup[];
 };
 
+export type Comment = Prisma.CommentGetPayload<{
+    include: {
+        author: {
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                image: true,
+            }
+        }
+        replies: {
+            include: {
+                author: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                        image: true,
+                    }
+                }
+            }
+        }
+    }
+}>;
+
+export type CommentView = {
+    id: string;
+    body: string | null;
+    author: { id: string; name: string | null; email: string; image: string | null } | null;
+    createdAt: Date;
+    editedAt: Date | null;
+    resolved: boolean;
+    deleted: boolean;
+    parentId: string | null;
+    replies: CommentView[];
+};
+
 export type Json = Prisma.JsonValue;
 
 export { KeySignature, LiturgicalSeason, LiturgicalYear, UserRole, NotificationStatus, CollaboratorRole } from "@/lib/generated/prisma/enums";
