@@ -236,3 +236,12 @@
     max-width: 1400px;
   }
 }
+
+/* TipTap comment editor: show the placeholder on the empty first paragraph. */
+.tiptap p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  color: var(--muted-foreground);
+  pointer-events: none;
+  height: 0;
+  float: left;
+}

@@ -20,10 +20,10 @@ function targetWhere(target: CommentTarget): Prisma.CommentWhereInput {
 export async function listComments(target: CommentTarget) {
   return prisma.comment.findMany({
     where: { ...targetWhere(target), parentId: null },
-    orderBy: { createdAt: "asc" },
+    orderBy: { createdAt: "desc" },
     include: {
       author,
-      replies: { orderBy: { createdAt: "asc" }, include: { author } },
+      replies: { orderBy: { createdAt: "desc" }, include: { author } },
     },
   });
 }
