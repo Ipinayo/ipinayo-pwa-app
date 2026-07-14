@@ -1,9 +1,15 @@
 import { MassSelectionFilter, SortBy, SortOrder } from "@/types/utils";
-import { MassSelectionStats, NewMassSelection, NewMassSelectionPart } from "@/types/models";
 import { Prisma, UserRole } from "@/lib/generated/prisma/client";
 import { capitalize, getCurrentWeekRange } from "@/lib/utils";
 
+import { MassSelectionStats } from "@/types/models";
+import { NewMassSelection } from "@/types/schemas/mass-selections";
 import prisma from "@/lib/prisma";
+
+type NewMassSelectionPart = Omit<Prisma.MassPartCreateInput, 'id' | 'massSelection' | 'order'> & {
+    id: string
+    order: number
+};
 
 export async function findSelectionWithParts(id: string) {
     return await prisma.massSelection.findUnique({
@@ -384,6 +390,7 @@ export async function updateSelection(
     selection: Partial<NewMassSelection>,
     id: string,
 ) {
+
     const { parts, date, themes, parishLocation, ...rest } = selection
 
     // Recompute featured status. It's sticky: once featured it stays featured

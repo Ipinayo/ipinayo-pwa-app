@@ -482,6 +482,26 @@ export const userNotificationEvents: Partial<Record<keyof ActivityEventMap, { la
         description: "These are notifications for when your access to a  draft is removed",
         default: { inApp: true, email: false, push: true },
     },
+    "selection.commented": {
+        label: "New Comment",
+        description: "These are notifications for new comments on selections you collaborate on",
+        default: { inApp: true, email: false, push: true },
+    },
+    "draft.commented": {
+        label: "New Draft Comment",
+        description: "These are notifications for new comments on drafts you collaborate on",
+        default: { inApp: true, email: false, push: true },
+    },
+    "selection.comment_mention": {
+        label: "Mentioned in a Comment",
+        description: "These are notifications for when someone mentions you in a comment",
+        default: { inApp: true, email: false, push: true },
+    },
+    "draft.comment_mention": {
+        label: "Mentioned in a Draft Comment",
+        description: "These are notifications for when someone mentions you in a draft comment",
+        default: { inApp: true, email: false, push: true },
+    },
     "draft.shared_with_other": {
         label: "Draft Shared With You",
         description: "These are notifications for when someone shares a draft with you",
@@ -593,7 +613,7 @@ export const ROLE_OPTIONS: {
 }[] = [
         { value: "MANAGER", label: "Manager", description: "Can edit and manage sharing" },
         { value: "EDITOR", label: "Editor", description: "Can view and make changes" },
-        // { value: "COMMENTER", label: "Commenter", description: "Can view and comment" },
+        { value: "COMMENTER", label: "Commenter", description: "Can view and comment" },
         { value: "VIEWER", label: "Viewer", description: "Can view only" },
     ];
 
@@ -601,6 +621,6 @@ export const ROLE_LABEL: Record<string, string> = {
     OWNER: "Owner",
     MANAGER: "Manager",
     EDITOR: "Editor",
-    // COMMENTER: "Commenter",
+    COMMENTER: "Commenter",
     VIEWER: "Viewer",
 };

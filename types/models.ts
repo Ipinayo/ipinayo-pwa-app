@@ -27,21 +27,9 @@ export type MassSelectionWithParts = Prisma.MassSelectionGetPayload<{
 
 export type MassPart = Prisma.MassPartGetPayload<{}>;
 
-export type NewMassSelectionPart = Omit<Prisma.MassPartCreateInput, 'id' | 'massSelection' | 'order'> & {
-    id: string
-    order: number
-};
-
 export type NewLocation = Omit<Prisma.LocationCreateInput, 'id' | 'massSelections' | 'userProfiles' | 'createdAt' | 'updatedAt' | 'country'> & {
     id?: string
     country?: string
-};
-
-export type NewMassSelection = Omit<Prisma.MassSelectionCreateInput, 'id' | 'createdAt' | 'updatedAt' | 'createdBy' | 'group' | 'groupId' | 'isFeatured' | 'themes' | 'parishLocation' | 'date'> & {
-    date: Date
-    themes: string[]
-    parts: NewMassSelectionPart[]
-    parishLocation?: NewLocation | null
 };
 
 export type MassSelection = Prisma.MassSelectionGetPayload<{
@@ -246,6 +234,43 @@ export type GroupContext = {
     /** The entity's current group. `name === null` means ad-hoc (direct sharing). */
     group: { id: string; name: string | null };
     attachableGroups: AttachableGroup[];
+};
+
+export type Comment = Prisma.CommentGetPayload<{
+    include: {
+        author: {
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                image: true,
+            },
+        },
+        replies: {
+            include: {
+                author: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                        image: true,
+                    }
+                }
+            }
+        }
+    }
+}>;
+
+export type CommentView = {
+    id: string;
+    body: string | null;
+    author: { id: string; name: string | null; email: string; image: string | null } | null;
+    createdAt: Date;
+    editedAt: Date | null;
+    resolved: boolean;
+    deleted: boolean;
+    parentId: string | null;
+    replies: CommentView[];
 };
 
 export type Json = Prisma.JsonValue;
