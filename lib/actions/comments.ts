@@ -1,6 +1,10 @@
 "use server";
 
 import {
+  COMMENT_MAX,
+  COMMENT_MIN,
+  COMMENT_TOO_LONG,
+  COMMENT_TOO_SHORT,
   CommentEntity,
   CreateCommentInput,
   DeleteCommentInput,
@@ -11,6 +15,7 @@ import {
   editCommentSchema,
   resolveCommentSchema,
 } from "@/types/schemas/comment";
+import { htmlTextLength, sanitizeCommentHtml } from "@/lib/sanitize";
 import { Permission, can } from "@/lib/collaboration-utils";
 import {
   type CommentTarget,
@@ -168,7 +173,13 @@ export async function createComment(input: CreateCommentInput) {
     const parsed = createCommentSchema.safeParse(input);
     if (!parsed.success) throw new Error(getFieldError(parsed.error.issues));
 
-    const { entity, entityId, body, parentId, mentionedUserIds } = parsed.data;
+    const { entity, entityId, parentId, mentionedUserIds } = parsed.data;
+
+    // Sanitize the rich-text HTML at the boundary, then validate visible length.
+    const body = sanitizeCommentHtml(parsed.data.body);
+    const len = htmlTextLength(body);
+    if (len < COMMENT_MIN) throw new Error(COMMENT_TOO_SHORT);
+    if (len > COMMENT_MAX) throw new Error(COMMENT_TOO_LONG);
 
     const access = await entityAccess(entity, entityId, session.user.id);
     if (!can(access, Permission.Comment)) {
@@ -266,12 +277,17 @@ export async function editComment(input: EditCommentInput) {
       throw new Error("You don't have permission to comment here.");
     }
 
+    const body = sanitizeCommentHtml(parsed.data.body);
+    const len = htmlTextLength(body);
+    if (len < COMMENT_MIN) throw new Error(COMMENT_TOO_SHORT);
+    if (len > COMMENT_MAX) throw new Error(COMMENT_TOO_LONG);
+
     const accessIds = await entityAccessIds(target.entity, target.entityId);
     const mentions = [...new Set(parsed.data.mentionedUserIds)].filter(
       (uid) => accessIds.has(uid) && uid !== session.user!.id,
     );
 
-    await editCommentDb(parsed.data.commentId, parsed.data.body, mentions);
+    await editCommentDb(parsed.data.commentId, body, mentions);
     revalidateEntity(target.entity, target.entityId);
   } catch (error: any) {
     console.error("Error editing comment:", error);

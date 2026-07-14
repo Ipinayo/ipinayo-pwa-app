@@ -1,7 +1,7 @@
 "use client";
 
 import { CheckCircle2 } from "lucide-react";
-import { CommentComposer, mentionLabel } from "./comment-composer";
+import { CommentComposer } from "./comment-composer";
 import type { AccessPerson } from "@/lib/collaboration-utils";
 import type { CommentEntity } from "@/types/schemas/comment";
 import type { CommentView } from "@/types/models";
@@ -11,45 +11,13 @@ import {
   editComment,
   resolveComment,
 } from "@/lib/actions/comments";
-import { type ReactNode, useState, useTransition } from "react";
+import { useState, useTransition } from "react";
 
 import { Button } from "@/components/ui/button";
 import { ConfirmPopover } from "@/components/common/confirm-popover";
 import UserAvatar from "@/components/common/user-avatar";
 import { cn, formatDate } from "@/lib/utils";
 import { withToast } from "@/lib/with-toast";
-
-const escapeRegExp = (s: string) =>
-  s.replace(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`);
-
-/** Render body text with `@Name` mentions highlighted (longest labels first so
- *  a name that's a prefix of another doesn't win). */
-function renderBody(body: string, mentionables: AccessPerson[]): ReactNode {
-  const labels = mentionables
-    .map(mentionLabel)
-    .filter(Boolean)
-    .sort((a, b) => b.length - a.length);
-  if (labels.length === 0) return body;
-
-  const pattern = new RegExp(`@(?:${labels.map(escapeRegExp).join("|")})`, "g");
-  const nodes: ReactNode[] = [];
-  let last = 0;
-  let match: RegExpExecArray | null;
-  while ((match = pattern.exec(body)) !== null) {
-    if (match.index > last) nodes.push(body.slice(last, match.index));
-    nodes.push(
-      <span
-        key={match.index}
-        className="text-primary bg-primary/10 rounded px-1 font-medium"
-      >
-        {match[0]}
-      </span>,
-    );
-    last = match.index + match[0].length;
-  }
-  if (last < body.length) nodes.push(body.slice(last));
-  return nodes;
-}
 
 export function CommentItem({
   comment,
@@ -182,9 +150,11 @@ export function CommentItem({
                 />
               </div>
             ) : (
-              <p className="mt-0.5 text-sm wrap-break-word whitespace-pre-wrap">
-                {renderBody(comment.body ?? "", mentionables)}
-              </p>
+              // Body is sanitized server-side on write, so rendering is safe.
+              <div
+                className="comment-body mt-0.5 text-sm wrap-break-word"
+                dangerouslySetInnerHTML={{ __html: comment.body ?? "" }}
+              />
             )}
 
             {!editing && (

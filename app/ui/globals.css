@@ -245,3 +245,25 @@
   height: 0;
   float: left;
 }
+
+/* Mention chip — matches the composer's live chip, styled by data-attr so the
+   sanitized HTML needn't carry a class. Applies in the editor and in display. */
+.tiptap span[data-type="mention"],
+.comment-body span[data-type="mention"] {
+  color: var(--primary);
+  background-color: color-mix(in oklab, var(--primary) 10%, transparent);
+  border-radius: 0.25rem;
+  padding-inline: 0.25rem;
+  font-weight: 500;
+}
+
+/* Rendered comment body (sanitized rich text). */
+.comment-body p {
+  margin: 0;
+}
+.comment-body p + p {
+  margin-top: 0.5rem;
+}
+.comment-body u {
+  text-decoration: underline;
+}

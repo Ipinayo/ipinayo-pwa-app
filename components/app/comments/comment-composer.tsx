@@ -1,69 +1,42 @@
 "use client";
 
+import { Bold, Italic, Loader2, Underline } from "lucide-react";
+import {
+  COMMENT_MAX,
+  COMMENT_MIN,
+  COMMENT_TOO_LONG,
+  COMMENT_TOO_SHORT,
+} from "@/types/schemas/comment";
 import { EditorContent, useEditor } from "@tiptap/react";
-import { useMemo, useRef, useState } from "react";
+import { useRef, useState } from "react";
 
 import { AccessPerson } from "@/lib/collaboration-utils";
+import { Bold as BoldMark } from "@tiptap/extension-bold";
 import { Button } from "@/components/ui/button";
 import { Document } from "@tiptap/extension-document";
 import { History } from "@tiptap/extension-history";
-import { Loader2 } from "lucide-react";
+import { Italic as ItalicMark } from "@tiptap/extension-italic";
 import { Mention } from "@tiptap/extension-mention";
 import { Paragraph } from "@tiptap/extension-paragraph";
 import { Placeholder } from "@tiptap/extension-placeholder";
 import { Text } from "@tiptap/extension-text";
+import { Underline as UnderlineMark } from "@tiptap/extension-underline";
 import UserAvatar from "@/components/common/user-avatar";
 import { cn } from "@/lib/utils";
 
-export const mentionLabel = (m: AccessPerson) => m.name || m.email.split("@")[0];
+export const mentionLabel = (m: AccessPerson) =>
+  m.name || m.email.split("@")[0];
 
 /** Chip styling — identical to the rendered-comment mention highlight. */
 const CHIP_CLASS = "text-primary bg-primary/10 rounded px-1 font-medium";
 
-const escapeHtml = (s: string) =>
-  s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-
-const escapeRegExp = (s: string) =>
-  s.replace(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`);
-
-/** Build TipTap-parseable HTML from a stored `@Label` body (for edit mode) —
- *  mentions become `<span data-type="mention">` nodes, the rest stays text. */
-function bodyToHtml(body: string, mentionables: AccessPerson[]) {
-  const labels = mentionables
-    .map((m) => ({ id: m.id, label: mentionLabel(m) }))
-    .filter((l) => l.label)
-    .sort((a, b) => b.label.length - a.label.length);
-  if (!body) return "";
-  if (labels.length === 0) return `<p>${escapeHtml(body)}</p>`;
-
-  const byLabel = new Map(labels.map((l) => [l.label, l.id]));
-  const pattern = new RegExp(
-    `@(?:${labels.map((l) => escapeRegExp(l.label)).join("|")})`,
-    "g",
-  );
-  let html = "";
-  let last = 0;
-  let m: RegExpExecArray | null;
-  while ((m = pattern.exec(body)) !== null) {
-    if (m.index > last) html += escapeHtml(body.slice(last, m.index));
-    const label = m[0].slice(1);
-    const id = byLabel.get(label);
-    html += id
-      ? `<span data-type="mention" data-id="${id}" data-label="${escapeHtml(label)}"></span>`
-      : escapeHtml(m[0]);
-    last = m.index + m[0].length;
-  }
-  if (last < body.length) html += escapeHtml(body.slice(last));
-  return `<p>${html}</p>`;
-}
-
 type Coords = { top: number; left: number };
 
 /**
- * Comment / reply / edit composer on TipTap. Typing `@` opens a collaborator
- * picker; a chosen mention is an atomic, styled node (one Backspace removes it).
- * On submit the doc serializes to plain text (`@Label`) with mention ids read
- * off the mention nodes — the server contract is unchanged.
+ * Comment / reply / edit composer on TipTap: bold/italic/underline + `@`
+ * mentions. `@` opens a collaborator picker; a chosen mention is an atomic,
+ * styled node. On submit the doc serializes to HTML (sanitized server-side) and
+ * mention ids are read off the nodes. Edit mode loads the stored HTML directly.
  */
 export function CommentComposer({
   mentionables,
@@ -85,13 +58,15 @@ export function CommentComposer({
   onCancel?: () => void;
 }>) {
   const [empty, setEmpty] = useState(!initialBody);
+  const [error, setError] = useState<string | null>(null);
+  // Bump on every transaction so the toolbar reflects the active marks.
+  const [_, setForce] = useState(0);
 
   // Suggestion popup state, driven by the mention extension's callbacks.
   const [items, setItems] = useState<AccessPerson[]>([]);
   const [coords, setCoords] = useState<Coords | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
 
-  // Refs the (once-created) suggestion handlers read without stale closures.
   const commandRef = useRef<
     ((attrs: { id: string; label: string }) => void) | null
   >(null);
@@ -110,29 +85,29 @@ export function CommentComposer({
     }
   };
 
-  const initialContent = useMemo(
-    () => bodyToHtml(initialBody, mentionables),
-    // Mount-only: a composer instance has a fixed initialBody.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
-  );
-
   const editor = useEditor({
     immediatelyRender: false, // required for SSR (Next)
     autofocus: autoFocus ? "end" : false,
-    content: initialContent,
+    content: initialBody,
     editorProps: {
       attributes: {
         class:
           "tiptap border-input focus-visible:border-ring focus-visible:ring-ring/50 max-h-40 min-h-[76px] w-full overflow-auto rounded-md border bg-transparent px-3 py-2 text-sm outline-none focus-visible:ring-[3px]",
       },
     },
-    onUpdate: ({ editor }) => setEmpty(editor.isEmpty),
+    onUpdate: ({ editor }) => {
+      setEmpty(editor.isEmpty);
+      setError(null);
+    },
+    onTransaction: () => setForce((n) => n + 1),
     extensions: [
       Document,
       Paragraph,
       Text,
       History,
+      BoldMark,
+      ItalicMark,
+      UnderlineMark,
       Placeholder.configure({ placeholder }),
       Mention.configure({
         HTMLAttributes: { class: CHIP_CLASS },
@@ -203,21 +178,55 @@ export function CommentComposer({
   });
 
   const submit = () => {
-    if (!editor || editor.isEmpty) return;
+    if (!editor) return;
     const text = editor.getText({ blockSeparator: "\n" }).trim();
-    if (!text) return;
+    if (!text) return setError("Write a comment.");
+    if (text.length < COMMENT_MIN) return setError(COMMENT_TOO_SHORT);
+    if (text.length > COMMENT_MAX) return setError(COMMENT_TOO_LONG);
+
     const ids = new Set<string>();
     editor.state.doc.descendants((node) => {
       if (node.type.name === "mention" && node.attrs.id) ids.add(node.attrs.id);
     });
-    onSubmit(text, [...ids]);
+    setError(null);
+    onSubmit(editor.getHTML(), [...ids]);
     editor.commands.clearContent();
     setEmpty(true);
   };
 
+  const mark = (name: "bold" | "italic" | "underline", toggle: () => void) => (
+    <Button
+      type="button"
+      variant="ghost"
+      size="icon"
+      className={cn("size-7", editor?.isActive(name) && "bg-muted")}
+      aria-pressed={editor?.isActive(name) ?? false}
+      aria-label={name}
+      onClick={toggle}
+    >
+      {name === "bold" ? (
+        <Bold className="size-3.5" />
+      ) : name === "italic" ? (
+        <Italic className="size-3.5" />
+      ) : (
+        <Underline className="size-3.5" />
+      )}
+    </Button>
+  );
+
   return (
     <div className="space-y-2">
+      <div className="flex items-center gap-0.5">
+        {mark("bold", () => editor?.chain().focus().toggleBold().run())}
+        {mark("italic", () => editor?.chain().focus().toggleItalic().run())}
+        {mark("underline", () =>
+          editor?.chain().focus().toggleUnderline().run(),
+        )}
+      </div>
+
       <EditorContent editor={editor} />
+
+      {error && <p className="text-destructive text-xs">{error}</p>}
 
       {items.length > 0 && coords && (
         <div
