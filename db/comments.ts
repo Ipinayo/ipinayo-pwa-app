@@ -4,8 +4,8 @@ import prisma from "@/lib/prisma";
 
 /** A comment always targets exactly one of a selection or a draft. */
 export type CommentTarget =
-  | { selectionId: string; draftId?: any }
-  | { draftId: string; selectionId?: any };
+  | { selectionId: string; draftId?: never }
+  | { draftId: string; selectionId?: never };
 
 const author = {
   select: { id: true, name: true, email: true, image: true },

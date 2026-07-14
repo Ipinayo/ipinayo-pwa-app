@@ -2,7 +2,8 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { createComment, getComments } from "@/lib/actions/comments";
-import { useState, useTransition } from "react";
+
+import { useState } from "react";
 
 import { AccessPerson } from "@/lib/collaboration-utils";
 import { CommentComposer } from "./comment-composer";
@@ -43,7 +44,6 @@ export function CommentsPanel({
 }>) {
   const router = useRouter();
   const [comments, setComments] = useState(initialComments);
-  const [pending, startTransition] = useTransition();
 
   const refresh = async () => {
     await getComments(entity, entityId)
@@ -52,20 +52,17 @@ export function CommentsPanel({
     router.refresh();
   };
 
-  const post = (body: string, mentionedIds: string[]) =>
-    startTransition(async () => {
-      const { error } = await withToast(
-        () =>
-          createComment({
-            entity,
-            entityId,
-            body,
-            mentionedUserIds: mentionedIds,
-          }),
-        { success: "Comment posted." },
-      );
-      if (!error) refresh();
-    });
+  // Returns success so the composer only clears the draft when the post lands.
+  const post = async (body: string, mentionedIds: string[]) => {
+    const { error } = await withToast(
+      () =>
+        createComment({ entity, entityId, body, mentionedUserIds: mentionedIds }),
+      { success: "Comment posted." },
+    );
+    if (error) return false;
+    await refresh();
+    return true;
+  };
 
   const count = liveCount(comments);
 
@@ -79,11 +76,7 @@ export function CommentsPanel({
       </CardHeader>
       <CardContent className="space-y-3">
         {canComment && (
-          <CommentComposer
-            mentionables={mentionables}
-            pending={pending}
-            onSubmit={post}
-          />
+          <CommentComposer mentionables={mentionables} onSubmit={post} />
         )}
 
         {comments.length === 0 ? (

@@ -50,41 +50,40 @@ export function CommentItem({
   const canDelete = !comment.deleted && (mine || canModerate);
   const canResolve = !isReply && !comment.deleted && (mine || canModerate);
 
-  const doEdit = (body: string, mentionedIds: string[]) =>
-    startTransition(async () => {
-      const { error } = await withToast(
-        () =>
-          editComment({
-            commentId: comment.id,
-            body,
-            mentionedUserIds: mentionedIds,
-          }),
-        { success: "Comment updated." },
-      );
-      if (!error) {
-        setEditing(false);
-        onChanged();
-      }
-    });
+  // Composer submits await these and clear only on success, so return a boolean.
+  const doEdit = async (body: string, mentionedIds: string[]) => {
+    const { error } = await withToast(
+      () =>
+        editComment({
+          commentId: comment.id,
+          body,
+          mentionedUserIds: mentionedIds,
+        }),
+      { success: "Comment updated." },
+    );
+    if (error) return false;
+    setEditing(false);
+    onChanged();
+    return true;
+  };
 
-  const doReply = (body: string, mentionedIds: string[]) =>
-    startTransition(async () => {
-      const { error } = await withToast(
-        () =>
-          createComment({
-            entity,
-            entityId,
-            body,
-            parentId: comment.id,
-            mentionedUserIds: mentionedIds,
-          }),
-        { success: "Reply posted." },
-      );
-      if (!error) {
-        setReplying(false);
-        onChanged();
-      }
-    });
+  const doReply = async (body: string, mentionedIds: string[]) => {
+    const { error } = await withToast(
+      () =>
+        createComment({
+          entity,
+          entityId,
+          body,
+          parentId: comment.id,
+          mentionedUserIds: mentionedIds,
+        }),
+      { success: "Reply posted." },
+    );
+    if (error) return false;
+    setReplying(false);
+    onChanged();
+    return true;
+  };
 
   const doDelete = () =>
     startTransition(async () => {

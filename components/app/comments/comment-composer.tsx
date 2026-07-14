@@ -49,16 +49,18 @@ export function CommentComposer({
   onCancel,
 }: Readonly<{
   mentionables: AccessPerson[];
-  pending: boolean;
+  pending?: boolean;
   submitLabel?: string;
   initialBody?: string;
   placeholder?: string;
   autoFocus?: boolean;
-  onSubmit: (body: string, mentionedIds: string[]) => void;
+  /** Resolve `true` on success so the composer clears; `false` keeps the draft. */
+  onSubmit: (body: string, mentionedIds: string[]) => Promise<boolean>;
   onCancel?: () => void;
 }>) {
   const [empty, setEmpty] = useState(!initialBody);
   const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
   // Bump on every transaction so the toolbar reflects the active marks.
   const [_, setForce] = useState(0);
 
@@ -177,8 +179,8 @@ export function CommentComposer({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   });
 
-  const submit = () => {
-    if (!editor) return;
+  const submit = async () => {
+    if (!editor || submitting) return;
     const text = editor.getText({ blockSeparator: "\n" }).trim();
     if (!text) return setError("Write a comment.");
     if (text.length < COMMENT_MIN) return setError(COMMENT_TOO_SHORT);
@@ -189,10 +191,20 @@ export function CommentComposer({
       if (node.type.name === "mention" && node.attrs.id) ids.add(node.attrs.id);
     });
     setError(null);
-    onSubmit(editor.getHTML(), [...ids]);
-    editor.commands.clearContent();
-    setEmpty(true);
+    setSubmitting(true);
+    try {
+      // Only clear on confirmed success — a failed action keeps the draft.
+      const ok = await onSubmit(editor.getHTML(), [...ids]);
+      if (ok) {
+        editor.commands.clearContent();
+        setEmpty(true);
+      }
+    } finally {
+      setSubmitting(false);
+    }
   };
+
+  const busy = pending || submitting;
 
   const mark = (name: "bold" | "italic" | "underline", toggle: () => void) => (
     <Button
@@ -268,7 +280,7 @@ export function CommentComposer({
             variant="ghost"
             size="sm"
             onClick={onCancel}
-            disabled={pending}
+            disabled={busy}
           >
             Cancel
           </Button>
@@ -277,9 +289,9 @@ export function CommentComposer({
           type="button"
           size="sm"
           onClick={submit}
-          disabled={pending || empty}
+          disabled={busy || empty}
         >
-          {pending ? <Loader2 className="size-4 animate-spin" /> : submitLabel}
+          {busy ? <Loader2 className="size-4 animate-spin" /> : submitLabel}
         </Button>
       </div>
     </div>

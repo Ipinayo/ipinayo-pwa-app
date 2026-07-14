@@ -316,13 +316,13 @@ export async function deleteComment(input: DeleteCommentInput) {
       throw new Error("You can't remove this comment.");
     }
 
-    const replies = await countCommentReplies(session.user.id);
-
+    // Tombstone if it has replies (keep the thread readable); hard-delete a leaf.
+    const replies = await countCommentReplies(parsed.data.commentId);
     if (replies > 0) {
       await softDeleteComment(parsed.data.commentId, session.user.id);
-    }
-    else
+    } else {
       await deleteCommentDb(parsed.data.commentId);
+    }
 
     revalidateEntity(target.entity, target.entityId);
   } catch (error: any) {
