@@ -58,7 +58,7 @@ const FAQS = [
   {
     question: "How do I create a selection?",
     answer:
-      "There are multiple ways to create a selection.  To manually add the song for each part, click “Create Manually” to begin, pick a template for a common liturgy or start from a blank template.  You can also clone an existing public selection and adjust it. Finally, you can click 'Create with Ìpínayò AI', describe the celebration and Ìpínayò AI will draft a full selection for you to refine.",
+      "There are multiple ways to create a selection.  To manually add the song for each part, click “Create Selection” to begin, pick a template for a common liturgy or start from a blank template.  You can also clone an existing public selection and adjust it. Finally, you can click 'Create with Ìpínayò AI', describe the celebration and Ìpínayò AI will draft a full selection for you to refine.",
   },
   {
     question: "Can Ìpínayò suggest the music for me?",

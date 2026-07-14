@@ -12,10 +12,10 @@ export default function CreateSelectionTrigger({
   return (
     <div className={cn("flex flex-wrap items-center gap-2", className)}>
       <AssistantTrigger />
-      <Button size="lg" variant="outline" className="gap-2" asChild>
+      <Button size="lg" className="gap-2" asChild>
         <Link href="/liturgical-selections/new">
           <Plus className="h-5 w-5" />
-          Create Manually
+          Create Selection
         </Link>
       </Button>
     </div>
