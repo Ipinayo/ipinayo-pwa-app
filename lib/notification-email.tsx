@@ -20,7 +20,7 @@ import { render } from "@react-email/render";
  * to many recipients reuses warm SMTP connections.
  */
 let transporter: Transporter | null = null;
-function getTransporter() {
+export function getNotificationTransporter() {
   if (transporter) return transporter;
 
   const port = Number(process.env.NOTIFICATION_EMAIL_SERVER_PORT);
@@ -354,7 +354,7 @@ export async function sendNotificationEmail<K extends keyof ActivityEventMap>(
     render(element, { plainText: true }),
   ]);
 
-  const result = await getTransporter().sendMail({
+  const result = await getNotificationTransporter().sendMail({
     to,
     from: process.env.NOTIFICATION_EMAIL_FROM,
     subject,
