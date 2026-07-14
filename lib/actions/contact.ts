@@ -45,6 +45,7 @@ export async function sendContactMessage(input: ContactInput) {
             message: parsed.data.message,
         });
     } catch (error: any) {
-        throw new Error("Could not send your message: " + error?.message);
+        console.error("Error sending contact message:", error);
+        throw new Error("Could not send your message. Please try again later.");
     }
 }
