@@ -137,6 +137,22 @@ export type ActivityEventMap = {
         };
     };
 
+    "selection.commented": {
+        entityType: "selection";
+        metadata: {
+            title: string;
+            actorName: string;
+        };
+    };
+
+    "selection.comment_mention": {
+        entityType: "selection";
+        metadata: {
+            title: string;
+            actorName: string;
+        };
+    };
+
     "selection.shared_by_other": {
         entityType: "selection";
         metadata: {
@@ -282,6 +298,22 @@ export type ActivityEventMap = {
     };
 
     "draft.access_revoked": {
+        entityType: "draft";
+        metadata: {
+            title: string;
+            actorName: string;
+        };
+    };
+
+    "draft.commented": {
+        entityType: "draft";
+        metadata: {
+            title: string;
+            actorName: string;
+        };
+    };
+
+    "draft.comment_mention": {
         entityType: "draft";
         metadata: {
             title: string;

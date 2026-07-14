@@ -1,3 +1,8 @@
+import {
+  CommentsError,
+  CommentsSection,
+  CommentsSkeleton,
+} from "@/components/app/comments/comments-section";
 import { Permission, can } from "@/lib/collaboration-utils";
 import { getAllPartNames, getThemes } from "@/lib/actions/mass-selections";
 import {
@@ -8,7 +13,9 @@ import {
 import { AccessAvatarGroup } from "@/components/app/collaboration/access-avatar-group";
 import BackButton from "@/components/common/back-button";
 import CreateForm from "@/components/app/draft-selections/create-form";
+import { ErrorBoundary } from "@/components/common/error-boundary";
 import { Params } from "@/types/utils";
+import { Suspense } from "react";
 import { getDraftById } from "@/lib/actions/draft";
 import { requireAuth } from "@/lib/auth";
 
@@ -72,6 +79,23 @@ export default async function CreateMassSelectionPage(props: {
         draftSelection={draft}
         canEdit={canEdit}
       />
+
+      {hasAccess && (
+        <div className="mt-10">
+          <ErrorBoundary fallback={<CommentsError />}>
+            <Suspense fallback={<CommentsSkeleton />}>
+              <CommentsSection
+                entity="draft"
+                entityId={draft.id}
+                viewerId={session.user.id}
+                canComment={can(access, Permission.Comment)}
+                canModerate={can(access, Permission.Manage)}
+                mentionables={accessPeople}
+              />
+            </Suspense>
+          </ErrorBoundary>
+        </div>
+      )}
     </div>
   );
 }

@@ -201,6 +201,10 @@ const TITLES: EventText = {
     "selection.updated_by_other": "A shared selection was updated",
     "selection.access_revoked": "Your access was removed",
     "draft.access_revoked": "Your access was removed",
+    "selection.commented": "New comment",
+    "draft.commented": "New comment",
+    "selection.comment_mention": "You were mentioned",
+    "draft.comment_mention": "You were mentioned",
     "draft.shared_with_other": "A draft was shared with you",
     "draft.shared_by_other": "Your draft was shared",
     "draft.shared_by_self": "Draft shared",
@@ -247,6 +251,10 @@ const MESSAGES: EventText = {
     "selection.updated_by_other": (m) => `${m.actorName} updated the selection "${m.title}".`,
     "selection.access_revoked": (m) => `${m.actorName} revoked your access to the selection "${m.title}".`,
     "draft.access_revoked": (m) => `${m.actorName} revoked your access to the draft "${m.title}".`,
+    "selection.commented": (m) => `${m.actorName} commented on "${m.title}".`,
+    "draft.commented": (m) => `${m.actorName} commented on the draft "${m.title}".`,
+    "selection.comment_mention": (m) => `${m.actorName} mentioned you in a comment on "${m.title}".`,
+    "draft.comment_mention": (m) => `${m.actorName} mentioned you in a comment on the draft "${m.title}".`,
     "draft.shared_with_other": (m) => `${m.actorName} invited you to the draft - "${m.title}" as ${roleArticle(m.role)}.`,
     "draft.shared_by_other": (m) => `${m.actorName} shared your selection draft "${m.title}" with ${m.count} ${m.count === 1 ? "person" : "people"}.`,
     "draft.shared_by_self": (m) => `You shared the draft "${m.title}" with ${m.count} ${m.count === 1 ? "person" : "people"}.`,
@@ -300,12 +308,16 @@ function getActionURL<K extends keyof ActivityEventMap>(
         case "selection.shared_by_other":
         case "selection.role_updated":
         case "selection.updated_by_other":
+        case "selection.commented":
+        case "selection.comment_mention":
             return `/liturgical-selections/${entityId}`;
 
         case "draft.shared_with_other":
         case "draft.shared_by_other":
         case "draft.role_updated":
         case "draft.updated_by_other":
+        case "draft.commented":
+        case "draft.comment_mention":
             return `/liturgical-selections/new/${entityId}`;
 
         case "collaboration.added_to_group":
@@ -348,6 +360,8 @@ function getPath<K extends keyof ActivityEventMap>(
         case "selection.shared_by_self":
         case "selection.role_updated":
         case "selection.updated_by_other":
+        case "selection.commented":
+        case "selection.comment_mention":
             return `/liturgical-selections/${entityId}`;
 
         case "selection.deleted_by_self":
@@ -363,6 +377,8 @@ function getPath<K extends keyof ActivityEventMap>(
         case "draft.shared_by_self":
         case "draft.role_updated":
         case "draft.updated_by_other":
+        case "draft.commented":
+        case "draft.comment_mention":
             return `/liturgical-selections/new/${entityId}`;
 
         case "draft.deleted_by_self":

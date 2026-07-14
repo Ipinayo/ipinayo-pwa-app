@@ -1,8 +1,8 @@
 'use server'
 
 import { MassSelectionFilter, SortBy, SortOrder } from "@/types/utils";
+import { NewMassSelection, createMassSelectionSchema, updateMassSelectionSchema } from "@/types/schemas/mass-selections";
 import { Permission, can } from "@/lib/collaboration-utils";
-import { createMassSelectionSchema, updateMassSelectionSchema } from "@/types/schemas/mass-selections";
 import {
     findAllPartNames,
     findAllSelections,
@@ -18,7 +18,6 @@ import {
 } from "@/db/mass-selections";
 import { getDraftAccess, getSelectionAccess } from "@/lib/actions/collaboration";
 
-import { NewMassSelection } from "@/types/models";
 import { auth } from "@/auth";
 import { createActivity } from "@/lib/notifications/dispatch";
 import { createDraft } from "@/db/draft";

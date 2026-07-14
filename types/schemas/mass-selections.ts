@@ -48,4 +48,5 @@ export const updateMassSelectionSchema = createMassSelectionSchema.partial().ext
 });
 
 
-export type DraftMassSelection = z.infer<typeof draftMassSelectionSchema>;
+export type DraftMassSelection = z.input<typeof draftMassSelectionSchema>;
+export type NewMassSelection = z.input<typeof createMassSelectionSchema>;

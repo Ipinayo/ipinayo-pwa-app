@@ -10,7 +10,7 @@ if (!connectionString) throw new Error('DATABASE_URL must be set to run prisma s
 const adapter = new PrismaPg({ connectionString })
 const prisma = new PrismaClient({ adapter })
 
-export type NewMassSelection = Omit<Prisma.MassSelectionCreateInput, 'id' | 'updatedAt' | 'createdBy' | 'group' | 'groupId' | 'isFeatured' | 'themes' | 'parishLocation'> & {
+export type NewMassSelection = Omit<Prisma.MassSelectionCreateInput, 'id' | 'updatedAt' | 'createdBy' | 'group' | 'groupId' | 'isFeatured' | 'themes' | 'parishLocation' | 'comments'> & {
     themes: string[]
     parts: Omit<Prisma.MassPartCreateInput, 'massSelection'>[]
     parishLocation?: Prisma.LocationCreateInput

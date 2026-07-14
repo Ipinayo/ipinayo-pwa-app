@@ -1,5 +1,10 @@
 import { Calendar, Globe, Lock, Music } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  CommentsError,
+  CommentsSection,
+  CommentsSkeleton,
+} from "@/components/app/comments/comments-section";
 import { Permission, can } from "@/lib/collaboration-utils";
 import {
   Table,
@@ -24,9 +29,11 @@ import { keySignatureItems, liturgicalSeasonItems } from "@/lib/constants";
 import { AccessAvatarGroup } from "@/components/app/collaboration/access-avatar-group";
 import BackButton from "@/components/common/back-button";
 import { Badge } from "@/components/ui/badge";
+import { ErrorBoundary } from "@/components/common/error-boundary";
 import FeaturedBadge from "@/components/app/mass-selections/featured-badge";
 import Options from "@/components/app/mass-selections/options";
 import { Params } from "@/types/utils";
+import { Suspense } from "react";
 import { auth } from "@/auth";
 import { getSelectionById } from "@/lib/actions/mass-selections";
 
@@ -272,6 +279,23 @@ export default async function LiturgicalSelectionPage(props: {
           </Card>
         </div>
       </div>
+
+      {hasAccess && session?.user?.id && (
+        <div className="mt-10">
+          <ErrorBoundary fallback={<CommentsError />}>
+            <Suspense fallback={<CommentsSkeleton />}>
+              <CommentsSection
+                entity="selection"
+                entityId={selection.id}
+                viewerId={session.user.id}
+                canComment={can(access, Permission.Comment)}
+                canModerate={can(access, Permission.Manage)}
+                mentionables={accessPeople}
+              />
+            </Suspense>
+          </ErrorBoundary>
+        </div>
+      )}
     </div>
   );
 }
