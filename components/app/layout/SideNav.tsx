@@ -1,3 +1,4 @@
+import ContactNavLink from "./ContactNavLink";
 import LazyThemeToggle from "./LazyThemeToggle";
 import NavLinks from "./NavLinks";
 import SignInOutToggle from "./SignInOutToggle";
@@ -22,8 +23,9 @@ export default function SideNav({
         )}
       >
         <NavLinks adminNav={adminNav} />
-        <div className="mt-auto px-3 py-4">
-          <LazyThemeToggle className="mb-2 w-full justify-start py-2" />
+        <div className="border-border mt-auto space-y-2 border-t px-3 py-4">
+          <ContactNavLink />
+          <LazyThemeToggle className="w-full justify-start py-2" />
           <SignInOutToggle />
         </div>
       </div>
@@ -40,10 +42,14 @@ export default function SideNav({
             collapsibleContentClassName="hidden group-hover:block"
           />
 
-          <div className="mt-auto px-3 py-4">
+          <div className="border-border mt-auto space-y-2 border-t px-3 py-4">
+            <ContactNavLink
+              iconClassName="min-w-4"
+              textClassName="opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+            />
             <div className="flex justify-center transition-all group-hover:justify-start">
               <LazyThemeToggle
-                className="mb-2 w-full justify-start py-2 group-hover:flex"
+                className="w-full justify-start py-2 group-hover:flex"
                 textClassName="hidden group-hover:inline"
               />
             </div>
