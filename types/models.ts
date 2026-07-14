@@ -244,8 +244,8 @@ export type Comment = Prisma.CommentGetPayload<{
                 name: true,
                 email: true,
                 image: true,
-            }
-        }
+            },
+        },
         replies: {
             include: {
                 author: {
