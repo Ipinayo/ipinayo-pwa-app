@@ -13,7 +13,11 @@ import { sendContactEmail } from "@/lib/contact-email";
 export async function sendContactMessage(input: ContactInput) {
     const session = await auth();
 
-    const parsed = contactSchema.safeParse(input);
+    const schemaToUse = session?.user?.id
+        ? contactSchema.pick({ subject: true, message: true })
+        : contactSchema;
+
+    const parsed = schemaToUse.safeParse(input);
     if (!parsed.success) {
         throw new Error(parsed.error.issues[0]?.message ?? "Invalid contact form.");
     }
